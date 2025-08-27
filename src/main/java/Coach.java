@@ -1,17 +1,19 @@
 import java.util.Scanner;
 
 public class Coach {
-
+    static String[] tasks = new String[100];
+    static int taskCount = 0;
 
     public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
+
         System.out.println("____________________________________________________________");
         System.out.println(" Hello! I'm Coach");
         System.out.println(" What can I do for you?");
         System.out.println("____________________________________________________________");
 
         while (true) {
-            String input = in.nextLine().trim();
+            String input = sc.nextLine().trim();
 
             if (input.equalsIgnoreCase("bye")) {
                 System.out.println("____________________________________________________________");
@@ -19,15 +21,25 @@ public class Coach {
                 System.out.println("____________________________________________________________");
                 break;
             }
-            else {
-
+            else if (input.equalsIgnoreCase("list")) {
                 System.out.println("____________________________________________________________");
-                System.out.println(input);
+                for (int i = 0; i < taskCount; i++) {
+                    System.out.println(" " + (i + 1) + ". " + tasks[i]);
+                }
+                if (taskCount == 0) {
+                    System.out.println(" No tasks yet!");
+                }
+                System.out.println("____________________________________________________________");
+            }
+            else {
+                tasks[taskCount] = input;
+                taskCount++;
+                System.out.println("____________________________________________________________");
+                System.out.println(" added: " + input);
                 System.out.println("____________________________________________________________");
             }
         }
-        in.close();
-
+        sc.close();
     }
 }
 
