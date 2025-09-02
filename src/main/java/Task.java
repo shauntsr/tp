@@ -42,6 +42,12 @@ public class Task {
         taskCount++;
         this.id = taskCount;
     }
+    public Task(String name) {
+        this.name = name;
+        this.isDone = false;
+        taskCount++;
+        this.id = taskCount;
+    }
 
     public String toString() {
         String mark = isDone ? "[X]" : "[ ]";

@@ -3,10 +3,6 @@ import java.util.Scanner;
 public class Coach {
     static Task[] tasks = new Task[100];
 
-    private static void printLine() {
-        System.out.println("____________________________________________________________");
-    }
-
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
@@ -35,18 +31,103 @@ public class Coach {
                 handleMark(inputs, false);
                 break;
 
+            case "todo":
+                handleToDo(input);
+                break;
+
+            case "deadline":
+                handleDeadline(input);
+                break;
+
+            case "event":
+                handleEvent(input);
+                break;
+
             default:
-                handleInput(input);
+                printLine();
+                System.out.println("Invalid command!");
+                printLine();
                 break;
             }
         }
     }
 
-    private static void handleInput(String input) {
-        tasks[Task.getTaskCount()] = new Task(input, false);
-        Task.incrementTaskCount();
+    private static void handleToDo(String input) {
         printLine();
-        System.out.println(" added: " + input);
+        String content = input.substring(4);
+        if (content.isEmpty())
+        {
+            printEmpty();
+            return;
+        }
+        else{
+            tasks[Task.getTaskCount()] = new ToDo(content);
+            Task.incrementTaskCount();
+            printAddTask();
+        }
+        printLine();
+    }
+
+    private static void handleDeadline(String input) {
+        printLine();
+        try {
+            String content = input.substring(9);
+            int byIndex = content.indexOf("/by ");
+            if (byIndex == -1) {
+                printInvalidFormat();
+                printLine();
+                return;
+            }
+
+            String name = content.substring(0, byIndex).trim();
+            String deadline = content.substring(byIndex + 4).trim();
+
+            if (name.isEmpty() || deadline.isEmpty()) {
+                printEmpty();
+                return;
+            }
+
+            tasks[Task.getTaskCount()] = new Deadline(name, deadline);
+            Task.incrementTaskCount();
+            printAddTask();
+
+        } catch (Exception e) {
+            printInvalidFormat();
+            return;
+        }
+        printLine();
+    }
+
+    private static void handleEvent(String input) {
+        printLine();
+        try {
+            String content = input.substring(6);
+
+            int fromIndex = content.indexOf("/from ");
+            int toIndex = content.indexOf("/to ");
+
+            if (fromIndex == -1 || toIndex == -1 || fromIndex >= toIndex) {
+                printInvalidFormat();
+                return;
+            }
+
+            String taskName = content.substring(0, fromIndex).trim();
+            String fromTime = content.substring(fromIndex + 6, toIndex).trim();
+            String toTime = content.substring(toIndex + 4).trim();
+
+            if (taskName.isEmpty() || fromTime.isEmpty() || toTime.isEmpty()) {
+                printEmpty();
+                return;
+            }
+
+            tasks[Task.getTaskCount()] = new Event(taskName, fromTime, toTime);
+            Task.incrementTaskCount();
+            printAddTask();
+
+        } catch (Exception e) {
+            printInvalidFormat();
+            return;
+        }
         printLine();
     }
 
@@ -55,7 +136,8 @@ public class Coach {
         try {
             int markIndex = Integer.parseInt(inputs[1]) - 1;
             if (markIndex < 0 || markIndex >= Task.getTaskCount()) {
-                System.out.println("Invalid index!");
+                printInvalidIndex();
+                return;
             } else {
                 if (isMark) {
                     tasks[markIndex].setDone(true);
@@ -68,7 +150,8 @@ public class Coach {
                 System.out.println(" " + tasks[markIndex]);
             }
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            System.out.println("Invalid index!");
+            printInvalidIndex();
+            return;
         }
         printLine();
     }
@@ -85,6 +168,7 @@ public class Coach {
         printLine();
     }
 
+
     private static void handleBye() {
         printLine();
         System.out.println(" Bye. Hope to see you again soon!");
@@ -95,6 +179,31 @@ public class Coach {
         printLine();
         System.out.println(" Hello! I'm Coach");
         System.out.println(" What can I do for you?");
+        printLine();
+    }
+
+    private static void printAddTask() {
+        System.out.println("Got it. I've added this task:");
+        System.out.println(" added: " + tasks[Task.getTaskCount() - 1]);
+        System.out.println(" Now you have " + Task.getTaskCount() + " tasks in the list.");
+    }
+
+    private static void printLine() {
+        System.out.println("____________________________________________________________");
+    }
+
+    private static void printEmpty() {
+        System.out.println("Empty input!");
+        printLine();
+    }
+
+    private static void printInvalidFormat() {
+        System.out.println("Invalid format!");
+        printLine();
+    }
+
+    private static void printInvalidIndex() {
+        System.out.println("Invalid index!");
         printLine();
     }
 }
