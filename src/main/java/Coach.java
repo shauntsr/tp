@@ -2,9 +2,15 @@ import java.util.Scanner;
 
 public class Coach {
     public static final int MAX_TASKS = 100;
+    private static final String TODO_EMPTY = "Task description cannot be empty!";
+    private static final String DEADLINE_FORMAT = "Deadline format should be: deadline <description> /by <time>";
+    private static final String DEADLINE_EMPTY = "Task description and deadline cannot be empty!";
+    private static final String EVENT_FORMAT = "Event format should be: event <description> /from <time> /to <time>";
+    private static final String EVENT_EMPTY = "Task description, start and end time cannot be empty!";
+
     static Task[] tasks = new Task[MAX_TASKS];
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws CoachException {
         Scanner sc = new Scanner(System.in);
 
         handleWelcome();
@@ -14,52 +20,53 @@ public class Coach {
             String[] inputs = input.split(" ");
             String command = inputs[0].toLowerCase();
 
-            switch (command) {
-            case "bye":
-                handleBye();
-                sc.close();
-                return;
+            try {
+                switch (command) {
+                case "bye":
+                    handleBye();
+                    sc.close();
+                    return;
 
-            case "list":
-                handleList();
-                break;
+                case "list":
+                    handleList();
+                    break;
 
-            case "mark":
-                handleMark(inputs,true);
-                break;
+                case "mark":
+                    handleMark(inputs, true);
+                    break;
 
-            case "unmark":
-                handleMark(inputs, false);
-                break;
+                case "unmark":
+                    handleMark(inputs, false);
+                    break;
 
-            case "todo":
-                handleToDo(input);
-                break;
+                case "todo":
+                    handleToDo(input);
+                    break;
 
-            case "deadline":
-                handleDeadline(input);
-                break;
+                case "deadline":
+                    handleDeadline(input);
+                    break;
 
-            case "event":
-                handleEvent(input);
-                break;
+                case "event":
+                    handleEvent(input);
+                    break;
 
-            default:
+                default:
+                    throw new InvalidInputException(command);
+                }
+            } catch (CoachException e) {
+                System.out.println(e.getMessage());
                 printLine();
-                System.out.println("Invalid command!");
-                printLine();
-                break;
             }
         }
     }
 
-    private static void handleToDo(String input) {
+    private static void handleToDo(String input) throws CoachException {
         printLine();
         String content = input.substring(4);
         if (content.isEmpty())
         {
-            printEmpty();
-            return;
+            throw new EmptyDescriptionException(TODO_EMPTY);
         }
         else{
             tasks[Task.getTaskCount()] = new ToDo(content);
@@ -69,47 +76,44 @@ public class Coach {
         printLine();
     }
 
-    private static void handleDeadline(String input) {
+    private static void handleDeadline(String input) throws CoachException {
         printLine();
         try {
             String content = input.substring(9);
             int byIndex = content.indexOf("/by ");
+
             if (byIndex == -1) {
-                printInvalidFormat();
-                printLine();
-                return;
+                throw new InvalidTaskFormatException(DEADLINE_FORMAT);
             }
 
             String name = content.substring(0, byIndex).trim();
             String deadline = content.substring(byIndex + 4).trim();
 
             if (name.isEmpty() || deadline.isEmpty()) {
-                printEmpty();
-                return;
+                throw new EmptyDescriptionException(DEADLINE_EMPTY);
             }
 
             tasks[Task.getTaskCount()] = new Deadline(name, deadline);
             Task.incrementTaskCount();
             printAddTask();
 
-        } catch (Exception e) {
-            printInvalidFormat();
-            return;
+        } catch (StringIndexOutOfBoundsException e) { //produces this error when trying to generate string after deadline but no string to be found
+            throw new EmptyDescriptionException(DEADLINE_EMPTY);
         }
         printLine();
     }
 
-    private static void handleEvent(String input) {
+    private static void handleEvent(String input) throws CoachException {
         printLine();
         try {
+
             String content = input.substring(6);
 
-            int fromIndex = content.indexOf("/from ");
-            int toIndex = content.indexOf("/to ");
+            int fromIndex = content.indexOf("/from");
+            int toIndex = content.indexOf("/to");
 
-            if (fromIndex == -1 || toIndex == -1 || fromIndex >= toIndex) {
-                printInvalidFormat();
-                return;
+            if (fromIndex == -1 || toIndex == -1 || fromIndex > toIndex) {
+                throw new InvalidTaskFormatException(EVENT_FORMAT);
             }
 
             String taskName = content.substring(0, fromIndex).trim();
@@ -117,42 +121,37 @@ public class Coach {
             String toTime = content.substring(toIndex + 4).trim();
 
             if (taskName.isEmpty() || fromTime.isEmpty() || toTime.isEmpty()) {
-                printEmpty();
-                return;
+                throw new EmptyDescriptionException(EVENT_EMPTY);
             }
 
             tasks[Task.getTaskCount()] = new Event(taskName, fromTime, toTime);
             Task.incrementTaskCount();
             printAddTask();
 
-        } catch (Exception e) {
-            printInvalidFormat();
-            return;
+        } catch (StringIndexOutOfBoundsException e) { //produces this error when trying to generate string after deadline but no string to be found
+            throw new EmptyDescriptionException(EVENT_FORMAT);
         }
         printLine();
     }
 
-    private static void handleMark(String[] inputs, boolean isMark) {
+    private static void handleMark(String[] inputs, boolean isMark) throws CoachException {
         printLine();
         try {
+            if (inputs.length < 2) {
+                throw new EmptyDescriptionException("Please specify a task number to mark/unmark!");
+            }
             int markIndex = Integer.parseInt(inputs[1]) - 1;
             if (markIndex < 0 || markIndex >= Task.getTaskCount()) {
-                printInvalidIndex();
-                return;
-            } else {
-                if (isMark) {
-                    tasks[markIndex].setDone(true);
-                    System.out.println("Nice! I've marked this task as done:");
-                }
-                else{
-                    tasks[markIndex].setDone(false);
-                    System.out.println("OK, I've marked this task as not done yet:");
-                }
-                System.out.println(" " + tasks[markIndex]);
+                throw new InvalidTaskIndexException("Task number out of range!");
             }
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            printInvalidIndex();
-            return;
+
+            tasks[markIndex].setDone(isMark);
+            String action = isMark ? "marked this task as done" : "marked this task as not done yet";
+            System.out.println("Nice! I've " + action + ":");
+            System.out.println(" " + tasks[markIndex]);
+
+        } catch (NumberFormatException e) {
+            throw new InvalidTaskIndexException("Task number must be a valid integer!");
         }
         printLine();
     }
@@ -168,7 +167,6 @@ public class Coach {
         }
         printLine();
     }
-
 
     private static void handleBye() {
         printLine();
@@ -193,19 +191,5 @@ public class Coach {
         System.out.println("____________________________________________________________");
     }
 
-    private static void printEmpty() {
-        System.out.println("Empty input!");
-        printLine();
-    }
-
-    private static void printInvalidFormat() {
-        System.out.println("Invalid format!");
-        printLine();
-    }
-
-    private static void printInvalidIndex() {
-        System.out.println("Invalid index!");
-        printLine();
-    }
 }
 
