@@ -1,6 +1,16 @@
 todo do homework
-deadline go shopping /by 5pm tommorow
+todo
+deadline go shopping /by 5pm tomorrow
+deadline go shopping
+deadline
 event fish in pond /from 1 am /to 6 am
+event fish in pond /from /to 1 am
+event
+event fish in pond
+event fish in pond /to 1 am /from 6 am
 mark 2
+mark
+mark x
+mark 10
 list
 bye
