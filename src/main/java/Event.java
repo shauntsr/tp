@@ -1,17 +1,16 @@
-public class Event extends Task {
+public class Event extends Deadline {
     protected String from;
-    protected String to;
 
     public Event(String name, String from, String to) {
-        super(name, false);
+        super(name, to);
         this.from = from;
-        this.to = to;
+        this.by = to;
     }
 
     public Event(String name, boolean isDone, String from, String to) {
-        super(name, isDone);
+        super(name,to);
         this.from = from;
-        this.to = to;
+        this.by = to;
     }
 
     public String getFrom() {
@@ -23,15 +22,15 @@ public class Event extends Task {
     }
 
     public String getTo() {
-        return to;
+        return by;
     }
 
     public void setTo(String to) {
-        this.to = to;
+        this.by = to;
     }
 
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";
+        return "[E]" + getBaseString() + " (from: " + from + " to: " + by + ")";
     }
 }

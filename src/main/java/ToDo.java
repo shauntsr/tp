@@ -8,8 +8,7 @@ public class ToDo extends Task {
         super(name, false);
     }
 
-    @Override
     public String toString() {
-        return "[T]" + super.toString();
+        return "[T]" + getBaseString();
     }
 }

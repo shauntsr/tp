@@ -1,7 +1,8 @@
 import java.util.Scanner;
 
 public class Coach {
-    static Task[] tasks = new Task[100];
+    public static final int MAX_TASKS = 100;
+    static Task[] tasks = new Task[MAX_TASKS];
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);

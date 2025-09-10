@@ -1,4 +1,4 @@
-public class Task {
+public abstract class Task {
     private String name;
     private boolean isDone;
     private final int id;
@@ -42,16 +42,16 @@ public class Task {
         taskCount++;
         this.id = taskCount;
     }
+
     public Task(String name) {
-        this.name = name;
-        this.isDone = false;
-        taskCount++;
-        this.id = taskCount;
+        this(name, false);
     }
 
-    public String toString() {
+    protected String getBaseString() {
         String mark = isDone ? "[X]" : "[ ]";
         return mark + " " + name;
     }
 
+    @Override
+    public abstract String toString();
 }
