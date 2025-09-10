@@ -1,3 +1,10 @@
+package chatbot;
+
+import chatbot.tasks.Deadline;
+import chatbot.tasks.Event;
+import chatbot.tasks.Task;
+import chatbot.tasks.ToDo;
+
 import java.util.Scanner;
 
 public class Coach {
@@ -52,6 +59,7 @@ public class Coach {
                     break;
 
                 default:
+                    printLine();
                     throw new InvalidInputException(command);
                 }
             } catch (CoachException e) {

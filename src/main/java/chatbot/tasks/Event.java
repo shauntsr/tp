@@ -1,3 +1,5 @@
+package chatbot.tasks;
+
 public class Event extends Deadline {
     protected String from;
 
