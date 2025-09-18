@@ -35,6 +35,12 @@ public abstract class Task {
         return mark + " " + name;
     }
 
+    protected String getSafeString() {
+        // 1 = done, 0 = not done
+        return (isDone ? "1" : "0") + " | " + name;
+    }
+
     @Override
     public abstract String toString();
+    public abstract String toSaveFormat();
 }

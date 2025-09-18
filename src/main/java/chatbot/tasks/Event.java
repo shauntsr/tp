@@ -35,4 +35,7 @@ public class Event extends Deadline {
     public String toString() {
         return "[E]" + getBaseString() + " (from: " + from + " to: " + by + ")";
     }
+    public String toSaveFormat() {
+        return "E | " + getSafeString() + " | " + from + " /to " + by;
+    }
 }

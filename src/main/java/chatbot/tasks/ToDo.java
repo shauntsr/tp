@@ -13,4 +13,9 @@ public class ToDo extends Task {
     public String toString() {
         return "[T]" + getBaseString();
     }
+
+    @Override
+    public String toSaveFormat() {
+        return "T | " + getSafeString();
+    }
 }

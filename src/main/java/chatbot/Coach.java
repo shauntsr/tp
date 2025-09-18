@@ -5,6 +5,7 @@ import chatbot.tasks.Event;
 import chatbot.tasks.Task;
 import chatbot.tasks.ToDo;
 
+
 import java.util.Scanner;
 import java.util.ArrayList;
 
@@ -18,9 +19,13 @@ public class Coach {
     private static final String INDEX_OOR = "Task number out of range!";
     private static final String INDEX_INVALID = "Task number must be a valid integer!";
 
+    private static final String FILE_PATH = "./data/coach.txt";
+    private static Storage storage = new Storage(FILE_PATH);
+
     static ArrayList<Task> tasks = new ArrayList<>();
 
     public static void main(String[] args) throws CoachException {
+        tasks = storage.load();
         Scanner sc = new Scanner(System.in);
 
         handleWelcome();
@@ -84,8 +89,7 @@ public class Coach {
             throw new EmptyDescriptionException(TODO_EMPTY);
         }
         else{
-            tasks.add(new ToDo(content));
-            printAddTask();
+            addTask(new ToDo(content.trim()));
         }
         printLine();
     }
@@ -107,8 +111,7 @@ public class Coach {
                 throw new EmptyDescriptionException(DEADLINE_EMPTY);
             }
 
-            tasks.add(new Deadline(name, deadline));
-            printAddTask();
+            addTask(new Deadline(name, deadline));
 
         } catch (StringIndexOutOfBoundsException e) { //produces this error when trying to generate string after deadline but no string to be found
             throw new EmptyDescriptionException(DEADLINE_EMPTY);
@@ -137,8 +140,7 @@ public class Coach {
                 throw new EmptyDescriptionException(EVENT_EMPTY);
             }
 
-            tasks.add(new Event(taskName, fromTime, toTime));
-            printAddTask();
+            addTask(new Event(taskName, fromTime, toTime));
 
         } catch (StringIndexOutOfBoundsException e) { //produces this error when trying to generate string after deadline but no string to be found
             throw new EmptyDescriptionException(EVENT_FORMAT);
@@ -154,6 +156,7 @@ public class Coach {
         String action = isMark ? "marked this task as done" : "marked this task as not done yet";
         System.out.println("Nice! I've " + action + ":");
         System.out.println(" " + tasks.get(markIndex));
+        storage.save(tasks);
         printLine();
     }
 
@@ -192,6 +195,7 @@ public class Coach {
         System.out.println("Noted. I've removed this task:");
         System.out.println("  " + removedTask);
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+        storage.save(tasks);
         printLine();
     }
 
@@ -215,6 +219,12 @@ public class Coach {
         System.out.println("Got it. I've added this task:");
         System.out.println(" added: " + tasks.get(tasks.size() - 1));
         System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+    }
+
+    private static void addTask(Task task) {
+        tasks.add(task);
+        printAddTask();
+        storage.save(tasks);
     }
 
 

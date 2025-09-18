@@ -25,4 +25,7 @@ public class Deadline extends ToDo {
     public String toString() {
         return "[D]" + getBaseString() + " (by: " + by + ")";
     }
+    public String toSaveFormat() {
+        return "D | " + getSafeString() + " | " + by;
+    }
 }
