@@ -3,8 +3,6 @@ package chatbot.tasks;
 public abstract class Task {
     private String name;
     private boolean isDone;
-    private final int id;
-    private static int taskCount = 0;
 
     public String getName() {
         return name;
@@ -22,27 +20,10 @@ public abstract class Task {
         isDone = done;
     }
 
-    public static int getTaskCount() {
-        return taskCount;
-    }
-
-    public static void setTaskCount(int taskCount) {
-        Task.taskCount = taskCount;
-    }
-
-    public static void incrementTaskCount() {
-        Task.taskCount = taskCount++;
-    }
-
-    public int getId() {
-        return id;
-    }
 
     public Task(String name, boolean isDone) {
         this.name = name;
         this.isDone = isDone;
-        taskCount++;
-        this.id = taskCount;
     }
 
     public Task(String name) {

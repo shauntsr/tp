@@ -12,5 +12,9 @@ mark 2
 mark
 mark x
 mark 10
+delete 2
+delete
+delete x
+delete 10
 list
 bye

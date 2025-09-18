@@ -6,16 +6,19 @@ import chatbot.tasks.Task;
 import chatbot.tasks.ToDo;
 
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Coach {
-    public static final int MAX_TASKS = 100;
     private static final String TODO_EMPTY = "Task description cannot be empty!";
     private static final String DEADLINE_FORMAT = "Deadline format should be: deadline <description> /by <time>";
     private static final String DEADLINE_EMPTY = "Task description and deadline cannot be empty!";
     private static final String EVENT_FORMAT = "Event format should be: event <description> /from <time> /to <time>";
     private static final String EVENT_EMPTY = "Task description, start and end time cannot be empty!";
+    private static final String INDEX_EMPTY = "Please specify a task number to ";
+    private static final String INDEX_OOR = "Task number out of range!";
+    private static final String INDEX_INVALID = "Task number must be a valid integer!";
 
-    static Task[] tasks = new Task[MAX_TASKS];
+    static ArrayList<Task> tasks = new ArrayList<>();
 
     public static void main(String[] args) throws CoachException {
         Scanner sc = new Scanner(System.in);
@@ -58,6 +61,10 @@ public class Coach {
                     handleEvent(input);
                     break;
 
+                case "delete":
+                    handleDelete(inputs);
+                    break;
+
                 default:
                     printLine();
                     throw new InvalidInputException(command);
@@ -77,8 +84,7 @@ public class Coach {
             throw new EmptyDescriptionException(TODO_EMPTY);
         }
         else{
-            tasks[Task.getTaskCount()] = new ToDo(content);
-            Task.incrementTaskCount();
+            tasks.add(new ToDo(content));
             printAddTask();
         }
         printLine();
@@ -101,8 +107,7 @@ public class Coach {
                 throw new EmptyDescriptionException(DEADLINE_EMPTY);
             }
 
-            tasks[Task.getTaskCount()] = new Deadline(name, deadline);
-            Task.incrementTaskCount();
+            tasks.add(new Deadline(name, deadline));
             printAddTask();
 
         } catch (StringIndexOutOfBoundsException e) { //produces this error when trying to generate string after deadline but no string to be found
@@ -132,8 +137,7 @@ public class Coach {
                 throw new EmptyDescriptionException(EVENT_EMPTY);
             }
 
-            tasks[Task.getTaskCount()] = new Event(taskName, fromTime, toTime);
-            Task.incrementTaskCount();
+            tasks.add(new Event(taskName, fromTime, toTime));
             printAddTask();
 
         } catch (StringIndexOutOfBoundsException e) { //produces this error when trying to generate string after deadline but no string to be found
@@ -144,34 +148,24 @@ public class Coach {
 
     private static void handleMark(String[] inputs, boolean isMark) throws CoachException {
         printLine();
-        try {
-            if (inputs.length < 2) {
-                throw new EmptyDescriptionException("Please specify a task number to mark/unmark!");
-            }
-            int markIndex = Integer.parseInt(inputs[1]) - 1;
-            if (markIndex < 0 || markIndex >= Task.getTaskCount()) {
-                throw new InvalidTaskIndexException("Task number out of range!");
-            }
+        int markIndex = parseTaskIndex(inputs, "mark/unmark");
 
-            tasks[markIndex].setDone(isMark);
-            String action = isMark ? "marked this task as done" : "marked this task as not done yet";
-            System.out.println("Nice! I've " + action + ":");
-            System.out.println(" " + tasks[markIndex]);
-
-        } catch (NumberFormatException e) {
-            throw new InvalidTaskIndexException("Task number must be a valid integer!");
-        }
+        tasks.get(markIndex).setDone(isMark);
+        String action = isMark ? "marked this task as done" : "marked this task as not done yet";
+        System.out.println("Nice! I've " + action + ":");
+        System.out.println(" " + tasks.get(markIndex));
         printLine();
     }
 
     private static void handleList() {
         printLine();
         System.out.println(" Here are the tasks in your list:");
-        for (int i = 0; i < Task.getTaskCount(); i++) {
-            System.out.println(" " + (i + 1) + ". " + tasks[i]);
-        }
-        if (Task.getTaskCount() == 0) {
+        if (tasks.isEmpty()) {
             System.out.println(" No tasks yet!");
+        } else {
+            for (int i = 0; i < tasks.size(); i++) {
+                System.out.println(" " + (i + 1) + ". " + tasks.get(i));
+            }
         }
         printLine();
     }
@@ -189,11 +183,41 @@ public class Coach {
         printLine();
     }
 
+    private static void handleDelete(String[] inputs) throws CoachException {
+        printLine();
+        int deleteIndex = parseTaskIndex(inputs, "delete");
+
+        Task removedTask = tasks.remove(deleteIndex);
+
+        System.out.println("Noted. I've removed this task:");
+        System.out.println("  " + removedTask);
+        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+        printLine();
+    }
+
+    private static int parseTaskIndex(String[] inputs, String actionName) throws CoachException {
+        if (inputs.length < 2) {
+            throw new EmptyDescriptionException(INDEX_EMPTY + actionName + "!");
+        }
+
+        try {
+            int index = Integer.parseInt(inputs[1]) - 1;
+            if (index < 0 || index >= tasks.size()) {
+                throw new InvalidTaskIndexException(INDEX_OOR);
+            }
+            return index;
+        } catch (NumberFormatException e) {
+            throw new InvalidTaskIndexException(INDEX_INVALID);
+        }
+    }
+
     private static void printAddTask() {
         System.out.println("Got it. I've added this task:");
-        System.out.println(" added: " + tasks[Task.getTaskCount() - 1]);
-        System.out.println(" Now you have " + Task.getTaskCount() + " tasks in the list.");
+        System.out.println(" added: " + tasks.get(tasks.size() - 1));
+        System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
     }
+
+
 
     private static void printLine() {
         System.out.println("____________________________________________________________");
