@@ -1,83 +1,68 @@
 package chatbot;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
+import java.util.stream.*;
 
-import chatbot.tasks.Deadline;
-import chatbot.tasks.Event;
-import chatbot.tasks.Task;
-import chatbot.tasks.ToDo;
+import chatbot.tasks.*;
 
 public class Storage {
-    private final String filePath;
+    private final Path filePath;
 
     public Storage(String filePath) {
-        this.filePath = filePath;
+        this.filePath = Paths.get(filePath);
     }
 
     public ArrayList<Task> load() {
-        ArrayList<Task> loadedTasks = new ArrayList<>();
-        File file = new File(filePath);
-
-        if (!file.exists()) {
-            if (file.getParentFile() != null) {
-                file.getParentFile().mkdirs();
+        try {
+            if (!Files.exists(filePath)) {
+                Files.createDirectories(filePath.getParent());
+                return new ArrayList<>();
             }
-            return loadedTasks;
-        }
 
-        try (Scanner sc = new Scanner(file)) {
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                Task task = parseLine(line);
-                if (task != null) {
-                    loadedTasks.add(task);
-                }
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found: " + filePath);
+            return Files.lines(filePath)
+                    .map(this::parseLine)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toCollection(ArrayList::new));
+        } catch (IOException e) {
+            System.out.println("Error loading file: " + filePath);
+            return new ArrayList<>();
         }
-
-        return loadedTasks;
     }
 
-    public void save(ArrayList<Task> tasks) {
+    public void save(List<Task> tasks) {
         try {
-            File file = new File(filePath);
-            if (file.getParentFile() != null) {
-                file.getParentFile().mkdirs();
-            }
-            PrintWriter pw = new PrintWriter(new FileWriter(file));
-            for (Task t : tasks) {
-                pw.println(t.toSaveFormat());
-            }
-            pw.close();
+            Files.createDirectories(filePath.getParent()); // Ensure directory exists
+
+            List<String> lines = tasks.stream()
+                    .map(Task::toSaveFormat)
+                    .collect(Collectors.toList());
+
+            Files.write(filePath, lines);
         } catch (IOException e) {
             System.out.println("Error writing to file: " + e.getMessage());
         }
     }
 
     private Task parseLine(String line) {
-        if (line.isBlank()) {
-            return null;
-        }
+        if (line.isBlank()) return null;
+
         String[] fields = line.split(" \\| ");
         try {
             String type = fields[0];
             boolean isDone = fields[1].equals("1");
             String content = fields[2].trim();
+
             switch (type) {
             case "T":
                 return new ToDo(content, isDone);
             case "D":
                 return new Deadline(content, isDone, fields[3]);
             case "E":
-                String timings = fields[3];
-                String fromTime;
-                String toTime;
-                String[] times = timings.split("/to", 2);
-                fromTime = times[0].trim();
-                toTime = times[1].trim();
+                String[] times = fields[3].split("/to", 2);
+                String fromTime = times[0].trim();
+                String toTime = times[1].trim();
                 return new Event(content, fromTime, toTime);
             default:
                 return null;

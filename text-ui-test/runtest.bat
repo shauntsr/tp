@@ -7,7 +7,7 @@ REM delete output from previous run
 if exist ACTUAL.TXT del ACTUAL.TXT
 
 REM delete previous saved tasks
-if exist ..\data\coach.txt del ..\data\coach.txt
+if exist "%~dp0data\coach.txt" del "%~dp0data\coach.txt"
 
 REM compile the code into the bin folder
 javac -cp ..\src\main\java -Xlint:none -d ..\bin ..\src\main\java\chatbot\*.java
