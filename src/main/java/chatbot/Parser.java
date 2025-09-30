@@ -112,7 +112,7 @@ public class Parser {
         if (content.isEmpty()) {
             throw new EmptyDescriptionException("Search cannot be empty!");
         }
-        return new FindCommand(content);h
+        return new FindCommand(content);
     }
 
     private static Command parseListDateCommand(String input) throws CoachException {
