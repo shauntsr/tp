@@ -1,6 +1,5 @@
 package chatbot.commands;
 
-<<<<<<< HEAD
 import chatbot.Storage;
 import chatbot.UI;
 import chatbot.tasks.Task;
@@ -25,7 +24,4 @@ public class FindCommand extends Command {
         ui.showFinds(keyword, matchingTasks);
     }
 
-=======
-public class FindCommand {
->>>>>>> f5289c53ace3dad3148f24080e049d13934194b2
 }
