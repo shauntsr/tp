@@ -35,6 +35,7 @@ public class Parser {
             case "event" -> parseEventCommand(fullCommand);
             case "delete" -> parseDeleteCommand(inputs);
             case "on" -> parseListDateCommand(fullCommand);
+            case "find" -> parseFindCommand(fullCommand);
             default -> throw new InvalidInputException(command);
         };
     }
@@ -104,6 +105,14 @@ public class Parser {
     private static Command parseDeleteCommand(String[] inputs) throws CoachException {
         int index = parseTaskIndex(inputs, "delete");
         return new DeleteCommand(index);
+    }
+
+    private static Command parseFindCommand(String input) throws CoachException {
+        String content = input.substring(4).trim();
+        if (content.isEmpty()) {
+            throw new EmptyDescriptionException("Search cannot be empty!");
+        }
+        return new FindCommand(content);h
     }
 
     private static Command parseListDateCommand(String input) throws CoachException {

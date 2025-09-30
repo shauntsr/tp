@@ -6,9 +6,7 @@ import chatbot.tasks.Task;
 
 import java.util.ArrayList;
 
-/**
- * Main class for the Coach chatbot application
- */
+
 public class Coach {
     private static final String FILE_PATH = "./data/coach.txt";
 
