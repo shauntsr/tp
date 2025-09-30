@@ -1,10 +1,10 @@
 package chatbot;
 
-import chatbot.tasks.Deadline;
-import chatbot.tasks.Event;
 import chatbot.tasks.Task;
-import chatbot.tasks.ToDo;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
 
@@ -21,17 +21,17 @@ public class UI {
     }
 
     public void showWelcome() {
-        showLine();
+        printLine();
         System.out.println(" Hello! I'm Coach");
         System.out.println(" What can I do for you?");
-        showLine();
+        printLine();
     }
 
     public void showBye() {
         System.out.println(" Bye. Hope to see you again soon!");
     }
 
-    public void showLine() {
+    public void printLine() {
         System.out.println(LINE);
     }
 
@@ -62,6 +62,17 @@ public class UI {
         System.out.println(" Here are the tasks in your list:");
         if (tasks.isEmpty()) {
             System.out.println(" No tasks yet!");
+        } else {
+            for (int i = 0; i < tasks.size(); i++) {
+                System.out.println(" " + (i + 1) + ". " + tasks.get(i));
+            }
+        }
+    }
+
+    public void showTasksOnDate(LocalDate date, List<Task> tasks) {
+        System.out.println("Tasks on " + date.format(DateTimeFormatter.ofPattern("MMM d yyyy")) + ":");
+        if (tasks.isEmpty()) {
+            System.out.println(" No tasks found for this date.");
         } else {
             for (int i = 0; i < tasks.size(); i++) {
                 System.out.println(" " + (i + 1) + ". " + tasks.get(i));

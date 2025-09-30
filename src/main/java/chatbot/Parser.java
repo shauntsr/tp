@@ -7,6 +7,9 @@ import chatbot.exceptions.InvalidInputException;
 import chatbot.exceptions.InvalidTaskFormatException;
 import chatbot.exceptions.InvalidTaskIndexException;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class Parser {
     private static final String TODO_EMPTY = "Task description cannot be empty!";
@@ -15,6 +18,8 @@ public class Parser {
     private static final String EVENT_FORMAT = "Event format should be: event <description> /from <time> /to <time>";
     private static final String EVENT_EMPTY = "Task description, start and end time cannot be empty!";
     private static final String INDEX_EMPTY = "Please specify a task number to ";
+    private static final String ON_EMPTY = "Please specify a date!";
+    private static final String[] DATE_FORMATS = {"yyyy-MM-dd", "d/M/yyyy", "d-M-yyyy"};
 
     public static Command parse(String fullCommand) throws CoachException {
         String[] inputs = fullCommand.split(" ");
@@ -29,6 +34,7 @@ public class Parser {
             case "deadline" -> parseDeadlineCommand(fullCommand);
             case "event" -> parseEventCommand(fullCommand);
             case "delete" -> parseDeleteCommand(inputs);
+            case "on" -> parseListDateCommand(fullCommand);
             default -> throw new InvalidInputException(command);
         };
     }
@@ -98,6 +104,26 @@ public class Parser {
     private static Command parseDeleteCommand(String[] inputs) throws CoachException {
         int index = parseTaskIndex(inputs, "delete");
         return new DeleteCommand(index);
+    }
+
+    private static Command parseListDateCommand(String input) throws CoachException {
+        String content = input.substring(2).trim();
+        if (content.isEmpty()) {
+            throw new EmptyDescriptionException(ON_EMPTY);
+        }
+
+        LocalDate date = parseDate(content);
+        return new ListDateCommand(date);
+    }
+
+    private static LocalDate parseDate(String input) throws CoachException {
+        for (String fmt : DATE_FORMATS) {
+            try {
+                return LocalDate.parse(input, DateTimeFormatter.ofPattern(fmt));
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+        throw new InvalidTaskFormatException("Invalid date format! Use yyyy-MM-dd, d/M/yyyy, or d-M-yyyy.");
     }
 
     private static int parseTaskIndex(String[] inputs, String actionName) throws CoachException {

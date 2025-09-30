@@ -28,14 +28,14 @@ public class Coach {
         while (!isExit) {
             try {
                 String fullCommand = ui.readCommand();
-                ui.showLine();
+                ui.printLine();
                 Command c = Parser.parse(fullCommand);
                 c.execute(tasks, ui, storage);
                 isExit = c.isExit();
             } catch (CoachException e) {
                 ui.showError(e.getMessage());
             } finally {
-                ui.showLine();
+                ui.printLine();
             }
         }
         ui.close();
