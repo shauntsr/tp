@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class DukeTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
-    private final ByteArrayInputStream inContent = new ByteArrayInputStream("John".getBytes());
+    private final ByteArrayInputStream inContent = new ByteArrayInputStream("James Gosling".getBytes());
     private final String logo = " ______    _   _       _  ____ _     ___ \n" +
             "|__  / ___| |_| |_ ___| |/ ___| |   |_ _|\n" +
             "  / / / _ \\ __| __/ _ \\ | |   | |    | | \n" +
@@ -40,6 +40,6 @@ public class DukeTest {
         assertTrue(output.contains("Hello from"));
         assertTrue(output.contains(logo));
         assertTrue(output.contains("What is your name?"));
-        assertTrue(output.contains("Hello John"));
+        assertTrue(output.contains("Hello James"));
     }
 }
