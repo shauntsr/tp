@@ -55,10 +55,10 @@ public class AddCommand extends Command {
 
     private Task createTask() throws CoachException {
         return switch (taskType) {
-            case TODO -> new ToDo(description);
-            case DEADLINE -> new Deadline(description, time1);
-            case EVENT -> new Event(description, time1, time2);
-            default -> throw new InvalidTaskFormatException("Unknown task type");
+        case TODO -> new ToDo(description);
+        case DEADLINE -> new Deadline(description, time1);
+        case EVENT -> new Event(description, time1, time2);
+        default -> throw new InvalidTaskFormatException("Unknown task type");
         };
     }
 }

@@ -34,18 +34,19 @@ public class Parser {
         String command = inputs[0].toLowerCase();
 
         return switch (command) {
-            case "bye" -> new ExitCommand();
-            case "list" -> new ListCommand();
-            case "mark" -> parseMarkCommand(inputs, true);
-            case "unmark" -> parseMarkCommand(inputs, false);
-            case "todo" -> parseTodoCommand(userCommand);
-            case "deadline" -> parseDeadlineCommand(userCommand);
-            case "event" -> parseEventCommand(userCommand);
-            case "delete" -> parseDeleteCommand(inputs);
-            case "on" -> parseListDateCommand(userCommand);
-            case "find" -> parseFindCommand(userCommand);
-            default -> throw new InvalidInputException(command);
+        case "bye" -> new ExitCommand();
+        case "list" -> new ListCommand();
+        case "mark" -> parseMarkCommand(inputs, true);
+        case "unmark" -> parseMarkCommand(inputs, false);
+        case "todo" -> parseTodoCommand(userCommand);
+        case "deadline" -> parseDeadlineCommand(userCommand);
+        case "event" -> parseEventCommand(userCommand);
+        case "delete" -> parseDeleteCommand(inputs);
+        case "on" -> parseListDateCommand(userCommand);
+        case "find" -> parseFindCommand(userCommand);
+        default -> throw new InvalidInputException(command);
         };
+
     }
 
     private static Command parseTodoCommand(String input) throws CoachException {
@@ -135,10 +136,7 @@ public class Parser {
 
     private static LocalDate parseDate(String input) throws CoachException {
         for (String fmt : DATE_FORMATS) {
-            try {
-                return LocalDate.parse(input, DateTimeFormatter.ofPattern(fmt));
-            } catch (DateTimeParseException ignored) {
-            }
+            return LocalDate.parse(input, DateTimeFormatter.ofPattern(fmt));
         }
         throw new InvalidTaskFormatException("Invalid date format! Use yyyy-MM-dd, d/M/yyyy, or d-M-yyyy.");
     }
