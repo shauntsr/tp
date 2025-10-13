@@ -1,9 +1,13 @@
 package seedu.duke;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
-import java.util.stream.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import seedu.duke.tasks.Deadline;
 import seedu.duke.tasks.Event;
@@ -49,7 +53,9 @@ public class Storage {
     }
 
     private Task parseSaveFile(String line) {
-        if (line.isBlank()) return null;
+        if (line.isBlank()) {
+            return null;
+        }
 
         String[] fields = line.split(" \\| ");
         try {
@@ -76,3 +82,4 @@ public class Storage {
         }
     }
 }
+

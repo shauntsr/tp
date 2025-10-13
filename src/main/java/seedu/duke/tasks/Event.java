@@ -7,14 +7,7 @@ public class Event extends Deadline {
     protected String from;
     protected LocalDateTime fromDateTime;
 
-    public LocalDateTime getFromDateTime() {
-        return fromDateTime;
-    }
-
-    public void setFromDateTime(LocalDateTime fromDateTime) {
-        this.fromDateTime = fromDateTime;
-    }
-
+    // Constructors
     public Event(String name, String from, String to) {
         super(name, to);
         this.from = from;
@@ -25,6 +18,15 @@ public class Event extends Deadline {
         super(name, isDone, to);
         this.from = from;
         this.fromDateTime = parseDate(from);
+    }
+
+    // Getters / Setters
+    public LocalDateTime getFromDateTime() {
+        return fromDateTime;
+    }
+
+    public void setFromDateTime(LocalDateTime fromDateTime) {
+        this.fromDateTime = fromDateTime;
     }
 
     public String getFrom() {
@@ -44,6 +46,7 @@ public class Event extends Deadline {
         this.by = to;
         this.byDateTime = parseDate(to);
     }
+
 
     @Override
     public String toString() {

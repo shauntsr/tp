@@ -4,6 +4,17 @@ public abstract class Task {
     private String name;
     private boolean isDone;
 
+    // Constructors
+    public Task(String name, boolean isDone) {
+        this.name = name;
+        this.isDone = isDone;
+    }
+
+    public Task(String name) {
+        this(name, false);
+    }
+
+    // Getters and setters
     public String getName() {
         return name;
     }
@@ -20,15 +31,7 @@ public abstract class Task {
         isDone = done;
     }
 
-    public Task(String name, boolean isDone) {
-        this.name = name;
-        this.isDone = isDone;
-    }
-
-    public Task(String name) {
-        this(name, false);
-    }
-
+    // Helper methods
     protected String getBaseString() {
         String mark = isDone ? "[X]" : "[ ]";
         return mark + " " + name;
@@ -39,8 +42,10 @@ public abstract class Task {
         return (isDone ? "1" : "0") + " | " + name;
     }
 
+    // Abstract methods
     @Override
     public abstract String toString();
 
     public abstract String toSaveFormat();
 }
+

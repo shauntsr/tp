@@ -5,16 +5,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class Deadline extends ToDo {
-    protected String by;
-    protected LocalDateTime byDateTime;
-
-    public LocalDateTime getByDateTime() {
-        return byDateTime;
-    }
-
-    public void setByDateTime(LocalDateTime byDateTime) {
-        this.byDateTime = byDateTime;
-    }
 
     protected static final DateTimeFormatter[] INPUT_FORMATS = new DateTimeFormatter[]{
             DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"),
@@ -26,6 +16,10 @@ public class Deadline extends ToDo {
     protected static final DateTimeFormatter OUTPUT_FORMAT =
             DateTimeFormatter.ofPattern("MMM d yyyy, h:mma");
 
+    protected String by;
+    protected LocalDateTime byDateTime;
+
+    // Constructors
     public Deadline(String name, String by) {
         super(name, false);
         this.by = by;
@@ -38,6 +32,15 @@ public class Deadline extends ToDo {
         this.byDateTime = parseDate(by);
     }
 
+    // Getters / Setters
+    public LocalDateTime getByDateTime() {
+        return byDateTime;
+    }
+
+    public void setByDateTime(LocalDateTime byDateTime) {
+        this.byDateTime = byDateTime;
+    }
+
     public String getBy() {
         return by;
     }
@@ -47,15 +50,13 @@ public class Deadline extends ToDo {
         this.byDateTime = parseDate(by);
     }
 
+
     protected LocalDateTime parseDate(String input) {
         for (DateTimeFormatter fmt : INPUT_FORMATS) {
-            try {
-                if (fmt.toString().contains("H")) {
-                    return LocalDateTime.parse(input, fmt);
-                } else {
-                    return java.time.LocalDate.parse(input, fmt).atStartOfDay();
-                }
-            } catch (DateTimeParseException ignored) {
+            if (fmt.toString().contains("H")) {
+                return LocalDateTime.parse(input, fmt);
+            } else {
+                return java.time.LocalDate.parse(input, fmt).atStartOfDay();
             }
         }
         return null;
