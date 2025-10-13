@@ -1,0 +1,2 @@
+T | 0 | do homework
+E | 0 | fish in pond | 1 am /to 6 am
