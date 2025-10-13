@@ -1,4 +1,4 @@
-package chatbot.tasks;
+package seedu.duke.tasks;
 
 /**
  * Represents a todo task without any date or time constraints.

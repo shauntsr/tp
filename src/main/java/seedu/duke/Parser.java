@@ -1,11 +1,18 @@
-package chatbot;
+package seedu.duke;
 
-import chatbot.commands.*;
-import chatbot.exceptions.CoachException;
-import chatbot.exceptions.EmptyDescriptionException;
-import chatbot.exceptions.InvalidInputException;
-import chatbot.exceptions.InvalidTaskFormatException;
-import chatbot.exceptions.InvalidTaskIndexException;
+import seedu.duke.commands.AddCommand;
+import seedu.duke.commands.Command;
+import seedu.duke.commands.DeleteCommand;
+import seedu.duke.commands.ExitCommand;
+import seedu.duke.commands.FindCommand;
+import seedu.duke.commands.ListCommand;
+import seedu.duke.commands.ListDateCommand;
+import seedu.duke.commands.MarkCommand;
+import seedu.duke.exceptions.CoachException;
+import seedu.duke.exceptions.EmptyDescriptionException;
+import seedu.duke.exceptions.InvalidInputException;
+import seedu.duke.exceptions.InvalidTaskFormatException;
+import seedu.duke.exceptions.InvalidTaskIndexException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

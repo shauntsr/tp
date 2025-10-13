@@ -1,10 +1,10 @@
-package chatbot.commands;
+package seedu.duke.commands;
 
-import chatbot.exceptions.CoachException;
-import chatbot.exceptions.InvalidTaskFormatException;
-import chatbot.Storage;
-import chatbot.UI;
-import chatbot.tasks.Task;
+import seedu.duke.exceptions.CoachException;
+import seedu.duke.exceptions.InvalidTaskFormatException;
+import seedu.duke.Storage;
+import seedu.duke.UI;
+import seedu.duke.tasks.Task;
 
 import java.util.ArrayList;
 

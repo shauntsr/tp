@@ -1,4 +1,4 @@
-package chatbot.exceptions;
+package seedu.duke.exceptions;
 
 /**
  * Represents a general exception specific to the Coach chatbot application.

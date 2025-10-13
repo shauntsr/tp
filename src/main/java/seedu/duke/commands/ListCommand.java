@@ -1,8 +1,8 @@
-package chatbot.commands;
+package seedu.duke.commands;
 
-import chatbot.tasks.Task;
-import chatbot.UI;
-import chatbot.Storage;
+import seedu.duke.tasks.Task;
+import seedu.duke.UI;
+import seedu.duke.Storage;
 
 import java.util.ArrayList;
 

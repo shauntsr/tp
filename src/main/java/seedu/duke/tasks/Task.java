@@ -1,4 +1,4 @@
-package chatbot.tasks;
+package seedu.duke.tasks;
 
 /**
  * Represents an abstract task in the Coach chatbot.

@@ -1,4 +1,4 @@
-package chatbot.exceptions;
+package seedu.duke.exceptions;
 
 /**
  * Exception thrown when a task index is invalid or out of bounds.

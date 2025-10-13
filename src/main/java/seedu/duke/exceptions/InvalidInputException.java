@@ -1,4 +1,4 @@
-package chatbot.exceptions;
+package seedu.duke.exceptions;
 
 /**
  * Exception thrown when user input is invalid or cannot be parsed correctly.

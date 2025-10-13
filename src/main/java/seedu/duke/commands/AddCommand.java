@@ -1,13 +1,13 @@
-package chatbot.commands;
+package seedu.duke.commands;
 
-import chatbot.exceptions.CoachException;
-import chatbot.Storage;
-import chatbot.UI;
-import chatbot.exceptions.InvalidTaskFormatException;
-import chatbot.tasks.Deadline;
-import chatbot.tasks.Event;
-import chatbot.tasks.Task;
-import chatbot.tasks.ToDo;
+import seedu.duke.exceptions.CoachException;
+import seedu.duke.Storage;
+import seedu.duke.UI;
+import seedu.duke.exceptions.InvalidTaskFormatException;
+import seedu.duke.tasks.Deadline;
+import seedu.duke.tasks.Event;
+import seedu.duke.tasks.Task;
+import seedu.duke.tasks.ToDo;
 
 import java.util.ArrayList;
 

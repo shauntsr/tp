@@ -1,4 +1,4 @@
-package chatbot.exceptions;
+package seedu.duke.exceptions;
 
 /**
  * Exception thrown when a task format is invalid or improperly structured.

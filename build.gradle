@@ -1,10 +1,7 @@
 plugins {
     id 'java'
     id 'application'
-<<<<<<< HEAD
     id 'checkstyle'
-=======
->>>>>>> Ip/master
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
@@ -32,7 +29,6 @@ test {
 }
 
 application {
-<<<<<<< HEAD
     mainClass.set("seedu.duke.Duke")
 }
 
@@ -46,16 +42,5 @@ checkstyle {
 }
 
 run{
-=======
-    mainClass.set("chatbot.Coach")
-}
-
-shadowJar {
-    archiveBaseName = "coach"
-    archiveClassifier = null
-}
-
-run {
->>>>>>> Ip/master
     standardInput = System.in
 }

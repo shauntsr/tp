@@ -1,11 +1,14 @@
-package chatbot;
+package seedu.duke;
 
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.*;
 
-import chatbot.tasks.*;
+import seedu.duke.tasks.Deadline;
+import seedu.duke.tasks.Event;
+import seedu.duke.tasks.Task;
+import seedu.duke.tasks.ToDo;
 
 /**
  * Manages the loading and saving of tasks to storage on device.

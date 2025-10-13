@@ -1,11 +1,11 @@
-package chatbot.commands;
+package seedu.duke.commands;
 
-import chatbot.Storage;
-import chatbot.UI;
-import chatbot.exceptions.CoachException;
-import chatbot.tasks.Deadline;
-import chatbot.tasks.Event;
-import chatbot.tasks.Task;
+import seedu.duke.Storage;
+import seedu.duke.UI;
+import seedu.duke.exceptions.CoachException;
+import seedu.duke.tasks.Deadline;
+import seedu.duke.tasks.Event;
+import seedu.duke.tasks.Task;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

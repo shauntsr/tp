@@ -1,6 +1,6 @@
-package chatbot;
+package seedu.duke;
 
-import chatbot.tasks.Task;
+import seedu.duke.tasks.Task;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

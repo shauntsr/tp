@@ -1,8 +1,8 @@
-package chatbot;
+package seedu.duke;
 
-import chatbot.commands.Command;
-import chatbot.exceptions.CoachException;
-import chatbot.tasks.Task;
+import seedu.duke.commands.Command;
+import seedu.duke.exceptions.CoachException;
+import seedu.duke.tasks.Task;
 
 import java.util.ArrayList;
 

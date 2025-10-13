@@ -1,4 +1,4 @@
-package chatbot.tasks;
+package seedu.duke.tasks;
 
 import java.time.LocalDateTime;
 
