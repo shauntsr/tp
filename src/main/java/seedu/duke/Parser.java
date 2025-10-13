@@ -16,7 +16,6 @@ import seedu.duke.exceptions.InvalidTaskIndexException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 public class Parser {
     private static final String TODO_EMPTY = "Task description cannot be empty!";
