@@ -29,7 +29,7 @@ public class ZettelTest {
 
     @Test //test if print ascii and correct name
     public void testMainOutput() {
-        Duke.main(new String[]{});
+        Zettel.main(new String[]{});
         String output = outContent.toString();
         assertTrue(output.contains("Hello from ZettelCLI"));
         assertTrue(output.contains("What is your name?"));
