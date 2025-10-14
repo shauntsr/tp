@@ -1,6 +1,5 @@
 package seedu.zettel;
 
-
 import seedu.duke.exceptions.ZettelException;
 import seedu.duke.exceptions.EmptyDescriptionException;
 import seedu.duke.exceptions.InvalidInputException;
@@ -14,7 +13,6 @@ import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.ListNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.PinNoteCommand;
-
 
 public class Parser {
     private static final String LIST_FORMAT = "List format should be: list [-p]";
@@ -48,8 +46,7 @@ public class Parser {
         String content = input.substring(4).trim();
         if (content.isEmpty()) {
             return new ListNoteCommand(false);
-        }
-        else if (!content.equals("-p")) {
+        } else if (!content.equals("-p")) {
             throw new InvalidFormatException(LIST_FORMAT);
         }
         return new ListNoteCommand(true);
@@ -107,27 +104,27 @@ public class Parser {
         if (inputs.length > 2) {
             throw new InvalidFormatException(PIN_FORMAT);
         }
-        int noteID = parseNoteID(inputs, "pin/unpin");
-        return new PinNoteCommand(noteID, isPin);
+        String noteID = parseNoteID(inputs, "pin/unpin");
+        int id = Integer.parseInt(noteID);
+        return new PinNoteCommand(id, isPin);
     }
 
     private static Command parseDeleteNoteCommand(String[] inputs) throws ZettelException {
         boolean forceDelete = false;
         if (inputs.length > 3) {
             throw new InvalidFormatException(DELETE_FORMAT);
-        }
-        else if (inputs.length == 3){
+        } else if (inputs.length == 3){
             if (!inputs[1].equals("-f")) {
                 throw new InvalidInputException(DELETE_FORMAT);
             }
             forceDelete = true;
         }
-        int noteID = parseNoteID(inputs, "delete");
+        String noteID = parseNoteID(inputs, "delete");
         return new DeleteNoteCommand(noteID, forceDelete);
     }
 
 
-    private static int parseNoteID(String[] inputs, String actionName) throws ZettelException {
+    private static String parseNoteID(String[] inputs, String actionName) throws ZettelException {
         if (inputs.length < 2) {
             throw new EmptyDescriptionException(ID_EMPTY + actionName + "!");
         }
@@ -136,10 +133,10 @@ public class Parser {
         if (idString.length() != 6) {
             throw new InvalidIndexException(ID_INVALID);
         }
-        try {
-            return Integer.parseInt(idString);
-        } catch (NumberFormatException e) {
+
+        if (!idString.matches("\\d{6}")) {
             throw new InvalidIndexException(ID_INVALID);
         }
+        return idString;
     }
 }
