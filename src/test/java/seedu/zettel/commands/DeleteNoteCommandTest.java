@@ -5,10 +5,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
@@ -21,17 +20,48 @@ public class DeleteNoteCommandTest {
 
     private static final String FILE_PATH = "./data/zettel.txt";
 
-    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-    private final PrintStream originalOut = System.out;
+    // Simple UI test double that records calls
+    private static class TestUI extends UI {
+        private final List<String> events = new ArrayList<>();
 
-    @BeforeEach // set up environment for test
-    public void setUpStreams() {
-        System.setOut(new PrintStream(outContent));
+        @Override
+        public void showDeleteNotFound(String id) {
+            events.add("notFound:" + id);
+        }
+
+        @Override
+        public void showDeleteConfirmation(String message) {
+            // record that confirmation was requested; include message for debugging if needed
+            events.add("confirm:" + message);
+        }
+
+        @Override
+        public void showNoteDeleted(String id) {
+            events.add("noteDeleted:" + id);
+        }
+
+        @Override
+        public void showDeletionCancelled() {
+            events.add("cancelled");
+        }
+
+        public boolean containsEvent(String e) {
+            return events.stream().anyMatch(s -> s.equals(e));
+        }
+
+        public List<String> getEvents() {
+            return events;
+        }
     }
 
-    @AfterEach // reset environment after test
-    public void restoreStreams() {
-        System.setOut(originalOut);
+    @BeforeEach
+    public void setUp() {
+        // nothing needed here anymore
+    }
+
+    @AfterEach
+    public void tearDown() {
+        // ensure System.in restored to default after tests that change it
         System.setIn(System.in);
     }
 
@@ -41,11 +71,20 @@ public class DeleteNoteCommandTest {
         notes.add(new Note("1", "Note One", "note1.txt", "Body 1", Instant.now(), Instant.now()));
         notes.add(new Note("2", "Note Two", "note2.txt", "Body 2", Instant.now(), Instant.now()));
 
-        DeleteNoteCommand cmd = new DeleteNoteCommand("1", true);
-        cmd.execute(notes, new UI(), new Storage(FILE_PATH));
+        TestUI ui = new TestUI();
+        // make Storage a no-op save so tests don't write files
+        Storage storage = new Storage(FILE_PATH) {
+            @Override
+            public void save(List<Note> notesToSave) {
+                // no-op for tests
+            }
+        };
 
-        String output = outContent.toString();
-        assertTrue(output.contains("note at 1 deleted"));
+        DeleteNoteCommand cmd = new DeleteNoteCommand("1", true);
+        cmd.execute(notes, ui, storage);
+
+        // assert UI recorded deletion event and note removed
+        assertTrue(ui.containsEvent("noteDeleted:1"), "expected UI to record noteDeleted:1");
         assertEquals(1, notes.size());
     }
 
@@ -54,11 +93,18 @@ public class DeleteNoteCommandTest {
         ArrayList<Note> notes = new ArrayList<>();
         notes.add(new Note("1", "Note One", "note1.txt", "Body 1", Instant.now(), Instant.now()));
 
-        DeleteNoteCommand cmd = new DeleteNoteCommand("3", true);
-        cmd.execute(notes, new UI(), new Storage(FILE_PATH));
+        TestUI ui = new TestUI();
+        Storage storage = new Storage(FILE_PATH) {
+            @Override
+            public void save(List<Note> notesToSave) {
+                // no-op for tests
+            }
+        };
 
-        String output = outContent.toString();
-        assertTrue(output.contains("No note found with id 3"));
+        DeleteNoteCommand cmd = new DeleteNoteCommand("3", true);
+        cmd.execute(notes, ui, storage);
+
+        assertTrue(ui.containsEvent("notFound:3"), "expected UI to record notFound:3");
         assertEquals(1, notes.size());
     }
 
@@ -71,11 +117,18 @@ public class DeleteNoteCommandTest {
         notes.add(new Note("1", "Note One", "note1.txt", "Body 1", Instant.now(), Instant.now()));
         notes.add(new Note("2", "Note Two", "note2.txt", "Body 2", Instant.now(), Instant.now()));
 
-        DeleteNoteCommand cmd = new DeleteNoteCommand("2", false);
-        cmd.execute(notes, new UI(), new Storage(FILE_PATH));
+        TestUI ui = new TestUI();
+        Storage storage = new Storage(FILE_PATH) {
+            @Override
+            public void save(List<Note> notesToSave) {
+                // no-op for tests
+            }
+        };
 
-        String output = outContent.toString();
-        assertTrue(output.contains("note at 2 deleted"));
+        DeleteNoteCommand cmd = new DeleteNoteCommand("2", false);
+        cmd.execute(notes, ui, storage);
+
+        assertTrue(ui.containsEvent("noteDeleted:2"), "expected UI to record noteDeleted:2");
         assertEquals(1, notes.size());
     }
 
@@ -88,11 +141,18 @@ public class DeleteNoteCommandTest {
         notes.add(new Note("1", "Note One", "note1.txt", "Body 1", Instant.now(), Instant.now()));
         notes.add(new Note("2", "Note Two", "note2.txt", "Body 2", Instant.now(), Instant.now()));
 
-        DeleteNoteCommand cmd = new DeleteNoteCommand("1", false);
-        cmd.execute(notes, new UI(), new Storage(FILE_PATH));
+        TestUI ui = new TestUI();
+        Storage storage = new Storage(FILE_PATH) {
+            @Override
+            public void save(List<Note> notesToSave) {
+                // no-op for tests
+            }
+        };
 
-        String output = outContent.toString();
-        assertTrue(output.contains("Deletion cancelled"));
+        DeleteNoteCommand cmd = new DeleteNoteCommand("1", false);
+        cmd.execute(notes, ui, storage);
+
+        assertTrue(ui.containsEvent("cancelled"), "expected UI to record cancelled");
         assertEquals(2, notes.size());
     }
 }

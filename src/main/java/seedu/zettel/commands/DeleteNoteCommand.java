@@ -30,7 +30,7 @@ public class DeleteNoteCommand extends Command {
 
         boolean shouldDelete = force;
         if (!force) {
-            ui.showDeleteConfirmation("Are you sure you want to delete '" + note.getTitle() + "', id " + id + "? (y/n)");
+            ui.showDeleteConfirmation("Confirm deletion on '" + note.getTitle() + "', id " + id + "? (y/n)");
 
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine().trim().toLowerCase();
