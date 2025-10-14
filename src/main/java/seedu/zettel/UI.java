@@ -12,7 +12,7 @@ public class UI {
 
 
     public String readCommand() {
-        return scanner.nextLine().trim();
+        return scanner.nextLine();
     }
 
     public void showWelcome() {
