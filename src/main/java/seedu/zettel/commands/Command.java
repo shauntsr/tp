@@ -1,5 +1,6 @@
 package seedu.zettel.commands;
 
+import seedu.zettel.Note;
 import seedu.zettel.UI;
 import seedu.zettel.Storage;
 
