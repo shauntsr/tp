@@ -1,4 +1,4 @@
-package seedu.exceptions;
+package seedu.zettel.exceptions;
 
 public class InvalidFormatException extends ZettelException {
     public InvalidFormatException(String message) {
