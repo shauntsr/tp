@@ -13,10 +13,18 @@ public class UI {
     }
 
     public String readCommand() {
-        if (!scanner.hasNextLine()) {
-            return "bye";  // Auto-exit when no more input (prevents hanging in CI)
+        try {
+            if (!scanner.hasNextLine()) {
+                return "bye";
+            }
+            String input = scanner.nextLine();
+            if (input == null) {
+                return "bye";
+            }
+            return input;
+        } catch (Exception e) {
+            return "bye";  // Return bye on any scanner error
         }
-        return scanner.nextLine();
     }
 
     public void showWelcome() {
