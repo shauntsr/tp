@@ -19,7 +19,7 @@ public class NewNoteCommand extends Command {
 
     @Override
     public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
-        String id = String.valueOf(Note.getNumberOfNotes());
+        String id = String.valueOf(Note.getNumberOfNotes() + 1);
         String filename = title.replaceAll("\\s+", "_") + ".txt";
 
         // Check if filename already exists
