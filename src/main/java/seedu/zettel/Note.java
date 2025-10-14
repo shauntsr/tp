@@ -11,7 +11,7 @@ public class Note {
             DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
 
     // Static counter for tracking total notes
-    private static int NUMBER_OF_NOTES = 0;
+    private static int numberOfNotes = 0;
     // Instance fields
     private final String id;
     private String title;
@@ -36,7 +36,7 @@ public class Note {
         this.archived = false;
         this.archiveName = null;
         this.logs = new ArrayList<>();
-        NUMBER_OF_NOTES++;
+        numberOfNotes++;
     }
 
     // Constructor with all fields (for loading from storage)
@@ -53,7 +53,7 @@ public class Note {
         this.archived = archived;
         this.archiveName = archiveName;
         this.logs = logs != null ? new ArrayList<>(logs) : new ArrayList<>();
-        NUMBER_OF_NOTES++;
+        numberOfNotes++;
     }
 
     // Getters
@@ -98,7 +98,7 @@ public class Note {
     }
 
     public static int getNumberOfNotes() {
-        return NUMBER_OF_NOTES;
+        return numberOfNotes;
     }
 
     // Setters
