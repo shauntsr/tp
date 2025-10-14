@@ -54,6 +54,9 @@ public class UI {
         System.out.println(" Bye. Hope to see you again soon!");
     }
 
+    public void showAddedNote(Note note) {
+        System.out.println("Note created: " + note.getFilename() + " #" + note.getId());
+    }
     public void showNoPinnedNotes() {
         System.out.println("No pinned notes found. Pin a note to add to this list.\n");
     }
