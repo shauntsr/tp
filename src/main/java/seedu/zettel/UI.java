@@ -12,7 +12,10 @@ public class UI {
 
 
     public String readCommand() {
-        return scanner.nextLine().trim();
+        if (!scanner.hasNextLine()) {
+            return "";
+        }
+        return scanner.nextLine();
     }
 
     public void showWelcome() {

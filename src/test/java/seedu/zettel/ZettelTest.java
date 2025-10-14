@@ -27,12 +27,11 @@ public class ZettelTest {
         System.setIn(System.in);
     }
 
-    @Test //test if print ascii and correct name
+    @Test
     public void testMainOutput() {
         Zettel.main(new String[]{});
         String output = outContent.toString();
-        assertTrue(output.contains("Hello from ZettelCLI"));
-        assertTrue(output.contains("What is your name?"));
-        assertTrue(output.contains("Hello James Gosling"));
+        assertTrue(output.contains("Hello! I'm Zettel"));
+        assertTrue(output.contains("What can I do for you?"));
     }
 }

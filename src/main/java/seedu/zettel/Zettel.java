@@ -36,6 +36,9 @@ public class Zettel {
         while (!isExit) {
             try {
                 String fullCommand = ui.readCommand();
+                if (fullCommand.isEmpty()) {
+                    break;
+                }
                 ui.printLine();
                 Command c = Parser.parse(fullCommand);
                 c.execute(notes, ui, storage);
