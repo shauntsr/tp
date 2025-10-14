@@ -1,1 +1,13 @@
-James Gosling
+new -t test1 -b hello1
+new -t test2 -b hello2
+new -t test3 -b hello3
+list
+pin f07685c6
+list -p
+unpin f07685c6
+list -p
+delete f07685c6
+y
+list
+find hello
+bye

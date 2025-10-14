@@ -50,10 +50,6 @@ public class UI {
         System.out.println(note);
     }
 
-    public void showDeleteNotFound(String id) {
-        System.out.println("No note found with id " + id);
-    }
-
     public void showError(String message) {
         System.out.println(message);
     }
@@ -102,12 +98,11 @@ public class UI {
     public void showFoundNotesMessage(ArrayList<Note> matchedNotes) {
         System.out.println(" Here are the matching notes in your list:");
         for (int i = 0; i < matchedNotes.size(); i++) {
-            System.out.println(" " + (i + 1) + ". " + matchedNotes.get(i).toStringWithIndex(i));
+            System.out.println(" " + (i + 1) + ". " + matchedNotes.get(i));
         }
     }
 
-    public void showJustPinnedNote(Note note, int idx) {
-        System.out.println(" Got it. I've " + (note.isPinned() ? "pinned" : "unpinned") + " this note:");
-        System.out.println(note.toStringWithIndex(idx));
+    public void showJustPinnedNote(Note note, String noteId) {
+        System.out.println(" Got it. I've " + (note.isPinned() ? "pinned" : "unpinned") + " this note: " + noteId);
     }
 }

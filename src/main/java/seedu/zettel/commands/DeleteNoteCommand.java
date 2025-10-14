@@ -24,7 +24,6 @@ public class DeleteNoteCommand extends Command {
         Optional<Note> maybe = notes.stream().filter(n -> n.getId().equals(id)).findFirst();
 
         if (maybe.isEmpty()) {
-            ui.showDeleteNotFound(id);
             throw new NoNoteException("You have no notes to delete.");
         }
 

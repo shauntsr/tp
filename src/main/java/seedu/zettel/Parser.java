@@ -130,13 +130,6 @@ public class Parser {
         }
         String idString = inputs[inputs.length - 1].trim();
 
-        if (idString.length() != 6) {
-            throw new InvalidIndexException(ID_INVALID);
-        }
-
-        if (!idString.matches("\\d{6}")) {
-            throw new InvalidIndexException(ID_INVALID);
-        }
         return idString;
     }
 }
