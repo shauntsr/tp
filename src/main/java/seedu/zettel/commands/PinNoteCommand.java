@@ -26,6 +26,6 @@ public class PinNoteCommand extends Command {
         // Update modified timestamp when pin state changes
         note.touchModified();
         ui.showJustPinnedNote(note, idx);
-        // storage.saveNote(note);
+        storage.save(notes);
     }
 }

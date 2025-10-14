@@ -26,10 +26,6 @@ public class UI {
         printLine();
     }
 
-    public void showDeletionNotFound() {
-
-    }
-
     public void showDeletionCancelled() {
         System.out.println("Deletion cancelled");
     }
