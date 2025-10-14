@@ -21,6 +21,7 @@ public class Note {
     // Date formatter for toString method
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
+
     // Static counter for tracking total notes
     private static int NUMBER_OF_NOTES = 0;
 
