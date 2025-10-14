@@ -1,5 +1,6 @@
 package seedu.zettel.commands;
 
+import seedu.zettel.exceptions.InvalidInputException;
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
@@ -27,7 +28,7 @@ public class NewNoteCommand extends Command {
                 .anyMatch(n-> n.getFilename().equals(filename));
 
         if (filenameExists) {
-            throw new ZettelException("Note already exists!");
+            throw new InvalidInputException("Note already exists!");
         }
 
         Instant now = Instant.now();

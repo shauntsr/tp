@@ -3,6 +3,7 @@ package seedu.zettel.commands;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import seedu.zettel.exceptions.InvalidInputException;
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
@@ -72,10 +73,10 @@ public class NewNoteCommandTest {
 
         NewNoteCommand cmd = new NewNoteCommand(title, body);
 
-        ZettelException e = assertThrows(ZettelException.class, () -> {
+        ZettelException e = assertThrows(InvalidInputException.class, () -> {
             cmd.execute(notes, ui, storage);
         });
-        assertEquals("Note already exists!", e.getMessage(), "Exception thrown with correct message.");
+        assertEquals("Invalid Input: Note already exists!", e.getMessage(), "Exception thrown with correct message.");
 
         // Ensure note list unchanged
         assertEquals(1, notes.size());
