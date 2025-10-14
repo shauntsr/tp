@@ -13,7 +13,9 @@ import java.io.PrintStream;
 import java.time.Instant;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class NewNoteCommandTest {
     private static final String FILE_PATH = "./data/zettel.txt";
