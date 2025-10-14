@@ -25,7 +25,6 @@ public class Parser {
     private static final String ID_EMPTY = "Please specify a Note ID to ";
     private static final String ID_INVALID = "Note ID must be exactly 6 Digits: eg. 123456 ";
     private static final String INIT_EMPTY = "Please specify a repo name!";
-    private static final String[] DATE_FORMATS = {"yyyy-MM-dd", "d/M/yyyy", "d-M-yyyy"};
 
     public static Command parse(String userCommand) throws ZettelException {
         String[] inputs = userCommand.split(" ");
