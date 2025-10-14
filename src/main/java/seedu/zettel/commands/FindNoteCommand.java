@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
 import seedu.zettel.UI;
+import seedu.zettel.exceptions.NoNoteException;
 import seedu.zettel.exceptions.ZettelException;
 
 public class FindNoteCommand extends Command{
@@ -17,7 +18,7 @@ public class FindNoteCommand extends Command{
     @Override
     public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
         if (notes.isEmpty()) {
-            throw new ZettelException("There are no notes available to search.");
+            throw new NoNoteException("There are no notes available to search.");
         }
         ArrayList<Note> matchedNotes = new ArrayList<>();
         for (Note note: notes) {
