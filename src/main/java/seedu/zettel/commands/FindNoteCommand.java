@@ -16,7 +16,7 @@ public class FindNoteCommand extends Command{
     }
 
     @Override
-    public Command execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
+    public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
         if (notes.isEmpty()) {
             throw new ZettelException("There are no notes available to search.");
         }
@@ -31,6 +31,5 @@ public class FindNoteCommand extends Command{
         } else {
             // ui.showFoundNotesMessage(matchedNotes);
         }
-        return this;
     }
 }
