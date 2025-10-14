@@ -1,4 +1,4 @@
-package seedu.duke;
+package seedu.zettel;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
@@ -10,7 +10,7 @@ import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DukeTest {
+public class ZettelTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
     private final ByteArrayInputStream inContent = new ByteArrayInputStream("James Gosling".getBytes());
@@ -29,7 +29,7 @@ public class DukeTest {
 
     @Test //test if print ascii and correct name
     public void testMainOutput() {
-        Duke.main(new String[]{});
+        Zettel.main(new String[]{});
         String output = outContent.toString();
         assertTrue(output.contains("Hello from ZettelCLI"));
         assertTrue(output.contains("What is your name?"));
