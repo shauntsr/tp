@@ -13,7 +13,7 @@ public class DeleteNoteCommand extends Command {
     }
 
     @Override
-    public CommandResult execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
+    public Command execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
         return null;
     }
 }
