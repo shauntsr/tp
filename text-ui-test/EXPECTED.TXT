@@ -1,0 +1,3 @@
+Hello from ZettelCLI
+What is your name?
+Hello James Gosling
