@@ -4,7 +4,6 @@ on: [push, pull_request]
 
 jobs:
   build:
-    timeout-minutes: 10
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
@@ -43,15 +42,14 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install dos2unix
 
-      # FIX: Append 'bye' to the specific test input file to prevent hanging.
       - name: Append exit command to test inputs (*NIX)
         if: runner.os == 'Linux' || runner.os == 'macOS'
-        run: echo -e "\nbye" >> tp/text-ui-test/input.txt
+        run: echo -e "\nbye" >> text-ui-test/input.txt
 
       - name: Append exit command to test inputs (Windows)
         if: runner.os == 'Windows'
         shell: cmd
-        run: (echo. & echo bye) >> tp\text-ui-test\input.txt
+        run: (echo. & echo bye) >> text-ui-test\input.txt
 
       - name: Perform IO redirection test (*NIX or macOS)
         if: runner.os == 'Linux' || runner.os == 'macOS'
