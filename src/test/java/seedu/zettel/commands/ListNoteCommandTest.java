@@ -3,7 +3,7 @@ package seedu.zettel.commands;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import seedu.duke.exceptions.ZettelException;
+import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
 import seedu.zettel.UI;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ListNodeCommandTest {
+public class ListNoteCommandTest {
     private static final String FILE_PATH = "./data/zettel.txt";
 
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
