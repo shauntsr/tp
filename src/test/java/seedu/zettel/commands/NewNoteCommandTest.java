@@ -48,12 +48,14 @@ public class NewNoteCommandTest {
         assertEquals(1, notes.size());
 
         Note note = notes.get(0);
-        assertEquals(title, note.getTitle());
-        assertEquals(body, note.getBody());
-        assertEquals( "Test_Note.txt", note.getFilename());
+        assertEquals(title, note.getTitle(), "Added note has correct title.");
+        assertEquals(body, note.getBody(), "Added note has correct body.");
+        assertEquals( "Test_Note.txt", note.getFilename(), "Added note has correct filename.");
 
         String output = outputStream.toString();
-        assertTrue(output.contains("Note created: Test_Note.txt #1"));
+        String expectedMessage = "Note created: " + note.getFilename() + " #" + note.getId();
+        assertTrue(output.contains(expectedMessage),
+                "Prints correct note created message with filename and ID");
     }
 
     @Test
@@ -71,7 +73,7 @@ public class NewNoteCommandTest {
         ZettelException e = assertThrows(ZettelException.class, () -> {
             cmd.execute(notes, ui, storage);
         });
-        assertEquals("Note already exists!", e.getMessage());
+        assertEquals("Note already exists!", e.getMessage(), "Exception thrown with correct message.");
 
         // Ensure note list unchanged
         assertEquals(1, notes.size());
