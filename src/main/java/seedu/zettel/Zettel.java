@@ -46,7 +46,6 @@ public class Zettel {
                 ui.printLine();
             }
         }
-
         ui.close();
     }
 

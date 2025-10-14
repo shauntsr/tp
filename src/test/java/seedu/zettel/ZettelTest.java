@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ZettelTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
-    private final ByteArrayInputStream inContent = new ByteArrayInputStream("James Gosling".getBytes());
+    private final ByteArrayInputStream inContent = new ByteArrayInputStream("James Gosling\n".getBytes());
 
     @BeforeEach //set up environment for test
     public void setUpStreams() {
