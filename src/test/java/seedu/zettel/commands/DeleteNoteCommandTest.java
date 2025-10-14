@@ -14,6 +14,7 @@ import seedu.zettel.Note;
 import seedu.zettel.Storage;
 import seedu.zettel.UI;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DeleteNoteCommandTest {
@@ -41,11 +42,11 @@ public class DeleteNoteCommandTest {
         notes.add(new Note("2", "Note Two", "note2.txt", "Body 2", Instant.now(), Instant.now()));
 
         DeleteNoteCommand cmd = new DeleteNoteCommand("1", true);
-        cmd.execute(notes, new UI(), new Storage());
+        cmd.execute(notes, new UI(), new Storage(FILE_PATH));
 
         String output = outContent.toString();
         assertTrue(output.contains("note at 1 deleted"));
-        assertTrue(notes.size() == 1);
+        assertEquals(1, notes.size());
     }
 
     @Test // test deleting a non-existing note
@@ -54,11 +55,11 @@ public class DeleteNoteCommandTest {
         notes.add(new Note("1", "Note One", "note1.txt", "Body 1", Instant.now(), Instant.now()));
 
         DeleteNoteCommand cmd = new DeleteNoteCommand("3", true);
-        cmd.execute(notes, new UI(), new Storage());
+        cmd.execute(notes, new UI(), new Storage(FILE_PATH));
 
         String output = outContent.toString();
         assertTrue(output.contains("No note found with id 3"));
-        assertTrue(notes.size() == 1);
+        assertEquals(1, notes.size());
     }
 
     @Test // test deleting a note without force, user confirms
@@ -71,11 +72,11 @@ public class DeleteNoteCommandTest {
         notes.add(new Note("2", "Note Two", "note2.txt", "Body 2", Instant.now(), Instant.now()));
 
         DeleteNoteCommand cmd = new DeleteNoteCommand("2", false);
-        cmd.execute(notes, new UI(), new Storage());
+        cmd.execute(notes, new UI(), new Storage(FILE_PATH));
 
         String output = outContent.toString();
         assertTrue(output.contains("note at 2 deleted"));
-        assertTrue(notes.size() == 1);
+        assertEquals(1, notes.size());
     }
 
     @Test // test deleting a note without force, user cancels
@@ -88,10 +89,10 @@ public class DeleteNoteCommandTest {
         notes.add(new Note("2", "Note Two", "note2.txt", "Body 2", Instant.now(), Instant.now()));
 
         DeleteNoteCommand cmd = new DeleteNoteCommand("1", false);
-        cmd.execute(notes, new UI(), new Storage());
+        cmd.execute(notes, new UI(), new Storage(FILE_PATH));
 
         String output = outContent.toString();
         assertTrue(output.contains("Deletion cancelled"));
-        assertTrue(notes.size() == 2);
+        assertEquals(2, notes.size());
     }
 }
