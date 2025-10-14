@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Note {
+    // Date formatter for toString method
+    private static final DateTimeFormatter DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
+
+    // Static counter for tracking total notes
+    private static int NUMBER_OF_NOTES = 0;
     // Instance fields
     private final String id;
     private String title;
@@ -17,13 +23,6 @@ public class Note {
     private boolean archived;
     private String archiveName;
     private List<String> logs; // history/log data
-
-    // Date formatter for toString method
-    private static final DateTimeFormatter DATE_FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
-
-    // Static counter for tracking total notes
-    private static int NUMBER_OF_NOTES = 0;
 
     // Constructor for creating a new note
     public Note(String id, String title, String filename, String body, Instant createdAt, Instant modifiedAt) {
