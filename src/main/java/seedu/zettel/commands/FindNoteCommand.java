@@ -2,12 +2,10 @@ package seedu.zettel.commands;
 
 import java.util.ArrayList;
 
-import seedu.zettel.exceptions.ZettelException;
-
-import seedu.duke.exceptions.ZettelException;
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
 import seedu.zettel.UI;
+import seedu.zettel.exceptions.ZettelException;
 
 public class FindNoteCommand extends Command{
     private final String keyword;
