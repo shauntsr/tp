@@ -18,6 +18,7 @@ public class ListNoteCommand extends Command{
 
     @Override
     public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException{
+        // Add notes
         notes.sort(Comparator.comparing(Note::getCreatedAt).reversed());
 
         List<Note> filtered = notes.stream()
@@ -26,24 +27,15 @@ public class ListNoteCommand extends Command{
 
         // Handle no notes found
         if (filtered.isEmpty() && showsPinnedOnly) {
-           System.out.println("No pinned notes found. Pin a note to add to this list.\n");
-           return;
-        }
-
-        if (filtered.isEmpty()) {
-            System.out.println("No notes found.\n");
+            ui.showNoPinnedNotes();
             return;
         }
 
-        // Show number of notes found.
-        if (showsPinnedOnly) {
-            System.out.println("You have " + filtered.size() + " pinned notes:\n");
-        } else {
-            System.out.println("You have " + filtered.size() + " notes:\n");
+        if (filtered.isEmpty()) {
+            ui.showNoNotes();
+            return;
         }
 
-        for (int idx = 0; idx < filtered.size(); idx++) {
-            System.out.println("    " + (idx + 1) + ". " + filtered.get(idx));
-        }
+        ui.showNoteList(filtered, showsPinnedOnly);
     }
 }

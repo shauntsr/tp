@@ -1,5 +1,6 @@
 package seedu.zettel;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class UI {
@@ -31,6 +32,27 @@ public class UI {
 
     public void showBye() {
         System.out.println(" Bye. Hope to see you again soon!");
+    }
+
+    public void showNoPinnedNotes() {
+        System.out.println("No pinned notes found. Pin a note to add to this list.\n");
+    }
+
+    public void showNoNotes() {
+        System.out.println("No notes found.\n");
+    }
+    public void showNoteList(List<Note> notes, boolean isPinned) {
+        // Show number of notes found.
+        if (isPinned) {
+            System.out.println("You have " + notes.size() + " pinned notes:");
+        } else {
+            System.out.println("You have " + notes.size() + " notes:");
+        }
+
+        // Show the list of notes.
+        for (int idx = 0; idx < notes.size(); idx++) {
+            System.out.println("    " + (idx + 1) + ". " + notes.get(idx));
+        }
     }
 
     public void printLine() {
