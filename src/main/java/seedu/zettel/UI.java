@@ -11,7 +11,6 @@ public class UI {
         this.scanner = new Scanner(System.in);
     }
 
-
     public String readCommand() {
         if (!scanner.hasNextLine()) {
             return "";
@@ -23,6 +22,18 @@ public class UI {
         printLine();
         System.out.println(" Hello! I'm Zettel");
         System.out.println(" What can I do for you?");
+        printLine();
+        System.out.println();
+        System.out.println(" Available Commands:");
+        System.out.println("   init <repo-name>           - Initialize a new repository");
+        System.out.println("   new -t <title> [-b <body>] - Create a new note");
+        System.out.println("   list [-p]                  - List all notes (or pinned only)");
+        System.out.println("   delete [-f] <note-id>      - Delete a note by ID");
+        System.out.println("   pin <note-id>              - Pin a note");
+        System.out.println("   unpin <note-id>            - Unpin a note");
+        System.out.println("   find <text>                - Search for notes");
+        System.out.println("   bye                        - Exit the application");
+        System.out.println();
         printLine();
     }
 
@@ -61,6 +72,7 @@ public class UI {
     public void showNoNotes() {
         System.out.println("No notes found.\n");
     }
+
     public void showNoteList(List<Note> notes, boolean isPinned) {
         // Show number of notes found.
         if (isPinned) {

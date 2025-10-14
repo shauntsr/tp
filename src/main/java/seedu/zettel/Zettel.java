@@ -2,57 +2,80 @@ package seedu.zettel;
 
 import seedu.zettel.commands.Command;
 import seedu.zettel.exceptions.ZettelException;
-import java.time.Instant;
 
 import java.util.ArrayList;
 
+/**
+ * Main class for the Zettel CLI application.
+ * Handles initialization, storage setup, and the main program loop.
+ */
 public class Zettel {
-    private static final String FILE_PATH = "./data/zettel.txt";
+    private static final String DATA_FILE_PATH = "data/notes.txt";
 
-    private final Storage storage;
-    private final ArrayList<Note> notes;
-    private final UI ui;
+    private Storage storage;
+    private ArrayList<Note> notes;
+    private UI ui;
+    private boolean isRunning;
 
-    public Zettel(String filePath) {
-        ui = new UI();
-        storage = new Storage(filePath);
-        notes = storage.load();
+    /**
+     * Constructor for Zettel application.
+     * Initializes the UI, storage, and loads existing notes.
+     */
+    public Zettel() {
+        this.ui = new UI();
+        this.storage = new Storage(DATA_FILE_PATH);
+        this.notes = storage.load();
+        this.isRunning = true;
     }
 
+    /**
+     * Runs the main application loop.
+     * Displays greeting, processes commands until exit command is received.
+     */
     public void run() {
         ui.showWelcome();
-        if (notes.isEmpty()) {
-            Instant timestamp = Instant.parse("2025-10-14T10:00:00Z");
-            Note testNote = new Note("abc123", "Test Note", "test.txt",
-                    "This is a test note body", timestamp, timestamp);
-            notes.add(testNote);
-            storage.save(notes);
-            System.out.println(notes);
-        }
 
-        System.out.println("Total notes: " + notes.size());
-        boolean isExit = false;
-
-        while (!isExit) {
+        while (isRunning) {
             try {
-                String fullCommand = ui.readCommand();
-                if (fullCommand.isEmpty()) {
+                String userInput = ui.readCommand();
+
+                // Skip empty input
+                if (userInput.trim().isEmpty()) {
+                    continue;
+                }
+
+                // Parse the command
+                Command command = Parser.parse(userInput);
+
+                // Check if it's an exit command
+                if (command.isExit()) {
+                    isRunning = false;
+                    ui.showBye();
                     break;
                 }
-                ui.printLine();
-                Command c = Parser.parse(fullCommand);
-                c.execute(notes, ui, storage);
-                isExit = c.isExit();
+
+                // Execute the command
+                command.execute(notes, ui, storage);
+
+                // Save notes after each command (auto-save)
+                storage.save(notes);
+
             } catch (ZettelException e) {
                 ui.showError(e.getMessage());
-            } finally {
-                ui.printLine();
+            } catch (Exception e) {
+                ui.showError("An unexpected error occurred: " + e.getMessage());
             }
         }
+
         ui.close();
     }
 
+    /**
+     * Main entry-point for the Zettel application.
+     *
+     * @param args command line arguments (not used)
+     */
     public static void main(String[] args) {
-        new Zettel(FILE_PATH).run();
+        new Zettel().run();
     }
 }
