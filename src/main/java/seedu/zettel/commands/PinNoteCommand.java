@@ -16,7 +16,7 @@ public class PinNoteCommand extends Command {
     }
 
     @Override
-    public Command execute(ArrayList<Note> notes, UI ui, Storage storage) {
+    public void execute(ArrayList<Note> notes, UI ui, Storage storage) {
 
         if (notes.size() <= noteId || noteId < 0) {
             throw new IndexOutOfBoundsException("Note with ID " + noteId + " does not exist.");
@@ -27,6 +27,6 @@ public class PinNoteCommand extends Command {
         note.touchModified();
         // ui.showNote(note);
         // storage.saveNote(note);
-        return this;
+        return;
     }
 }

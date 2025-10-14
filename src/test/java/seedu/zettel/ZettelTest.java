@@ -1,22 +1,37 @@
 package seedu.zettel;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
-/**
- * Simple JUnit tests for the Zettel main class.
- */
-class ZettelTest {
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
-    @Test
-    void testZettelConstructor() {
-        Zettel zettel = new Zettel();
-        assertNotNull(zettel);
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class ZettelTest {
+    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    private final PrintStream originalOut = System.out;
+    private final ByteArrayInputStream inContent = new ByteArrayInputStream("James Gosling\n".getBytes());
+
+    @BeforeEach //set up environment for test
+    public void setUpStreams() {
+        System.setOut(new PrintStream(outContent));
+        System.setIn(inContent);
+    }
+
+    @AfterEach //reset environment after test
+    public void restoreStreams() {
+        System.setOut(originalOut);
+        System.setIn(System.in);
     }
 
     @Test
-    void testMainMethodExists() {
-        // Just verify the main method doesn't throw exception on instantiation
-        assertNotNull(Zettel.class);
+    public void testMainOutput() {
+        Zettel.main(new String[]{});
+        String output = outContent.toString();
+        assertTrue(output.contains("Hello! I'm Zettel"));
+        assertTrue(output.contains("What can I do for you?"));
     }
 }
