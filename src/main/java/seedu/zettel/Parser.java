@@ -108,7 +108,8 @@ public class Parser {
             throw new InvalidFormatException(PIN_FORMAT);
         }
         String noteID = parseNoteID(inputs, "pin/unpin");
-        return new PinNoteCommand(1, isPin);
+        int ID = Integer.parseInt(noteID);
+        return new PinNoteCommand(ID, isPin);
     }
 
     private static Command parseDeleteNoteCommand(String[] inputs) throws ZettelException {
