@@ -9,7 +9,7 @@ import seedu.zettel.UI;
 
 public abstract class Command {
 
-    public abstract Command execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException;
+    public abstract void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException;
 
     public boolean isExit() {
         return false;
