@@ -8,7 +8,7 @@ import seedu.zettel.UI;
 import java.util.ArrayList;
 
 public class DeleteNoteCommand extends Command {
-    public DeleteNoteCommand(int noteID, boolean forceDelete) {
+    public DeleteNoteCommand(String noteID, boolean forceDelete) {
         super();
     }
 

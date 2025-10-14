@@ -107,8 +107,9 @@ public class Parser {
         if (inputs.length > 2) {
             throw new InvalidFormatException(PIN_FORMAT);
         }
-        int noteID = parseNoteID(inputs, "pin/unpin");
-        return new PinNoteCommand(noteID, isPin);
+        String noteID = parseNoteID(inputs, "pin/unpin");
+        int ID = Integer.parseInt(noteID);
+        return new PinNoteCommand(ID, isPin);
     }
 
     private static Command parseDeleteNoteCommand(String[] inputs) throws ZettelException {
@@ -122,12 +123,12 @@ public class Parser {
             }
             forceDelete = true;
         }
-        int noteID = parseNoteID(inputs, "delete");
+        String noteID = parseNoteID(inputs, "delete");
         return new DeleteNoteCommand(noteID, forceDelete);
     }
 
 
-    private static int parseNoteID(String[] inputs, String actionName) throws ZettelException {
+    private static String parseNoteID(String[] inputs, String actionName) throws ZettelException {
         if (inputs.length < 2) {
             throw new EmptyDescriptionException(ID_EMPTY + actionName + "!");
         }
@@ -136,10 +137,10 @@ public class Parser {
         if (idString.length() != 6) {
             throw new InvalidIndexException(ID_INVALID);
         }
-        try {
-            return Integer.parseInt(idString);
-        } catch (NumberFormatException e) {
+
+        if (!idString.matches("\\d{6}")) {
             throw new InvalidIndexException(ID_INVALID);
         }
+        return idString;
     }
 }
