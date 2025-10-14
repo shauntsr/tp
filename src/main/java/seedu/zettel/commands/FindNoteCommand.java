@@ -1,19 +1,36 @@
 package seedu.zettel.commands;
 
 
+import java.util.ArrayList;
+
 import seedu.duke.exceptions.ZettelException;
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
 import seedu.zettel.UI;
 
-import java.util.ArrayList;
-
 public class FindNoteCommand extends Command{
-    public FindNoteCommand(String content) {
+    private final String keyword;
+
+    public FindNoteCommand(String keyword) {
+        this.keyword = keyword;
     }
 
     @Override
     public Command execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
-        return null;
+        if (notes.isEmpty()) {
+            throw new ZettelException("There are no notes available to search.");
+        }
+        ArrayList<Note> matchedNotes = new ArrayList<>();
+        for (Note note: notes) {
+            if (note.getBody().toLowerCase().contains(keyword.toLowerCase())) {
+                matchedNotes.add(note);
+            }
+        }
+        if (matchedNotes.isEmpty()) {
+            // ui.showNoNotesFoundMessage();
+        } else {
+            // ui.showFoundNotesMessage(matchedNotes);
+        }
+        return this;
     }
 }

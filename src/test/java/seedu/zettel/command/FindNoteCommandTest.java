@@ -1,0 +1,55 @@
+package seedu.zettel.commands;
+
+import java.time.Instant;
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import seedu.duke.exceptions.ZettelException;
+import seedu.zettel.Note;
+
+public class FindNoteCommandTest {
+    @Test
+    public void testValidFindNoteCommandNoteIsFound(){
+        ArrayList<Note> notes = new ArrayList<>();
+        notes.add(new Note("id-0", "Title 0", "file0.txt", "Body 0", Instant.now(), Instant.now()));
+        notes.add(new Note("id-1", "Title 1", "file1.txt", "Body 1", Instant.now(), Instant.now()));
+        // FindNoteCommand searches in note body (case-insensitive)
+        String keyword = "body 1";
+        FindNoteCommand command = new FindNoteCommand(keyword);
+        int sizeBefore = notes.size();
+        Command returned = assertDoesNotThrow(() -> command.execute(notes, null, null));
+        assertTrue(returned == command, "execute should return the same command instance");
+        assertEquals(sizeBefore, notes.size(), "execute should not mutate the notes list size");
+    }
+
+    @Test 
+    public void testNoNotesFound() {
+        ArrayList<Note> notes = new ArrayList<>();
+        notes.add(new Note("id-0", "Title 0", "file0.txt", "Body 0", Instant.now(), Instant.now()));
+        notes.add(new Note("id-1", "Title 1", "file1.txt", "Body 1", Instant.now(), Instant.now()));
+        String keyword = "Hello";
+        FindNoteCommand command = new FindNoteCommand(keyword);
+        int sizeBefore = notes.size();
+        Command returned = assertDoesNotThrow(() -> command.execute(notes, null, null));
+        assertTrue(returned == command, "execute should return the same command instance");
+        assertEquals(sizeBefore, notes.size(), "execute should not mutate the notes list size");
+    }
+
+    @Test 
+    public void testNoNotesAvailable() {
+        ArrayList<Note> notes = new ArrayList<>();
+        FindNoteCommand command = new FindNoteCommand("Title");
+        try {
+            command.execute(notes, null, null);
+            org.junit.jupiter.api.Assertions.fail("Expected ZettelException when there are no notes");
+        } catch (ZettelException ex) {
+            assertTrue(ex.getMessage() == null || ex.getMessage().toLowerCase().contains("no notes"),
+                    "Exception message should mention that there are no notes");
+        }
+    }
+
+}
