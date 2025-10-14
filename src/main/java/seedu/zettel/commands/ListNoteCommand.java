@@ -10,11 +10,11 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ListNoteCommand extends Command{
+    private final boolean showsPinnedOnly;
+
     public ListNoteCommand(boolean showsPinnedOnly) {
         this.showsPinnedOnly = showsPinnedOnly;
     }
-
-    private final boolean showsPinnedOnly;
 
     @Override
     public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException{
