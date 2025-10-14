@@ -10,7 +10,7 @@ import seedu.zettel.UI;
 
 public class DeleteNoteCommand extends Command {
     private final String id;
-    private boolean force = false;
+    private boolean force;
 
     public DeleteNoteCommand(String noteId, boolean force) {
         this.id = noteId;
@@ -22,7 +22,7 @@ public class DeleteNoteCommand extends Command {
         Optional<Note> maybe = notes.stream().filter(n -> n.getId().equals(id)).findFirst();
 
         if (maybe.isEmpty()) {
-            System.out.println("No note found with id " + id);
+            ui.showDeleteNotFound(id);
             return;
         }
 
@@ -30,7 +30,7 @@ public class DeleteNoteCommand extends Command {
 
         boolean shouldDelete = force;
         if (!force) {
-            System.out.println("Are you sure you want to delete '" + note.getTitle() + "', id " + id + "? (y/n)");
+            ui.showDeleteConfirmation("Are you sure you want to delete '" + note.getTitle() + "', id " + id + "? (y/n)");
 
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine().trim().toLowerCase();
@@ -39,10 +39,12 @@ public class DeleteNoteCommand extends Command {
 
         if (shouldDelete) {
             notes.remove(note);
-            // storage.deleteNoteFile(note);
-            System.out.println("note at " + id + " deleted");
+            storage.save(notes);
+            ui.showNoteDeleted(id);
         } else {
-            System.out.println("Deletion cancelled");
+            ui.showDeletionCancelled();
         }
     }
+
+
 }
