@@ -42,6 +42,17 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install dos2unix
 
+      - name: Append exit command to test inputs (*NIX)
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        working-directory: ${{ github.workspace }}/text-ui-test
+        run: find cases -name "input.txt" -exec sh -c 'echo "" >> {} && echo "bye" >> {}' \;
+
+      - name: Append exit command to test inputs (Windows)
+        if: runner.os == 'Windows'
+        working-directory: ${{ github.workspace }}/text-ui-test
+        shell: cmd
+        run: for /r cases %%f in (input.txt) do (echo. >> "%%f" & echo bye >> "%%f")
+
       - name: Perform IO redirection test (*NIX or macOS)
         if: runner.os == 'Linux' || runner.os == 'macOS'
         working-directory: ${{ github.workspace }}/text-ui-test
@@ -52,3 +63,4 @@ jobs:
         working-directory: ${{ github.workspace }}/text-ui-test
         shell: cmd
         run: runtest.bat
+

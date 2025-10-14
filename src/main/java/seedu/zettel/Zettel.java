@@ -4,6 +4,11 @@ import seedu.zettel.commands.Command;
 import seedu.zettel.exceptions.ZettelException;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Main class for the Zettel CLI application.
@@ -11,6 +16,7 @@ import java.util.ArrayList;
  */
 public class Zettel {
     private static final String DATA_FILE_PATH = "data/notes.txt";
+    private static final int READ_TIMEOUT_SECONDS = 30;
 
     private Storage storage;
     private ArrayList<Note> notes;
@@ -34,11 +40,21 @@ public class Zettel {
      */
     public void run() {
         ui.showWelcome();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
 
         while (isRunning) {
             try {
-                // Simplified input reading, no longer needs a timeout.
-                String userInput = ui.readCommand();
+                // Read command with timeout
+                Future<String> future = executor.submit(() -> ui.readCommand());
+                String userInput;
+
+                try {
+                    userInput = future.get(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                } catch (TimeoutException e) {
+                    future.cancel(true);
+                    ui.showError("Input timeout. Exiting...");
+                    break;
+                }
 
                 // Skip empty input
                 if (userInput.trim().isEmpty()) {
@@ -68,7 +84,7 @@ public class Zettel {
             }
         }
 
-        ui.showBye();
+        executor.shutdownNow();
         ui.close();
     }
 
