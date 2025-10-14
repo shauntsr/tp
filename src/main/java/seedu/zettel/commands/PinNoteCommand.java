@@ -8,7 +8,7 @@ import seedu.zettel.UI;
 import java.util.ArrayList;
 
 public class PinNoteCommand extends Command {
-    public PinNoteCommand(int noteID, boolean isPin) {
+    public PinNoteCommand(String noteID, boolean isPin) {
         super();
     }
 

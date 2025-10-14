@@ -10,6 +10,7 @@ public class UI {
         this.scanner = new Scanner(System.in);
     }
 
+
     public String readCommand() {
         return scanner.nextLine().trim();
     }
@@ -19,6 +20,10 @@ public class UI {
         System.out.println(" Hello! I'm Zettel");
         System.out.println(" What can I do for you?");
         printLine();
+    }
+
+    public void showError(String message) {
+        System.out.println(message);
     }
 
     public void showBye() {
