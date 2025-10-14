@@ -1,7 +1,8 @@
 package seedu.zettel.commands;
 
-
 import java.util.ArrayList;
+
+import seedu.zettel.exceptions.ZettelException;
 
 import seedu.duke.exceptions.ZettelException;
 import seedu.zettel.Note;

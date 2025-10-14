@@ -1,5 +1,6 @@
 package seedu.zettel;
 
+
 import seedu.zettel.commands.Command;
 import seedu.zettel.commands.DeleteNoteCommand;
 import seedu.zettel.commands.ExitCommand;
