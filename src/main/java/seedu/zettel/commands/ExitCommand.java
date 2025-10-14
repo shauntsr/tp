@@ -1,6 +1,6 @@
 package seedu.zettel.commands;
 
-import seedu.duke.exceptions.ZettelException;
+import seedu.exceptions.ZettelException;
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
 import seedu.zettel.UI;

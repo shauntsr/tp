@@ -1,4 +1,4 @@
-package seedu.duke.exceptions;
+package seedu.exceptions;
 
 public class ZettelException extends Exception {
     public ZettelException(String message) {

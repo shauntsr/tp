@@ -1,4 +1,4 @@
-package seedu.duke.exceptions;
+package seedu.exceptions;
 
 public class InvalidIndexException extends ZettelException {
     public InvalidIndexException(String message) {

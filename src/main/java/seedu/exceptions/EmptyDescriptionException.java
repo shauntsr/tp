@@ -1,4 +1,4 @@
-package seedu.duke.exceptions;
+package seedu.exceptions;
 
 public class EmptyDescriptionException extends ZettelException {
     public EmptyDescriptionException(String message) {

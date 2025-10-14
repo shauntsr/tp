@@ -1,10 +1,10 @@
 package seedu.zettel;
 
-import seedu.duke.exceptions.ZettelException;
-import seedu.duke.exceptions.EmptyDescriptionException;
-import seedu.duke.exceptions.InvalidInputException;
-import seedu.duke.exceptions.InvalidFormatException;
-import seedu.duke.exceptions.InvalidIndexException;
+import seedu.exceptions.ZettelException;
+import seedu.exceptions.EmptyDescriptionException;
+import seedu.exceptions.InvalidInputException;
+import seedu.exceptions.InvalidFormatException;
+import seedu.exceptions.InvalidIndexException;
 import seedu.zettel.commands.Command;
 import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.DeleteNoteCommand;
