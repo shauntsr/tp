@@ -1,5 +1,6 @@
 package seedu.zettel.commands;
 
+import seedu.duke.exceptions.ZettelException;
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
 import seedu.zettel.UI;
@@ -16,7 +17,7 @@ public class ListNoteCommand extends Command{
     private final boolean showsPinnedOnly;
 
     @Override
-    public void execute(ArrayList<Note> notes, UI ui, Storage storage) {
+    public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException{
         notes.sort(Comparator.comparing(Note::getCreatedAt).reversed());
 
         List<Note> filtered = notes.stream()

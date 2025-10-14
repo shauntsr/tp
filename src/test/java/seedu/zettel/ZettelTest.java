@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ZettelTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
-    private final ByteArrayInputStream inContent = new ByteArrayInputStream("James Gosling".getBytes());
+    private final ByteArrayInputStream inContent = new ByteArrayInputStream("James Gosling\n".getBytes());
 
     @BeforeEach //set up environment for test
     public void setUpStreams() {
@@ -27,12 +27,11 @@ public class ZettelTest {
         System.setIn(System.in);
     }
 
-    @Test //test if print ascii and correct name
+    @Test
     public void testMainOutput() {
         Zettel.main(new String[]{});
         String output = outContent.toString();
-        assertTrue(output.contains("Hello from ZettelCLI"));
-        assertTrue(output.contains("What is your name?"));
-        assertTrue(output.contains("Hello James Gosling"));
+        assertTrue(output.contains("Hello! I'm Zettel"));
+        assertTrue(output.contains("What can I do for you?"));
     }
 }

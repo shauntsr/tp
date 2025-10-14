@@ -7,11 +7,7 @@ import seedu.zettel.UI;
 
 import java.util.ArrayList;
 
-public class DeleteNoteCommand extends Command {
-    public DeleteNoteCommand(String noteID, boolean forceDelete) {
-        super();
-    }
-
+public class ExitCommand extends Command {
     @Override
     public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
         return;
