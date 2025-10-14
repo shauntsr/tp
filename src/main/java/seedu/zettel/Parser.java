@@ -1,10 +1,5 @@
 package seedu.zettel;
 
-import seedu.duke.exceptions.EmptyDescriptionException;
-import seedu.duke.exceptions.InvalidFormatException;
-import seedu.duke.exceptions.InvalidIndexException;
-import seedu.duke.exceptions.InvalidInputException;
-import seedu.duke.exceptions.ZettelException;
 import seedu.zettel.commands.Command;
 import seedu.zettel.commands.DeleteNoteCommand;
 import seedu.zettel.commands.ExitCommand;
@@ -13,6 +8,11 @@ import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.ListNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.PinNoteCommand;
+import seedu.zettel.exceptions.EmptyDescriptionException;
+import seedu.zettel.exceptions.InvalidFormatException;
+import seedu.zettel.exceptions.InvalidIndexException;
+import seedu.zettel.exceptions.InvalidInputException;
+import seedu.zettel.exceptions.ZettelException;
 
 public class Parser {
     private static final String LIST_FORMAT = "List format should be: list [-p]";
