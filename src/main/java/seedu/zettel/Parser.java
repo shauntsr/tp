@@ -1,13 +1,13 @@
 package seedu.zettel;
 
-import seedu.duke.exceptions.ZettelException;
 import seedu.duke.exceptions.EmptyDescriptionException;
-import seedu.duke.exceptions.InvalidInputException;
 import seedu.duke.exceptions.InvalidFormatException;
 import seedu.duke.exceptions.InvalidIndexException;
+import seedu.duke.exceptions.InvalidInputException;
+import seedu.duke.exceptions.ZettelException;
 import seedu.zettel.commands.Command;
-import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.DeleteNoteCommand;
+import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.FindNoteCommand;
 import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.ListNoteCommand;
@@ -104,9 +104,8 @@ public class Parser {
         if (inputs.length > 2) {
             throw new InvalidFormatException(PIN_FORMAT);
         }
-        String noteID = parseNoteID(inputs, "pin/unpin");
-        int id = Integer.parseInt(noteID);
-        return new PinNoteCommand(id, isPin);
+        String noteId = parseNoteID(inputs, "pin/unpin");
+        return new PinNoteCommand(noteId, isPin);
     }
 
     private static Command parseDeleteNoteCommand(String[] inputs) throws ZettelException {
@@ -119,8 +118,8 @@ public class Parser {
             }
             forceDelete = true;
         }
-        String noteID = parseNoteID(inputs, "delete");
-        return new DeleteNoteCommand(noteID, forceDelete);
+        String noteId = parseNoteID(inputs, "delete");
+        return new DeleteNoteCommand(noteId, forceDelete);
     }
 
 

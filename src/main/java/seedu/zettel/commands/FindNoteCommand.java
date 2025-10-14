@@ -27,9 +27,9 @@ public class FindNoteCommand extends Command{
             }
         }
         if (matchedNotes.isEmpty()) {
-            // ui.showNoNotesFoundMessage();
+            ui.showNoNotesFoundMessage();
         } else {
-            // ui.showFoundNotesMessage(matchedNotes);
+            ui.showFoundNotesMessage(matchedNotes);
         }
     }
 }

@@ -21,8 +21,7 @@ public class FindNoteCommandTest {
         String keyword = "body 1";
         FindNoteCommand command = new FindNoteCommand(keyword);
         int sizeBefore = notes.size();
-        Command returned = assertDoesNotThrow(() -> command.execute(notes, null, null));
-        assertTrue(returned == command, "execute should return the same command instance");
+        assertDoesNotThrow(() -> command.execute(notes, null, null));
         assertEquals(sizeBefore, notes.size(), "execute should not mutate the notes list size");
     }
 
@@ -34,8 +33,7 @@ public class FindNoteCommandTest {
         String keyword = "Hello";
         FindNoteCommand command = new FindNoteCommand(keyword);
         int sizeBefore = notes.size();
-        Command returned = assertDoesNotThrow(() -> command.execute(notes, null, null));
-        assertTrue(returned == command, "execute should return the same command instance");
+        assertDoesNotThrow(() -> command.execute(notes, null, null));
         assertEquals(sizeBefore, notes.size(), "execute should not mutate the notes list size");
     }
 
