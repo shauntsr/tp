@@ -14,7 +14,7 @@ public class UI {
 
     public String readCommand() {
         if (!scanner.hasNextLine()) {
-            return "";
+            return "bye";  // Auto-exit when no more input (prevents hanging in CI)
         }
         return scanner.nextLine();
     }

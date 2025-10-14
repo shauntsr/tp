@@ -67,7 +67,6 @@ public class Zettel {
                 // Check if it's an exit command
                 if (command.isExit()) {
                     isRunning = false;
-                    ui.showBye();
                     break;
                 }
 

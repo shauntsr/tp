@@ -46,14 +46,7 @@ class ZettelTest {
     }
 
     @Test
-    void testZettelConstructorLoadsNotes() {
-        Zettel zettel = new Zettel();
-        assertNotNull(zettel);
-    }
-
-    @Test
     void testMainMethodExists() {
-        // Verify the main method and class exist
         assertNotNull(Zettel.class);
         assertDoesNotThrow(() -> {
             Zettel.class.getDeclaredMethod("main", String[].class);
@@ -64,14 +57,6 @@ class ZettelTest {
     void testZettelInstantiationDoesNotThrow() {
         assertDoesNotThrow(() -> {
             new Zettel();
-        });
-    }
-
-    @Test
-    void testZettelConstructorInitializesAllComponents() {
-        assertDoesNotThrow(() -> {
-            Zettel zettel = new Zettel();
-            assertNotNull(zettel);
         });
     }
 
