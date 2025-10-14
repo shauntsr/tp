@@ -1,29 +1,32 @@
 package seedu.zettel;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class UI {
     private static final String LINE = "____________________________________________________________";
-    private final Scanner scanner;
+    private final BufferedReader reader; // Changed from Scanner to BufferedReader
 
     public UI() {
-        this.scanner = new Scanner(System.in);
+        this.reader = new BufferedReader(new InputStreamReader(System.in));
     }
 
     public String readCommand() {
         try {
-            if (!scanner.hasNextLine()) {
-                return "bye";
-            }
-            String input = scanner.nextLine();
+            String input = reader.readLine();
+
+            // When the input stream ends (like in a CI test), readLine() returns null.
+            // We treat this as a signal to exit the application.
             if (input == null) {
                 return "bye";
             }
             return input;
-        } catch (Exception e) {
-            return "bye";  // Return bye on any scanner error
+        } catch (IOException e) {
+            // If any I/O error occurs, safely exit.
+            return "bye";
         }
     }
 
@@ -97,7 +100,11 @@ public class UI {
     }
 
     public void close() {
-        scanner.close();
+        try {
+            reader.close();
+        } catch (IOException e) {
+            System.err.println("Warning: Error closing the input reader.");
+        }
     }
 
     public void showNoNotesFoundMessage() {
