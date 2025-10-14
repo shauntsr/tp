@@ -1,5 +1,6 @@
 package seedu.zettel;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -24,10 +25,6 @@ public class UI {
         System.out.println(" Hello! I'm Zettel");
         System.out.println(" What can I do for you?");
         printLine();
-    }
-
-    public void showDeletionNotFound() {
-
     }
 
     public void showDeletionCancelled() {
@@ -81,5 +78,21 @@ public class UI {
 
     public void close() {
         scanner.close();
+    }
+
+    public void showNoNotesFoundMessage() {
+        System.out.println(" No notes found matching the search criteria.");
+    }
+
+    public void showFoundNotesMessage(ArrayList<Note> matchedNotes) {
+        System.out.println(" Here are the matching notes in your list:");
+        for (int i = 0; i < matchedNotes.size(); i++) {
+            System.out.println(" " + (i + 1) + ". " + matchedNotes.get(i).toStringWithIndex(i));
+        }
+    }
+
+    public void showJustPinnedNote(Note note, int idx) {
+        System.out.println(" Got it. I've " + (note.isPinned() ? "pinned" : "unpinned") + " this note:");
+        System.out.println(note.toStringWithIndex(idx));
     }
 }
