@@ -6,10 +6,13 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class NoteTest {
 
@@ -149,7 +152,8 @@ class NoteTest {
         Instant initialModifiedAt = note.getModifiedAt();
         Thread.sleep(1); // Ensure the clock tick is registered
         note.touchModified();
-        assertTrue(note.getModifiedAt().isAfter(initialModifiedAt), "touchModified should update the timestamp to a later time.");
+        assertTrue(note.getModifiedAt().isAfter(initialModifiedAt),
+                "touchModified should update the timestamp to a later time.");
     }
 
     @Test
