@@ -1,154 +1,139 @@
 package seedu.duke;
 
-import seedu.duke.commands.AddCommand;
 import seedu.duke.commands.Command;
-import seedu.duke.commands.DeleteCommand;
 import seedu.duke.commands.ExitCommand;
-import seedu.duke.commands.FindCommand;
-import seedu.duke.commands.ListCommand;
-import seedu.duke.commands.ListDateCommand;
-import seedu.duke.commands.MarkCommand;
-import seedu.duke.exceptions.CoachException;
+import seedu.duke.exceptions.ZettelException;
 import seedu.duke.exceptions.EmptyDescriptionException;
 import seedu.duke.exceptions.InvalidInputException;
-import seedu.duke.exceptions.InvalidTaskFormatException;
-import seedu.duke.exceptions.InvalidTaskIndexException;
+import seedu.duke.exceptions.InvalidFormatException;
+import seedu.duke.exceptions.InvalidIndexException;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class Parser {
-    private static final String TODO_EMPTY = "Task description cannot be empty!";
-    private static final String DEADLINE_FORMAT = "Deadline format should be: deadline <description> /by <time>";
-    private static final String DEADLINE_EMPTY = "Task description and deadline cannot be empty!";
-    private static final String EVENT_FORMAT = "Event format should be: event <description> /from <time> /to <time>";
-    private static final String EVENT_EMPTY = "Task description, start and end time cannot be empty!";
-    private static final String INDEX_EMPTY = "Please specify a task number to ";
-    private static final String INDEX_INVALID = "Task number must be a valid integer!";
-    private static final String ON_EMPTY = "Please specify a date!";
+    private static final String LIST_FORMAT = "List format should be: list [-p]";
+    private static final String PIN_FORMAT = "Pin format should be: pin/unpin <NOTE_ID>";
+    private static final String DELETE_FORMAT = "Delete format should be: delete [-f] <NOTE_ID> ";
+    private static final String NOTE_FORMAT = "New note format should be: new -t <TITLE> [-b <BODY>]";
+    private static final String NOTE_EMPTY = "Note title cannot be empty!";
+    private static final String ID_EMPTY = "Please specify a Note ID to ";
+    private static final String ID_INVALID = "Note ID must be exactly 6 Digits: eg. 123456 ";
+    private static final String INIT_EMPTY = "Please specify a repo name!";
     private static final String[] DATE_FORMATS = {"yyyy-MM-dd", "d/M/yyyy", "d-M-yyyy"};
 
-    public static Command parse(String userCommand) throws CoachException {
+    public static Command parse(String userCommand) throws ZettelException {
         String[] inputs = userCommand.split(" ");
         String command = inputs[0].toLowerCase();
 
         return switch (command) {
         case "bye" -> new ExitCommand();
-        case "list" -> new ListCommand();
-        case "mark" -> parseMarkCommand(inputs, true);
-        case "unmark" -> parseMarkCommand(inputs, false);
-        case "todo" -> parseTodoCommand(userCommand);
-        case "deadline" -> parseDeadlineCommand(userCommand);
-        case "event" -> parseEventCommand(userCommand);
-        case "delete" -> parseDeleteCommand(inputs);
-        case "on" -> parseListDateCommand(userCommand);
-        case "find" -> parseFindCommand(userCommand);
+        case "list" -> parseListNoteCommand(userCommand);
+        case "new" -> parseNewNoteCommand(userCommand);
+        case "delete" -> parseDeleteNoteCommand(inputs);
+        case "pin" -> parsePinNoteCommand(inputs, true);
+        case "unpin" -> parsePinNoteCommand(inputs, false);
+        case "init" -> parseInitCommand(userCommand);
+        case "find" -> parseFindNoteCommand(userCommand);
         default -> throw new InvalidInputException(command);
         };
 
     }
 
-    private static Command parseTodoCommand(String input) throws CoachException {
+    private static Command parseListNoteCommand(String input) throws ZettelException {
         String content = input.substring(4).trim();
         if (content.isEmpty()) {
-            throw new EmptyDescriptionException(TODO_EMPTY);
+            return new ListNoteCommand(false);
         }
-        return new AddCommand(content, AddCommand.TaskType.TODO);
+        else if (!content.equals("-p")) {
+            throw new InvalidFormatException(LIST_FORMAT);
+        }
+        return new ListNoteCommand(true);
     }
 
-    private static Command parseDeadlineCommand(String input) throws CoachException {
+    private static Command parseInitCommand(String input) throws ZettelException {
+        String content = input.substring(4).trim();
+        if (content.isEmpty()) {
+            throw new EmptyDescriptionException(INIT_EMPTY);
+        }
+        return new InitCommand(content);
+    }
+
+    private static Command parseNewNoteCommand(String input) throws ZettelException {
         try {
-            String content = input.substring(9);
-            int byIndex = content.indexOf("/by ");
+            String content = input.substring(3).trim();
 
-            if (byIndex == -1) {
-                throw new InvalidTaskFormatException(DEADLINE_FORMAT);
+            int titleIndex = content.indexOf("-t");
+            int bodyIndex = content.indexOf("-b");
+
+            if (titleIndex == -1) {
+                throw new InvalidFormatException(NOTE_FORMAT);
+            }
+            String title;
+            String body = "";
+
+            if (bodyIndex != -1) {
+                title = content.substring(titleIndex + 2, bodyIndex).trim();
+                body = content.substring(bodyIndex + 2).trim();
+            } else {
+                title = content.substring(titleIndex + 2).trim();
             }
 
-            String name = content.substring(0, byIndex).trim();
-            String deadline = content.substring(byIndex + 4).trim();
-
-            if (name.isEmpty() || deadline.isEmpty()) {
-                throw new EmptyDescriptionException(DEADLINE_EMPTY);
+            if (title.isEmpty()) {
+                throw new EmptyDescriptionException(NOTE_EMPTY);
             }
 
-            return new AddCommand(name, deadline, AddCommand.TaskType.DEADLINE);
+            return new NewNoteCommand(title, body);
 
         } catch (StringIndexOutOfBoundsException e) {
-            throw new EmptyDescriptionException(DEADLINE_EMPTY);
+            throw new InvalidFormatException(NOTE_FORMAT);
         }
     }
 
-    private static Command parseEventCommand(String input) throws CoachException {
-        try {
-            String content = input.substring(6);
-
-            int fromIndex = content.indexOf("/from");
-            int toIndex = content.indexOf("/to");
-
-            if (fromIndex == -1 || toIndex == -1 || fromIndex > toIndex) {
-                throw new InvalidTaskFormatException(EVENT_FORMAT);
-            }
-
-            String taskName = content.substring(0, fromIndex).trim();
-            String fromTime = content.substring(fromIndex + 6, toIndex).trim();
-            String toTime = content.substring(toIndex + 4).trim();
-
-            if (taskName.isEmpty() || fromTime.isEmpty() || toTime.isEmpty()) {
-                throw new EmptyDescriptionException(EVENT_EMPTY);
-            }
-
-            return new AddCommand(taskName, fromTime, toTime, AddCommand.TaskType.EVENT);
-
-        } catch (StringIndexOutOfBoundsException e) {
-            throw new EmptyDescriptionException(EVENT_FORMAT);
-        }
-    }
-
-    private static Command parseMarkCommand(String[] inputs, boolean isMark) throws CoachException {
-        int index = parseTaskIndex(inputs, "mark/unmark");
-        return new MarkCommand(index, isMark);
-    }
-
-    private static Command parseDeleteCommand(String[] inputs) throws CoachException {
-        int index = parseTaskIndex(inputs, "delete");
-        return new DeleteCommand(index);
-    }
-
-    private static Command parseFindCommand(String input) throws CoachException {
+    private static Command parseFindNoteCommand(String input) throws ZettelException {
         String content = input.substring(4).trim();
         if (content.isEmpty()) {
             throw new EmptyDescriptionException("Search cannot be empty!");
         }
-        return new FindCommand(content);
+        return new FindNoteCommand(content);
     }
 
-    private static Command parseListDateCommand(String input) throws CoachException {
-        String content = input.substring(2).trim();
-        if (content.isEmpty()) {
-            throw new EmptyDescriptionException(ON_EMPTY);
+
+    private static Command parsePinNoteCommand(String[] inputs, boolean isPin) throws ZettelException {
+        if (inputs.length > 2) {
+            throw new InvalidFormatException(PIN_FORMAT);
         }
-
-        LocalDate date = parseDate(content);
-        return new ListDateCommand(date);
+        int NoteID = parseNoteID(inputs, "pin/unpin");
+        return new PinNoteCommand(noteID, isPin);
     }
 
-    private static LocalDate parseDate(String input) throws CoachException {
-        for (String fmt : DATE_FORMATS) {
-            return LocalDate.parse(input, DateTimeFormatter.ofPattern(fmt));
+    private static Command parseDeleteNoteCommand(String[] inputs) throws ZettelException {
+        boolean forceDelete = false;
+        if (inputs.length > 3) {
+            throw new InvalidFormatException(DELETE_FORMAT);
         }
-        throw new InvalidTaskFormatException("Invalid date format! Use yyyy-MM-dd, d/M/yyyy, or d-M-yyyy.");
+        else if (inputs.length == 3){
+            if (!inputs[1].equals("-f")) {
+                throw new InvalidInputException(DELETE_FORMAT);
+            }
+            forceDelete = true;
+        }
+        int noteID = parseNoteID(inputs, "delete");
+        return new DeleteNoteCommand(noteID, forceDelete);
     }
 
-    private static int parseTaskIndex(String[] inputs, String actionName) throws CoachException {
+
+    private static int parseNoteID(String[] inputs, String actionName) throws ZettelException {
         if (inputs.length < 2) {
-            throw new EmptyDescriptionException(INDEX_EMPTY + actionName + "!");
+            throw new EmptyDescriptionException(ID_EMPTY + actionName + "!");
         }
+        String idString = inputs[inputs.length - 1].trim();
 
+        if (idString.length() != 6) {
+            throw new InvalidIndexException(ID_INVALID);
+        }
         try {
-            return Integer.parseInt(inputs[1]) - 1;
+            return Integer.parseInt(idString);
         } catch (NumberFormatException e) {
-            throw new InvalidTaskIndexException(INDEX_INVALID);
+            throw new InvalidIndexException(ID_INVALID);
         }
     }
 }
