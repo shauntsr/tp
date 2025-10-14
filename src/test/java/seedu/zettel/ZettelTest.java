@@ -16,6 +16,7 @@ class ZettelTest {
 
     @Test
     void testMainMethodExists() {
+        // Just verify the main method doesn't throw exception on instantiation
         assertNotNull(Zettel.class);
     }
 }

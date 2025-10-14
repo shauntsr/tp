@@ -5,6 +5,11 @@ import seedu.zettel.commands.Command;
 
 import java.util.ArrayList;
 
+/**
+ * Main class for the Zettel CLI application.
+ * Handles initialization and the main program loop.
+ * Note: Storage functionality not yet implemented.
+ */
 public class Zettel {
     private ArrayList<Note> notes;
     private UI ui;
