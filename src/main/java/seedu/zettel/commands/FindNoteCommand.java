@@ -13,7 +13,7 @@ public class FindNoteCommand extends Command{
     }
 
     @Override
-    public Command execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
-        return null;
+    public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
+        return;
     }
 }
