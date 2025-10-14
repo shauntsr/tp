@@ -17,7 +17,7 @@ public class DeleteNoteCommand extends Command {
     }
 
     @Override
-    public execute(ArrayList<Note> notes, UI ui, Storage storage) {
+    public void execute(ArrayList<Note> notes, UI ui, Storage storage) {
         Optional<Note> maybe = notes.stream().filter(n -> n.getId().equals(id)).findFirst();
 
         if (!maybe.isPresent()) {
