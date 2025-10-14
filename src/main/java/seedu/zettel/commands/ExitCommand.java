@@ -7,11 +7,7 @@ import seedu.zettel.UI;
 
 import java.util.ArrayList;
 
-public class PinNoteCommand extends Command {
-    public PinNoteCommand(int noteID, boolean isPin) {
-        super();
-    }
-
+public class ExitCommand extends Command {
     @Override
     public Command execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
         return null;
