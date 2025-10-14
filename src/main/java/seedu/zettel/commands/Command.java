@@ -1,9 +1,9 @@
-package seedu.duke.commands;
+package seedu.zettel.commands;
 
-import seedu.duke.tasks.Task;
-import seedu.duke.UI;
-import seedu.duke.Storage;
-import seedu.duke.exceptions.CoachException;
+import seedu.zettel.tasks.Task;
+import seedu.zettel.UI;
+import seedu.zettel.Storage;
+import seedu.zettel.exceptions.CoachException;
 
 import java.util.ArrayList;
 

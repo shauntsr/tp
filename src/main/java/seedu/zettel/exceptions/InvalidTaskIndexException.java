@@ -1,4 +1,4 @@
-package seedu.duke.exceptions;
+package seedu.zettel.exceptions;
 
 public class InvalidTaskIndexException extends CoachException {
     public InvalidTaskIndexException(String message) {

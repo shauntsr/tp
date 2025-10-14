@@ -1,4 +1,4 @@
-package seedu.duke;
+package seedu.zettel;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import seedu.duke.tasks.Deadline;
-import seedu.duke.tasks.Event;
-import seedu.duke.tasks.Task;
-import seedu.duke.tasks.ToDo;
+import seedu.zettel.tasks.Deadline;
+import seedu.zettel.tasks.Event;
+import seedu.zettel.tasks.Task;
+import seedu.zettel.tasks.ToDo;
 
 public class Storage {
     private final Path filePath;

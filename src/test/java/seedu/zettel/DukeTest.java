@@ -1,4 +1,4 @@
-package seedu.duke;
+package seedu.zettel;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;

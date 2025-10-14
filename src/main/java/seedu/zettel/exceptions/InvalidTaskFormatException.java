@@ -1,4 +1,4 @@
-package seedu.duke.exceptions;
+package seedu.zettel.exceptions;
 
 public class InvalidTaskFormatException extends CoachException {
     public InvalidTaskFormatException(String message) {

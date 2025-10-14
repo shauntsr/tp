@@ -1,4 +1,4 @@
-package seedu.duke.exceptions;
+package seedu.zettel.exceptions;
 
 public class EmptyDescriptionException extends CoachException {
     public EmptyDescriptionException(String message) {

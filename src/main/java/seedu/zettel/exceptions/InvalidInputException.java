@@ -1,4 +1,4 @@
-package seedu.duke.exceptions;
+package seedu.zettel.exceptions;
 
 public class InvalidInputException extends CoachException {
     public InvalidInputException(String message) {

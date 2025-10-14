@@ -1,6 +1,6 @@
-package seedu.duke;
+package seedu.zettel;
 
-import seedu.duke.tasks.Task;
+import seedu.zettel.tasks.Task;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
