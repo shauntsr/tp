@@ -7,6 +7,8 @@ import java.util.Scanner;
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
 import seedu.zettel.UI;
+import seedu.zettel.exceptions.NoNoteException;
+import seedu.zettel.exceptions.ZettelException;
 
 public class DeleteNoteCommand extends Command {
     private final String id;
@@ -18,12 +20,12 @@ public class DeleteNoteCommand extends Command {
     }
 
     @Override
-    public void execute(ArrayList<Note> notes, UI ui, Storage storage) {
+    public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
         Optional<Note> maybe = notes.stream().filter(n -> n.getId().equals(id)).findFirst();
 
         if (maybe.isEmpty()) {
             ui.showDeleteNotFound(id);
-            return;
+            throw new NoNoteException("You have no notes to delete.");
         }
 
         Note note = maybe.get();

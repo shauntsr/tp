@@ -11,6 +11,10 @@ public class ExitCommand extends Command {
     @Override
     public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
         ui.showBye();
-        return;
+    }
+
+    @Override
+    public boolean isExit() {
+        return true;
     }
 }

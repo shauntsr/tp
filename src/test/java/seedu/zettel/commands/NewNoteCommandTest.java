@@ -1,0 +1,84 @@
+package seedu.zettel.commands;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import seedu.zettel.exceptions.InvalidInputException;
+import seedu.zettel.exceptions.ZettelException;
+import seedu.zettel.Note;
+import seedu.zettel.Storage;
+import seedu.zettel.UI;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.time.Instant;
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+public class NewNoteCommandTest {
+    private static final String FILE_PATH = "./data/zettel.txt";
+
+    private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    private final PrintStream originalOutputStream = System.out;
+    private ArrayList<Note> notes;
+    private UI ui;
+    private Storage storage;
+
+    @BeforeEach
+    void setUp() {
+        System.setOut(new PrintStream(outputStream));
+        notes = new ArrayList<>();
+        ui = new UI();
+        storage = new Storage(FILE_PATH);
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.setOut(originalOutputStream);
+    }
+
+    @Test
+    void testAddsNewNoteAndPrintsMessage() throws ZettelException {
+        String title = "Test Note";
+        String body = "Test body";
+
+        NewNoteCommand cmd = new NewNoteCommand(title, body);
+        cmd.execute(notes, ui, storage); // storage ignored
+
+        assertEquals(1, notes.size());
+
+        Note note = notes.get(0);
+        assertEquals(title, note.getTitle(), "Added note has correct title.");
+        assertEquals(body, note.getBody(), "Added note has correct body.");
+        assertEquals( "Test_Note.txt", note.getFilename(), "Added note has correct filename.");
+
+        String output = outputStream.toString();
+        String expectedMessage = "Note created: " + note.getFilename() + " #" + note.getId();
+        assertTrue(output.contains(expectedMessage),
+                "Prints correct note created message with filename and ID");
+    }
+
+    @Test
+    void testDuplicateFilenameThrowsException() throws ZettelException {
+        String title = "Test Note";
+        String body = "Body 1";
+
+        // Add an existing note with the same filename
+        Note existingNote = new Note("0", title, "Test_Note.txt",
+                "Old body", Instant.now(), Instant.now());
+        notes.add(existingNote);
+
+        NewNoteCommand cmd = new NewNoteCommand(title, body);
+
+        ZettelException e = assertThrows(InvalidInputException.class, () -> {
+            cmd.execute(notes, ui, storage);
+        });
+        assertEquals("Invalid Input: Note already exists!", e.getMessage(), "Exception thrown with correct message.");
+
+        // Ensure note list unchanged
+        assertEquals(1, notes.size());
+    }
+}
