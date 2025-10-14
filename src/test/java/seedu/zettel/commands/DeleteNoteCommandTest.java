@@ -17,6 +17,9 @@ import seedu.zettel.UI;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DeleteNoteCommandTest {
+
+    private static final String FILE_PATH = "./data/zettel.txt";
+
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
 

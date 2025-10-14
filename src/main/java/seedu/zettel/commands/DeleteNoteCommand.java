@@ -13,7 +13,8 @@ public class DeleteNoteCommand extends Command {
     private boolean force = false;
 
     public DeleteNoteCommand(String noteId, boolean force) {
-        this.id = noteId; this.force = force;
+        this.id = noteId;
+        this.force = force;
     }
 
     @Override
