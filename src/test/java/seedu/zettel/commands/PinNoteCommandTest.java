@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import seedu.zettel.Note;
+import seedu.zettel.Storage;
+import seedu.zettel.UI;
 
 public class PinNoteCommandTest {
     @Test
@@ -21,7 +23,9 @@ public class PinNoteCommandTest {
         Instant before = target.getModifiedAt();
         // Ensure clock advances on platforms with coarse Instant resolution
         Thread.sleep(2);
-        new PinNoteCommand("1", true).execute(notes, null, null);
+        UI ui = new UI();
+        Storage storage = new Storage("build/testdata/pinnote-test.txt");
+        new PinNoteCommand("1", true).execute(notes, ui, storage);
         assertTrue(target.isPinned());
         assertTrue(target.getModifiedAt().isAfter(before), "modifiedAt should be updated on pinning");
     }       
@@ -38,7 +42,9 @@ public class PinNoteCommandTest {
         Instant before = target.getModifiedAt();
         // Ensure clock advances on platforms with coarse Instant resolution
         Thread.sleep(2);
-        new PinNoteCommand("0", false).execute(notes, null, null);
+        UI ui = new UI();
+        Storage storage = new Storage("build/testdata/pinnote-test.txt");
+        new PinNoteCommand("0", false).execute(notes, ui, storage);
         assertFalse(target.isPinned(), "Note at index 0 should be unpinned");
         assertTrue(target.getModifiedAt().isAfter(before), "modifiedAt should be updated on unpin");
     }

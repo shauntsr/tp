@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import seedu.duke.exceptions.ZettelException;
 import seedu.zettel.Note;
+import seedu.zettel.UI;
+import seedu.zettel.Storage;
 
 public class FindNoteCommandTest {
     @Test
@@ -20,8 +22,10 @@ public class FindNoteCommandTest {
         // FindNoteCommand searches in note body (case-insensitive)
         String keyword = "body 1";
         FindNoteCommand command = new FindNoteCommand(keyword);
+        UI ui = new UI();
+        Storage storage = new Storage("build/testdata/findnote-test.txt");
         int sizeBefore = notes.size();
-        assertDoesNotThrow(() -> command.execute(notes, null, null));
+        assertDoesNotThrow(() -> command.execute(notes, ui, storage));
         assertEquals(sizeBefore, notes.size(), "execute should not mutate the notes list size");
     }
 
@@ -32,8 +36,10 @@ public class FindNoteCommandTest {
         notes.add(new Note("id-1", "Title 1", "file1.txt", "Body 1", Instant.now(), Instant.now()));
         String keyword = "Hello";
         FindNoteCommand command = new FindNoteCommand(keyword);
+        UI ui = new UI();
+        Storage storage = new Storage("build/testdata/findnote-test.txt");
         int sizeBefore = notes.size();
-        assertDoesNotThrow(() -> command.execute(notes, null, null));
+        assertDoesNotThrow(() -> command.execute(notes, ui, storage));
         assertEquals(sizeBefore, notes.size(), "execute should not mutate the notes list size");
     }
 
@@ -41,8 +47,10 @@ public class FindNoteCommandTest {
     public void testNoNotesAvailable() {
         ArrayList<Note> notes = new ArrayList<>();
         FindNoteCommand command = new FindNoteCommand("Title");
+        UI ui = new UI();
+        Storage storage = new Storage("build/testdata/findnote-test.txt");
         try {
-            command.execute(notes, null, null);
+            command.execute(notes, ui, storage);
             org.junit.jupiter.api.Assertions.fail("Expected ZettelException when there are no notes");
         } catch (ZettelException ex) {
             assertTrue(ex.getMessage() == null || ex.getMessage().toLowerCase().contains("no notes"),
