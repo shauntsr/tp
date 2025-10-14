@@ -68,7 +68,7 @@ public class Storage {
     }
 
     private Note parseSaveFile(String line) {
-        if (line.isBlank()) return null;
+        if (line.isBlank()) { return null; }
 
         String[] fields = line.split(" \\| ");
         try {
