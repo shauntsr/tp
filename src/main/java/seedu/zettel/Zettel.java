@@ -16,7 +16,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class Zettel {
     private static final String DATA_FILE_PATH = "data/notes.txt";
-    private static final int READ_TIMEOUT_SECONDS = 30;
+    private static final int READ_TIMEOUT_SECONDS = 240;
 
     private Storage storage;
     private ArrayList<Note> notes;
