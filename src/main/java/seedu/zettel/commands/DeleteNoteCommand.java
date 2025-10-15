@@ -30,6 +30,8 @@ public class DeleteNoteCommand extends Command {
 
         Note note = maybe.get();
 
+        assert note != null; // for tutorial 9
+
         boolean shouldDelete = force;
         if (!force) {
             ui.showDeleteConfirmation("Confirm deletion on '" + note.getTitle() + "', id " + id + "? (y/n)");

@@ -15,6 +15,7 @@ import java.util.concurrent.TimeoutException;
  * Handles initialization, storage setup, and the main program loop.
  */
 public class Zettel {
+
     private static final String DATA_FILE_PATH = "data/notes.txt";
     private static final int READ_TIMEOUT_SECONDS = 240;
 
@@ -39,6 +40,7 @@ public class Zettel {
      * Displays greeting, processes commands until exit command is received.
      */
     public void run() {
+
         ui.showWelcome();
         ExecutorService executor = Executors.newSingleThreadExecutor();
 
