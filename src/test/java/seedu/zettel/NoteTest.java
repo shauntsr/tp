@@ -175,28 +175,6 @@ public class NoteTest {
     }
 
     @Test
-    @DisplayName("toStringWithIndex should return correctly formatted string with index")
-    void testToStringWithIndex() {
-        int index = 5;
-        String noteString = note.toStringWithIndex(index);
-
-        // Expected format: "INDEX. FILENAME yyyy-MM-dd NOTEID"
-        // Example: 5. test_note.txt 2025-10-14 testId123
-
-        // Check for the "index. " prefix
-        assertTrue(noteString.startsWith(index + ". "), "Should start with the index and a period.");
-
-        // We can reuse the base toString() logic for the rest
-        String baseString = noteString.substring((index + ". ").length());
-        String[] parts = baseString.split(" ");
-
-        assertEquals(3, parts.length, "The part after the index should have 3 components.");
-        assertEquals(filename, parts[0]);
-        assertEquals(id, parts[2]);
-        assertTrue(parts[1].matches("\\d{4}-\\d{2}-\\d{2}"), "Date part should be in yyyy-MM-dd format.");
-    }
-
-    @Test
     @DisplayName("Static note counter should increment on object creation")
     void testNumberOfNotesCounter() {
         // This test is self-contained to avoid interference from other tests' object creations.

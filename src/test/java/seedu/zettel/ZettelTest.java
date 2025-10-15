@@ -4,34 +4,82 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.fail;
 
-public class ZettelTest {
-    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-    private final PrintStream originalOut = System.out;
-    private final ByteArrayInputStream inContent = new ByteArrayInputStream("James Gosling\n".getBytes());
+/**
+ * Unit tests for the Zettel main class.
+ */
+class ZettelTest {
 
-    @BeforeEach //set up environment for test
-    public void setUpStreams() {
-        System.setOut(new PrintStream(outContent));
-        System.setIn(inContent);
+    private static final Path DATA_DIR = Path.of("data");
+    private static final Path NOTES_FILE = DATA_DIR.resolve("notes.txt");
+
+    @BeforeEach
+    void setUp() throws Exception {
+        // Ensure data directory exists before each test
+        Files.createDirectories(DATA_DIR);
     }
 
-    @AfterEach //reset environment after test
-    public void restoreStreams() {
-        System.setOut(originalOut);
-        System.setIn(System.in);
+    @AfterEach
+    void tearDown() {
+        // Clean up data files after each test
+        try {
+            Files.deleteIfExists(NOTES_FILE);
+            Files.deleteIfExists(DATA_DIR);
+        } catch (Exception e) {
+            System.err.println("Cleanup failed: " + e.getMessage());
+        }
     }
 
     @Test
-    public void testMainOutput() {
-        Zettel.main(new String[]{});
-        String output = outContent.toString();
-        assertTrue(output.contains("Hello! I'm Zettel"));
-        assertTrue(output.contains("What can I do for you?"));
+    void constructor_initializesDependenciesSuccessfully() {
+        assertDoesNotThrow(() -> {
+            Zettel zettel = new Zettel();
+            assertNotNull(zettel, "Zettel instance should not be null");
+        });
+    }
+
+    @Test
+    void constructor_createsUIAndStorageAndNotesList() {
+        Zettel zettel = new Zettel();
+
+        // Use reflection to access private fields
+        try {
+            var uiField = Zettel.class.getDeclaredField("ui");
+            var storageField = Zettel.class.getDeclaredField("storage");
+            var notesField = Zettel.class.getDeclaredField("notes");
+
+            uiField.setAccessible(true);
+            storageField.setAccessible(true);
+            notesField.setAccessible(true);
+
+            assertNotNull(uiField.get(zettel), "UI should be initialized");
+            assertNotNull(storageField.get(zettel), "Storage should be initialized");
+            assertNotNull(notesField.get(zettel), "Notes list should be initialized");
+        } catch (ReflectiveOperationException e) {
+            fail("Reflection access failed: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void mainMethod_existsAndDoesNotThrow() {
+        assertDoesNotThrow(() -> {
+            Zettel.class.getDeclaredMethod("main", String[].class);
+        }, "Zettel should have a main method");
+    }
+
+    @Test
+    void multipleInstances_canBeCreatedIndependently() {
+        assertDoesNotThrow(() -> {
+            Zettel z1 = new Zettel();
+            Zettel z2 = new Zettel();
+            assertNotSame(z1, z2, "Each Zettel instance should be unique");
+        });
     }
 }

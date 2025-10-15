@@ -156,16 +156,4 @@ public class Note {
         String formattedDate = DATE_FORMATTER.format(createdAt);
         return String.format("%s %s %s", filename, formattedDate, id);
     }
-
-    /**
-     * Returns a formatted string with line number prefix for numbered lists.
-     * Format: INDEX. FILENAME yyyy-MM-dd NOTEID
-     * Example: 1. my_note.txt 2025-10-14 a1b2c3d4
-     *
-     * @param index the line number to display
-     * @return formatted string with index prefix
-     */
-    public String toStringWithIndex(int index) {
-        return String.format("%d. %s", index, toString());
-    }
 }

@@ -8,6 +8,7 @@ import seedu.zettel.UI;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class NewNoteCommand extends Command {
     private final String title;
@@ -20,7 +21,7 @@ public class NewNoteCommand extends Command {
 
     @Override
     public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
-        String id = String.valueOf(Note.getNumberOfNotes());
+        String id = UUID.randomUUID().toString().substring(0,8);
         String filename = title.replaceAll("\\s+", "_") + ".txt";
 
         // Check if filename already exists

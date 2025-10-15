@@ -16,4 +16,11 @@ java -jar %jarloc% < ..\..\text-ui-test\input.txt > ..\..\text-ui-test\ACTUAL.TX
 
 cd ..\..\text-ui-test
 
-FC ACTUAL.TXT EXPECTED.TXT >NUL && ECHO Test passed! || Echo Test failed!
+REM Normalize IDs in ACTUAL.TXT - replace 8-char hex IDs with XXXXXXXX
+powershell -Command "(Get-Content ACTUAL.TXT) -replace '#[a-f0-9]{8}', '#XXXXXXXX' -replace '([a-f0-9]{8})( |$)', 'XXXXXXXX$2' | Set-Content ACTUAL-NORMALIZED.TXT"
+
+REM Normalize IDs in EXPECTED.TXT
+powershell -Command "(Get-Content EXPECTED.TXT) -replace '#[a-f0-9]{8}', '#XXXXXXXX' -replace '([a-f0-9]{8})( |$)', 'XXXXXXXX$2' | Set-Content EXPECTED-NORMALIZED.TXT"
+
+REM Compare normalized files
+FC ACTUAL-NORMALIZED.TXT EXPECTED-NORMALIZED.TXT >NUL && ECHO Test passed! || ECHO Test failed!

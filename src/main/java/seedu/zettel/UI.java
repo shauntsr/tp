@@ -12,10 +12,9 @@ public class UI {
         this.scanner = new Scanner(System.in);
     }
 
-
     public String readCommand() {
         if (!scanner.hasNextLine()) {
-            return "";
+            return "bye";  // Auto-exit when no more input (prevents hanging in CI)
         }
         return scanner.nextLine();
     }
@@ -24,6 +23,18 @@ public class UI {
         printLine();
         System.out.println(" Hello! I'm Zettel");
         System.out.println(" What can I do for you?");
+        printLine();
+        System.out.println();
+        System.out.println(" Available Commands:");
+        System.out.println("   init <repo-name>           - Initialize a new repository");
+        System.out.println("   new -t <title> [-b <body>] - Create a new note");
+        System.out.println("   list [-p]                  - List all notes (or pinned only)");
+        System.out.println("   delete [-f] <note-id>      - Delete a note by ID");
+        System.out.println("   pin <note-id>              - Pin a note");
+        System.out.println("   unpin <note-id>            - Unpin a note");
+        System.out.println("   find <text>                - Search for notes");
+        System.out.println("   bye                        - Exit the application");
+        System.out.println();
         printLine();
     }
 
@@ -61,6 +72,7 @@ public class UI {
     public void showNoNotes() {
         System.out.println("No notes found.\n");
     }
+
     public void showNoteList(List<Note> notes, boolean isPinned) {
         // Show number of notes found.
         if (isPinned) {
@@ -90,12 +102,11 @@ public class UI {
     public void showFoundNotesMessage(ArrayList<Note> matchedNotes) {
         System.out.println(" Here are the matching notes in your list:");
         for (int i = 0; i < matchedNotes.size(); i++) {
-            System.out.println(" " + (i + 1) + ". " + matchedNotes.get(i).toStringWithIndex(i));
+            System.out.println(" " + (i + 1) + ". " + matchedNotes.get(i));
         }
     }
 
-    public void showJustPinnedNote(Note note, int idx) {
-        System.out.println(" Got it. I've " + (note.isPinned() ? "pinned" : "unpinned") + " this note:");
-        System.out.println(note.toStringWithIndex(idx));
+    public void showJustPinnedNote(Note note, String noteId) {
+        System.out.println(" Got it. I've " + (note.isPinned() ? "pinned" : "unpinned") + " this note: " + noteId);
     }
 }

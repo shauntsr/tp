@@ -11,7 +11,6 @@ import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.PinNoteCommand;
 import seedu.zettel.exceptions.EmptyDescriptionException;
 import seedu.zettel.exceptions.InvalidFormatException;
-import seedu.zettel.exceptions.InvalidIndexException;
 import seedu.zettel.exceptions.InvalidInputException;
 import seedu.zettel.exceptions.ZettelException;
 
@@ -130,13 +129,6 @@ public class Parser {
         }
         String idString = inputs[inputs.length - 1].trim();
 
-        if (idString.length() != 6) {
-            throw new InvalidIndexException(ID_INVALID);
-        }
-
-        if (!idString.matches("\\d{6}")) {
-            throw new InvalidIndexException(ID_INVALID);
-        }
         return idString;
     }
 }

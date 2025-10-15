@@ -2,9 +2,26 @@ ____________________________________________________________
  Hello! I'm Zettel
  What can I do for you?
 ____________________________________________________________
-[test.txt 2025-10-14 abc123]
-Total notes: 1
+
+ Available Commands:
+   init <repo-name>           - Initialize a new repository
+   new -t <title> [-b <body>] - Create a new note
+   list [-p]                  - List all notes (or pinned only)
+   delete [-f] <note-id>      - Delete a note by ID
+   pin <note-id>              - Pin a note
+   unpin <note-id>            - Unpin a note
+   find <text>                - Search for notes
+   bye                        - Exit the application
+
 ____________________________________________________________
-Invalid Input: james
-____________________________________________________________
-____________________________________________________________
+Note created: test1.txt #XXXXXXXX
+Note created: test2.txt #XXXXXXXX
+Note created: test3.txt #XXXXXXXX
+You have 3 notes:
+    1. test3.txt 2025-10-15 XXXXXXXX
+    2. test2.txt 2025-10-15 XXXXXXXX
+    3. test1.txt 2025-10-15 XXXXXXXX
+ Here are the matching notes in your list:
+ 1. test3.txt 2025-10-15 XXXXXXXX
+ 2. test2.txt 2025-10-15 XXXXXXXX
+ 3. test1.txt 2025-10-15 XXXXXXXX

@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
+    timeout-minutes: 10
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
@@ -45,10 +46,12 @@ jobs:
       - name: Perform IO redirection test (*NIX or macOS)
         if: runner.os == 'Linux' || runner.os == 'macOS'
         working-directory: ${{ github.workspace }}/text-ui-test
+        timeout-minutes: 2
         run: ./runtest.sh
 
       - name: Perform IO redirection test (Windows)
         if: always() && runner.os == 'Windows'
         working-directory: ${{ github.workspace }}/text-ui-test
+        timeout-minutes: 2
         shell: cmd
         run: runtest.bat
