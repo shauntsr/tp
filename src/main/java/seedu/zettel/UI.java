@@ -50,6 +50,10 @@ public class UI {
         System.out.println(note);
     }
 
+    public void showDeleteNotFound(String id) {
+        System.out.println("No note found with id " + id);
+    }
+
     public void showError(String message) {
         System.out.println(message);
     }

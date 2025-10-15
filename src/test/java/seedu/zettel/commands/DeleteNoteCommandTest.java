@@ -28,7 +28,6 @@ public class DeleteNoteCommandTest {
     private static class TestUI extends UI {
         private final ArrayList<String> events = new ArrayList<>();
 
-        @Override
         public void showDeleteNotFound(String id) {
             events.add("notFound:" + id);
         }
