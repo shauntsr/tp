@@ -14,23 +14,14 @@ ____________________________________________________________
    bye                        - Exit the application
 
 ____________________________________________________________
-Note created: test1.txt #e6e5e891
-Note created: test2.txt #f07685c6
-Note created: test3.txt #06a2acf9
+Note created: test1.txt #dce1c5a2
+Note created: test2.txt #8f01f020
+Note created: test3.txt #8986b357
 You have 3 notes:
-    1. test3.txt 2025-10-15 06a2acf9
-    2. test2.txt 2025-10-15 f07685c6
-    3. test1.txt 2025-10-15 e6e5e891
- Got it. I've pinned this note: f07685c6
-You have 1 pinned notes:
-    1. test2.txt 2025-10-15 f07685c6
- Got it. I've unpinned this note: f07685c6
-No pinned notes found. Pin a note to add to this list.
-Confirm deletion on 'test2', id f07685c6? (y/n)
-Note at f07685c6 deleted
-You have 2 notes:
-    1. test3.txt 2025-10-15 06a2acf9
-    2. test1.txt 2025-10-15 e6e5e891
+    1. test3.txt 2025-10-15 8986b357
+    2. test2.txt 2025-10-15 8f01f020
+    3. test1.txt 2025-10-15 dce1c5a2
  Here are the matching notes in your list:
- 1. test3.txt 2025-10-15 06a2acf9
- 2. test1.txt 2025-10-15 e6e5e891
+ 1. test3.txt 2025-10-15 8986b357
+ 2. test2.txt 2025-10-15 8f01f020
+ 3. test1.txt 2025-10-15 dce1c5a2
