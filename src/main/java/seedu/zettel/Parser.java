@@ -28,7 +28,6 @@ public class Parser {
     public static Command parse(String userCommand) throws ZettelException {
         String[] inputs = userCommand.split(" ");
         String command = inputs[0].toLowerCase();
-
         return switch (command) {
         case "bye" -> new ExitCommand();
         case "list" -> parseListNoteCommand(userCommand);
@@ -129,6 +128,7 @@ public class Parser {
             throw new EmptyDescriptionException(ID_EMPTY + actionName + "!");
         }
         String idString = inputs[inputs.length - 1].trim();
+        assert !idString.isEmpty() : "ID string should not be empty after trim";
 
         if (idString.length() != 6) {
             throw new InvalidIndexException(ID_INVALID);
