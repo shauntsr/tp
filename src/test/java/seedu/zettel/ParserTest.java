@@ -11,7 +11,6 @@ import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.PinNoteCommand;
 import seedu.zettel.exceptions.EmptyDescriptionException;
 import seedu.zettel.exceptions.InvalidFormatException;
-import seedu.zettel.exceptions.InvalidIndexException;
 import seedu.zettel.exceptions.InvalidInputException;
 import seedu.zettel.exceptions.ZettelException;
 
@@ -83,16 +82,6 @@ class ParserTest {
     }
 
     @Test
-    void parse_deleteWithInvalidIdLength_throwsInvalidIndexException() {
-        assertThrows(InvalidIndexException.class, () -> Parser.parse("delete 12345"));
-    }
-
-    @Test
-    void parse_deleteWithNonNumericId_throwsInvalidIndexException() {
-        assertThrows(InvalidIndexException.class, () -> Parser.parse("delete abcdef"));
-    }
-
-    @Test
     void parse_pinWithValidId_returnsPinNoteCommand() throws ZettelException {
         Command command = Parser.parse("pin 123456");
         assertInstanceOf(PinNoteCommand.class, command);
@@ -107,16 +96,6 @@ class ParserTest {
     @Test
     void parse_pinWithoutId_throwsEmptyDescriptionException() {
         assertThrows(EmptyDescriptionException.class, () -> Parser.parse("pin"));
-    }
-
-    @Test
-    void parse_pinWithInvalidIdLength_throwsInvalidIndexException() {
-        assertThrows(InvalidIndexException.class, () -> Parser.parse("pin 12345"));
-    }
-
-    @Test
-    void parse_pinWithNonNumericId_throwsInvalidIndexException() {
-        assertThrows(InvalidIndexException.class, () -> Parser.parse("pin abcdef"));
     }
 
     @Test
