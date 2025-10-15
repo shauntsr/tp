@@ -20,6 +20,7 @@ public class FindNoteCommand extends Command{
         if (notes.isEmpty()) {
             throw new NoNoteException("There are no notes available to search.");
         }
+        assert notes != null : "Notes list should not be null";
         ArrayList<Note> matchedNotes = new ArrayList<>();
         for (Note note: notes) {
             if (note.getBody().toLowerCase().contains(keyword.toLowerCase())) {
