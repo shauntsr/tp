@@ -23,7 +23,9 @@ public class Parser {
     private static final String ID_EMPTY = "Please specify a Note ID to ";
     private static final String ID_INVALID = "Note ID must be exactly 6 Digits: eg. 123456 ";
     private static final String INIT_EMPTY = "Please specify a repo name!";
-    private static final String INIT_INVALID = "Repo name can only contain alphanumeric characters, hyphens and underscores.";
+    private static final String INIT_INVALID =
+        "Repo name can only contain alphanumeric characters, "
+        + "hyphens and underscores.";
 
     public static Command parse(String userCommand) throws ZettelException {
         String[] inputs = userCommand.split(" ");
