@@ -1,6 +1,5 @@
 package seedu.zettel;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,23 +14,27 @@ import java.util.stream.Collectors;
 
 public class Storage {
     static final String CONFIG_FILE = ".zettelConfig";
-    private final Path filePath; // Root file path
+    static final String STORAGE_FILE = "zettel.txt"; // Placeholder until we migrate
+    private final Path rootPath; // Root directory path
 
     public Storage(String filePath) {
-        this.filePath = Paths.get(filePath);
+        this.rootPath = Paths.get(filePath);
     }
 
     public void init() {
-        Path parentDir = filePath.getParent();
-        Path configPath = parentDir.resolve(CONFIG_FILE);
+        Path configPath = rootPath.resolve(CONFIG_FILE);
+        Path filePath = rootPath.resolve(STORAGE_FILE);
+
+        // Create root folder
         try {
-            if (Files.notExists(parentDir)) {
-                Files.createDirectories(parentDir);
+            if (Files.notExists(rootPath)) {
+                Files.createDirectories(rootPath);
             }
         } catch (IOException e) {
-            System.out.println("Error creating " + parentDir + " folder.");
+            System.out.println("Error creating " + rootPath + " folder.");
         }
 
+        // Create config file
         try {
             if (Files.notExists(configPath)) {
                 Files.createFile(configPath);
@@ -39,9 +42,20 @@ public class Storage {
         } catch (IOException e) {
             System.out.println("Error creating " + CONFIG_FILE + ".");
         }
+
+        // Create storage file
+        // Can remove this portion after we use a folder of notes
+        try {
+            if (Files.notExists(filePath)) {
+                Files.createFile(filePath);
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating " + filePath + ".");
+        }
     }
 
     public ArrayList<Note> load() {
+        Path filePath = rootPath.resolve(STORAGE_FILE);
         try {
             return Files.lines(filePath)
                     .map(this::parseSaveFile)
@@ -54,8 +68,9 @@ public class Storage {
     }
 
     public void save(List<Note> notes) {
+        Path filePath = rootPath.resolve(STORAGE_FILE);
         try {
-            Files.createDirectories(filePath.getParent()); // Ensure directory exists
+            Files.createDirectories(rootPath); // Ensure directory exists
 
             List<String> lines = notes.stream()
                     .map(this::toSaveFormat)

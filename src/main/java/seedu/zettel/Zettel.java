@@ -16,7 +16,7 @@ import seedu.zettel.exceptions.ZettelException;
  */
 public class Zettel {
 
-    private static final String DATA_FILE_PATH = "data/notes.txt";
+    private static final String DATA_FILE_PATH = "data/";
     private static final int READ_TIMEOUT_SECONDS = 240;
 
     private Storage storage;
