@@ -30,7 +30,21 @@ public class Storage {
     }
 
     public void init() {
-        // Create root folder
+        createRootFolder();
+
+        createConfigFile();
+
+        // Initialise default repo if doesn't exist
+        Path defaultRepoPath = rootPath.resolve(DEFAULT_REPO);
+        if (Files.notExists(defaultRepoPath)) {
+            createRepo(DEFAULT_REPO);
+        }
+
+        // Can remove this portion after we use a folder of notes
+        createStorageFile(defaultRepoPath);
+    }
+
+    private void createRootFolder() {
         try {
             if (Files.notExists(rootPath)) {
                 Files.createDirectories(rootPath);
@@ -38,8 +52,20 @@ public class Storage {
         } catch (IOException e) {
             System.out.println("Error creating " + rootPath + " folder.");
         }
+    }
 
-        // Create config file
+    private static void createStorageFile(Path defaultRepoPath) {
+        Path filePath = defaultRepoPath.resolve(REPO_NOTES).resolve(STORAGE_FILE);
+        try {
+            if (Files.notExists(filePath)) {
+                Files.createFile(filePath);
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating " + filePath + ".");
+        }
+    }
+
+    private void createConfigFile() {
         Path configPath = rootPath.resolve(CONFIG_FILE);
         try {
             if (Files.notExists(configPath)) {
@@ -48,23 +74,6 @@ public class Storage {
             }
         } catch (IOException e) {
             System.out.println("Error creating " + CONFIG_FILE + ".");
-        }
-
-        // Initialise default repo if doesn't exist
-        Path defaultRepoPath = rootPath.resolve(DEFAULT_REPO);
-        if (Files.notExists(defaultRepoPath)) {
-            createRepo(DEFAULT_REPO);
-        }
-
-        // Create storage file
-        // Can remove this portion after we use a folder of notes
-        Path filePath = defaultRepoPath.resolve(REPO_NOTES).resolve(STORAGE_FILE);
-        try {
-            if (Files.notExists(filePath)) {
-                Files.createFile(filePath);
-            }
-        } catch (IOException e) {
-            System.out.println("Error creating " + filePath + ".");
         }
     }
 
