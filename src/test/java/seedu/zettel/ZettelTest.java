@@ -1,16 +1,15 @@
 package seedu.zettel;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for the Zettel main class.
@@ -38,7 +37,7 @@ class ZettelTest {
     }
 
     @Test
-    void constructor_initializesDependenciesSuccessfully() {
+    void testConstructorInitializesDependenciesSuccessfully() {
         assertDoesNotThrow(() -> {
             Zettel zettel = new Zettel();
             assertNotNull(zettel, "Zettel instance should not be null");
@@ -46,7 +45,7 @@ class ZettelTest {
     }
 
     @Test
-    void constructor_createsUIAndStorageAndNotesList() {
+    void testConstructorCreatesUIAndStorageAndNotesList() {
         Zettel zettel = new Zettel();
 
         // Use reflection to access private fields
@@ -68,14 +67,14 @@ class ZettelTest {
     }
 
     @Test
-    void mainMethod_existsAndDoesNotThrow() {
+    void testMainMethodExistsAndDoesNotThrow() {
         assertDoesNotThrow(() -> {
             Zettel.class.getDeclaredMethod("main", String[].class);
         }, "Zettel should have a main method");
     }
 
     @Test
-    void multipleInstances_canBeCreatedIndependently() {
+    void testMultipleInstancesCanBeCreatedIndependently() {
         assertDoesNotThrow(() -> {
             Zettel z1 = new Zettel();
             Zettel z2 = new Zettel();

@@ -1,9 +1,5 @@
 package seedu.zettel;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -13,6 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 public class NoteTest {
 
@@ -147,13 +146,13 @@ public class NoteTest {
     }
 
     @Test
-    @DisplayName("touchModified should update the modifiedAt timestamp")
-    void testTouchModified() throws InterruptedException {
+    @DisplayName("updateModifiedAt should update the modifiedAt timestamp")
+    void testUpdateModifiedAt() throws InterruptedException {
         Instant initialModifiedAt = note.getModifiedAt();
         Thread.sleep(1); // Ensure the clock tick is registered
-        note.touchModified();
+        note.updateModifiedAt();
         assertTrue(note.getModifiedAt().isAfter(initialModifiedAt),
-                "touchModified should update the timestamp to a later time.");
+                "updateModifiedAt should update the timestamp to a later time.");
     }
 
     @Test

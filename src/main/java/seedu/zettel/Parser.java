@@ -21,11 +21,15 @@ public class Parser {
     private static final String NOTE_FORMAT = "New note format should be: new -t <TITLE> [-b <BODY>]";
     private static final String NOTE_EMPTY = "Note title cannot be empty!";
     private static final String ID_EMPTY = "Please specify a Note ID to ";
-    private static final String ID_INVALID = "Note ID must be exactly 6 Digits: eg. 123456 ";
+    private static final String ID_INVALID = "Note ID must be exactly 8 alphanumeric characters: eg. 12345678 ";
     private static final String INIT_EMPTY = "Please specify a repo name!";
+    private static final int VALID_NOTE_ID_LENGTH = 8;
+    private static final String VALID_NOTE_ID_REGEX = "^[a-zA-Z0-9]{" + VALID_NOTE_ID_LENGTH + "}$";
+    private static final String INVALID_ID_LENGTH_FORMAT = "Note ID must be exactly " + VALID_NOTE_ID_LENGTH + 
+                                                                " characters long.";
 
     public static Command parse(String userCommand) throws ZettelException {
-        String[] inputs = userCommand.split(" ");
+        String[] inputs = userCommand.trim().split(" ");
         String command = inputs[0].toLowerCase();
         return switch (command) {
         case "bye" -> new ExitCommand();
@@ -109,6 +113,7 @@ public class Parser {
 
     private static Command parseDeleteNoteCommand(String[] inputs) throws ZettelException {
         boolean forceDelete = false;
+
         if (inputs.length > 3) {
             throw new InvalidFormatException(DELETE_FORMAT);
         } else if (inputs.length == 3){
@@ -118,6 +123,8 @@ public class Parser {
             forceDelete = true;
         }
         String noteId = parseNoteID(inputs, "delete");
+        
+
         return new DeleteNoteCommand(noteId, forceDelete);
     }
 
@@ -128,6 +135,14 @@ public class Parser {
         }
         String idString = inputs[inputs.length - 1].trim();
         assert !idString.isEmpty() : "ID string should not be empty after trim";
+
+        // Validate noteId format
+        if (!idString.matches(VALID_NOTE_ID_REGEX)) {
+            throw new InvalidFormatException(ID_INVALID);
+        }
+        if (idString.length() != VALID_NOTE_ID_LENGTH) {
+            throw new InvalidFormatException(INVALID_ID_LENGTH_FORMAT);
+        }
 
         return idString;
     }

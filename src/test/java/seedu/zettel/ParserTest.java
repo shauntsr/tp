@@ -1,6 +1,9 @@
 package seedu.zettel;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
+
 import seedu.zettel.commands.Command;
 import seedu.zettel.commands.DeleteNoteCommand;
 import seedu.zettel.commands.ExitCommand;
@@ -14,114 +17,146 @@ import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.InvalidInputException;
 import seedu.zettel.exceptions.ZettelException;
 
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 class ParserTest {
 
     @Test
-    void parse_exitCommand_returnsExitCommand() throws ZettelException {
+    void testParseExitCommandReturnsExitCommand() throws ZettelException {
         Command command = Parser.parse("bye");
         assertInstanceOf(ExitCommand.class, command);
     }
 
     @Test
-    void parse_listCommand_returnsListNoteCommand() throws ZettelException {
+    void testParseListCommandReturnsListNoteCommand() throws ZettelException {
         Command command = Parser.parse("list");
         assertInstanceOf(ListNoteCommand.class, command);
     }
 
     @Test
-    void parse_listWithPinnedFlag_returnsListNoteCommand() throws ZettelException {
+    void testParseListWithPinnedFlagReturnsListNoteCommand() throws ZettelException {
         Command command = Parser.parse("list -p");
         assertInstanceOf(ListNoteCommand.class, command);
     }
 
     @Test
-    void parse_listWithInvalidFlag_throwsInvalidFormatException() {
+    void testParseListWithInvalidFlagThrowsInvalidFormatException() {
         assertThrows(InvalidFormatException.class, () -> Parser.parse("list -x"));
     }
 
     @Test
-    void parse_newNoteWithTitleOnly_returnsNewNoteCommand() throws ZettelException {
+    void testParseNewNoteWithTitleOnlyReturnsNewNoteCommand() throws ZettelException {
         Command command = Parser.parse("new -t My Title");
         assertInstanceOf(NewNoteCommand.class, command);
     }
 
     @Test
-    void parse_newNoteWithTitleAndBody_returnsNewNoteCommand() throws ZettelException {
+    void testParseNewNoteWithTitleAndBodyReturnsNewNoteCommand() throws ZettelException {
         Command command = Parser.parse("new -t My Title -b My Body");
         assertInstanceOf(NewNoteCommand.class, command);
     }
 
     @Test
-    void parse_newNoteWithoutTitleFlag_throwsInvalidFormatException() {
+    void testParseNewNoteWithoutTitleFlagThrowsInvalidFormatException() {
         assertThrows(InvalidFormatException.class, () -> Parser.parse("new My Title"));
     }
 
     @Test
-    void parse_newNoteWithEmptyTitle_throwsEmptyDescriptionException() {
+    void testParseNewNoteWithEmptyTitleThrowsEmptyDescriptionException() {
         assertThrows(EmptyDescriptionException.class, () -> Parser.parse("new -t"));
     }
 
     @Test
-    void parse_deleteWithValidId_returnsDeleteNoteCommand() throws ZettelException {
-        Command command = Parser.parse("delete 123456");
+    void testParseDeleteWithValidIdReturnsDeleteNoteCommand() throws ZettelException {
+        Command command = Parser.parse("delete 12345678");
         assertInstanceOf(DeleteNoteCommand.class, command);
     }
 
     @Test
-    void parse_deleteWithForceFlag_returnsDeleteNoteCommand() throws ZettelException {
-        Command command = Parser.parse("delete -f 123456");
+    void testParseDeleteWithSpecialCharactersThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete 1234-678"));
+    }
+
+    @Test
+    void testParseDeleteWithInvalidCharactersThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete 12@45678"));
+    }
+
+    @Test
+    void testParseDeleteWithForceFlagReturnsDeleteNoteCommand() throws ZettelException {
+        Command command = Parser.parse("delete -f 12345678");
         assertInstanceOf(DeleteNoteCommand.class, command);
     }
 
     @Test
-    void parse_deleteWithoutId_throwsEmptyDescriptionException() {
+    void testParseDeleteWithoutIdThrowsEmptyDescriptionException() {
         assertThrows(EmptyDescriptionException.class, () -> Parser.parse("delete"));
     }
 
     @Test
-    void parse_pinWithValidId_returnsPinNoteCommand() throws ZettelException {
-        Command command = Parser.parse("pin 123456");
+    void testParseDeleteWithTooShortIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete 123"));
+    }
+
+    @Test
+    void testParseDeleteWithTooLongIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete 123456789"));
+    }
+
+    @Test
+    void testParsePinWithValidIdReturnsPinNoteCommand() throws ZettelException {
+        Command command = Parser.parse("pin 12345678");
         assertInstanceOf(PinNoteCommand.class, command);
     }
 
     @Test
-    void parse_unpinWithValidId_returnsPinNoteCommand() throws ZettelException {
-        Command command = Parser.parse("unpin 654321");
+    void testParseUnpinWithValidIdReturnsPinNoteCommand() throws ZettelException {
+        Command command = Parser.parse("unpin abcdef12");
         assertInstanceOf(PinNoteCommand.class, command);
     }
 
     @Test
-    void parse_pinWithoutId_throwsEmptyDescriptionException() {
+    void testParsePinWithoutIdThrowsEmptyDescriptionException() {
         assertThrows(EmptyDescriptionException.class, () -> Parser.parse("pin"));
     }
 
     @Test
-    void parse_initWithRepoName_returnsInitCommand() throws ZettelException {
+    void testParsePinWithSpecialCharactersThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("pin 1234-678"));
+    }
+
+    @Test
+    void testParsePinWithTooShortIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("pin 123"));
+    }
+
+    @Test
+    void testParsePinWithTooLongIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("pin 123456789"));
+    }
+
+    @Test
+    void testParseInitWithRepoNameReturnsInitCommand() throws ZettelException {
         Command command = Parser.parse("init myRepo");
         assertInstanceOf(InitCommand.class, command);
     }
 
     @Test
-    void parse_initWithoutRepoName_throwsEmptyDescriptionException() {
+    void testParseInitWithoutRepoNameThrowsEmptyDescriptionException() {
         assertThrows(EmptyDescriptionException.class, () -> Parser.parse("init"));
     }
 
     @Test
-    void parse_findWithSearchTerm_returnsFindNoteCommand() throws ZettelException {
+    void testParseFindWithSearchTermReturnsFindNoteCommand() throws ZettelException {
         Command command = Parser.parse("find test");
         assertInstanceOf(FindNoteCommand.class, command);
     }
 
     @Test
-    void parse_findWithoutSearchTerm_throwsEmptyDescriptionException() {
+    void testParseFindWithoutSearchTermThrowsEmptyDescriptionException() {
         assertThrows(EmptyDescriptionException.class, () -> Parser.parse("find"));
     }
 
     @Test
-    void parse_unknownCommand_throwsInvalidInputException() {
+    void testParseUnknownCommandThrowsInvalidInputException() {
         assertThrows(InvalidInputException.class, () -> Parser.parse("unknown"));
     }
 }

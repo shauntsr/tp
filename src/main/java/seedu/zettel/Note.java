@@ -16,18 +16,18 @@ public class Note {
     // Static counter for tracking total notes
     private static int numberOfNotes = 0;
     // Instance fields
-    private final String id;
-    private String title;
+    private final String id; // id hash of the note
+    private String title; // title of the note
     private String filename; // actual filename on disk
-    private String body;
-    private Instant createdAt;
-    private Instant modifiedAt;
-    private boolean pinned;
-    private boolean archived;
-    private String archiveName;
-    private List<String> logs; // history/log data
+    private String body; // body of the note
+    private Instant createdAt; // timestamp when the note was created at
+    private Instant modifiedAt; // timestamp of the note when it was last modified
+    private boolean pinned; // whether or not the note is a pinned note or not
+    private boolean archived; // whether or not the note has been archived or not
+    private String archiveName; // name of the archive the note belongs to
+    private List<String> logs; // history/log data of that individual note
 
-    // Constructor for creating a new note
+    // Constructor for creating a new note by the user
     public Note(String id, String title, String filename, String body, Instant createdAt, Instant modifiedAt) {
         this.id = id;
         this.title = title;
@@ -108,7 +108,7 @@ public class Note {
     // Setters
     public void setTitle(String title) {
         this.title = title;
-        touchModified();
+        updateModifiedAt();
     }
 
     public void setFilename(String filename) {
@@ -117,22 +117,22 @@ public class Note {
 
     public void setBody(String body) {
         this.body = body;
-        touchModified();
+        updateModifiedAt();
     }
 
     public void setPinned(boolean pinned) {
         this.pinned = pinned;
-        touchModified();
+        updateModifiedAt();
     }
 
     public void setArchived(boolean archived) {
         this.archived = archived;
-        touchModified();
+        updateModifiedAt();
     }
 
     public void setArchiveName(String archiveName) {
         this.archiveName = archiveName;
-        touchModified();
+        updateModifiedAt();
     }
 
     public void setLogs(List<String> logs) {
@@ -144,7 +144,7 @@ public class Note {
     }
 
     // Helper method to update modifiedAt timestamp
-    public void touchModified() {
+    public void updateModifiedAt() {
         this.modifiedAt = Instant.now();
     }
 
