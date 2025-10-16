@@ -59,7 +59,8 @@ public class Parser {
 
         // Validate input
         if (!content.matches("[a-zA-Z0-9_-]+")) {
-            throw new InvalidInputException("Repo name can only contain alphanumeric characters, hyphens and underscores.");
+            throw new InvalidInputException(
+                    "Repo name can only contain alphanumeric characters, hyphens and underscores.");
         }
         return new InitCommand(content);
     }

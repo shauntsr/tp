@@ -12,7 +12,7 @@ public class InitCommand extends Command {
     private final String repoName;
 
     public InitCommand(String repoName) {
-       this.repoName = repoName;
+        this.repoName = repoName;
     }
 
     @Override
