@@ -84,6 +84,10 @@ public class Storage {
 
     public void createRepo(String repoName) {
         Path repoPath = rootPath.resolve(repoName);
+        if (Files.exists(repoPath)) {
+            System.out.println("Repository /"+ repoName + " already exists.");
+            return;
+        }
         try {
             Files.createDirectories(repoPath.resolve(REPO_NOTES));
             Files.createDirectories(repoPath.resolve(REPO_ARCHIVE));

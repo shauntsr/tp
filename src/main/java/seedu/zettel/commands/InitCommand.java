@@ -9,12 +9,15 @@ import seedu.zettel.UI;
 
 public class InitCommand extends Command {
 
-    public InitCommand(String content) {
-        super();
+    private final String repoName;
+
+    public InitCommand(String repoName) {
+       this.repoName = repoName;
     }
 
     @Override
     public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
-
+        storage.createRepo(repoName);
+        ui.showRepoInit(repoName);
     }
 }
