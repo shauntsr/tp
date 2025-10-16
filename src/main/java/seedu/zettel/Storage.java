@@ -25,10 +25,19 @@ public class Storage {
     private final Path rootPath; // Root directory path
     private String repoName = DEFAULT_REPO;
 
+    /**
+     * Creates a Storage instance with the specified root directory.
+     *
+     * @param rootPath The root directory for storage.
+     */
     public Storage(String rootPath) {
         this.rootPath = Paths.get(rootPath);
     }
 
+    /**
+     * Initializes the storage by creating the root folder, config file,
+     * default repository, and default storage file.
+     */
     public void init() {
         createRootFolder();
 
@@ -77,6 +86,11 @@ public class Storage {
         }
     }
 
+    /**
+     * Loads all notes from the current repository.
+     *
+     * @return An ArrayList of Note objects; empty list if loading fails.
+     */
     public ArrayList<Note> load() {
         Path repoPath = rootPath.resolve(repoName);
         Path filePath = repoPath.resolve(REPO_NOTES).resolve(STORAGE_FILE);
@@ -91,6 +105,12 @@ public class Storage {
         }
     }
 
+    /**
+     * Creates a new repository with notes and archive folders, and an index file.
+     * Prints a message if the repository already exists.
+     *
+     * @param repoName The name of the repository to create.
+     */
     public void createRepo(String repoName) {
         Path repoPath = rootPath.resolve(repoName);
         if (Files.exists(repoPath)) {
@@ -106,6 +126,11 @@ public class Storage {
         }
     }
 
+    /**
+     * Switches the current repository and updates the config file.
+     *
+     * @param repoName The repository to switch to.
+     */
     public void changeRepo(String repoName) {
         try {
             this.repoName = repoName;
@@ -116,6 +141,11 @@ public class Storage {
         }
     }
 
+    /**
+     * Saves a list of notes to the current repository.
+     *
+     * @param notes The notes to save.
+     */
     public void save(List<Note> notes) {
         Path repoPath = rootPath.resolve(repoName).resolve(REPO_NOTES);
         Path filePath = repoPath.resolve(STORAGE_FILE);
