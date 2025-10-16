@@ -10,21 +10,31 @@ cd text-ui-test
 
 java -jar $(find ../build/libs/ -mindepth 1 -print -quit) < input.txt > ACTUAL.TXT
 
-# Normalize IDs - replace all 8-character hex IDs with a placeholder
+# Normalize ACTUAL.TXT:
+# 1. Replace 8-char lowercase hex IDs with # prefix: #abcd1234 -> #XXXXXXXX
 sed -E 's/#[a-f0-9]{8}/#XXXXXXXX/g' ACTUAL.TXT > ACTUAL-NORMALIZED.TXT
-sed -E 's/[a-f0-9]{8}( |$)/XXXXXXXX\1/g' ACTUAL-NORMALIZED.TXT > ACTUAL-NORMALIZED2.TXT
-# Normalize dates - replace all dates with XXXX-XX-XX
+
+# 2. Replace standalone 8-char lowercase hex IDs: abcd1234 -> XXXXXXXX
+sed -E 's/\b[a-f0-9]{8}\b/XXXXXXXX/g' ACTUAL-NORMALIZED.TXT > ACTUAL-NORMALIZED2.TXT
+
+# 3. Normalize dates: YYYY-MM-DD -> XXXX-XX-XX
 sed -E 's/[0-9]{4}-[0-9]{2}-[0-9]{2}/XXXX-XX-XX/g' ACTUAL-NORMALIZED2.TXT > ACTUAL-NORMALIZED.TXT
 
+# Copy and convert EXPECTED.TXT line endings
 cp EXPECTED.TXT EXPECTED-UNIX.TXT
-dos2unix EXPECTED-UNIX.TXT ACTUAL-NORMALIZED.TXT
+dos2unix EXPECTED-UNIX.TXT ACTUAL-NORMALIZED.TXT 2>/dev/null || true
 
-# Normalize the expected file too
+# Normalize EXPECTED.TXT:
+# 1. Replace 8-char lowercase hex IDs with # prefix
 sed -E 's/#[a-f0-9]{8}/#XXXXXXXX/g' EXPECTED-UNIX.TXT > EXPECTED-NORMALIZED.TXT
-sed -E 's/[a-f0-9]{8}( |$)/XXXXXXXX\1/g' EXPECTED-NORMALIZED.TXT > EXPECTED-NORMALIZED2.TXT
-# Normalize dates in expected file
+
+# 2. Replace standalone 8-char lowercase hex IDs
+sed -E 's/\b[a-f0-9]{8}\b/XXXXXXXX/g' EXPECTED-NORMALIZED.TXT > EXPECTED-NORMALIZED2.TXT
+
+# 3. Normalize dates in expected file
 sed -E 's/[0-9]{4}-[0-9]{2}-[0-9]{2}/XXXX-XX-XX/g' EXPECTED-NORMALIZED2.TXT > EXPECTED-NORMALIZED.TXT
 
+# Compare the normalized files
 diff EXPECTED-NORMALIZED.TXT ACTUAL-NORMALIZED.TXT
 if [ $? -eq 0 ]
 then

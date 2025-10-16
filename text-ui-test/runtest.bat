@@ -1,26 +1,36 @@
-@echo off
-setlocal enableextensions
-pushd %~dp0
+#!/usr/bin/env bash
+
+# change to script directory
+cd "${0%/*}"
 
 cd ..
-call gradlew clean shadowJar
+./gradlew clean shadowJar
 
-cd build\libs
-for /f "tokens=*" %%a in (
-    'dir /b *.jar'
-) do (
-    set jarloc=%%a
-)
+cd text-ui-test
 
-java -jar %jarloc% < ..\..\text-ui-test\input.txt > ..\..\text-ui-test\ACTUAL.TXT
+java -jar $(find ../build/libs/ -mindepth 1 -print -quit) < input.txt > ACTUAL.TXT
 
-cd ..\..\text-ui-test
+# Normalize IDs - replace all 8-character hex IDs with a placeholder
+sed -E 's/#[a-f0-9]{8}/#XXXXXXXX/g' ACTUAL.TXT > ACTUAL-NORMALIZED.TXT
+sed -E 's/[a-f0-9]{8}( |$)/XXXXXXXX\1/g' ACTUAL-NORMALIZED.TXT > ACTUAL-NORMALIZED2.TXT
+# Normalize dates - replace all dates with XXXX-XX-XX
+sed -E 's/[0-9]{4}-[0-9]{2}-[0-9]{2}/XXXX-XX-XX/g' ACTUAL-NORMALIZED2.TXT > ACTUAL-NORMALIZED.TXT
 
-REM Normalize IDs and dates in ACTUAL.TXT - replace 8-char hex IDs with XXXXXXXX and dates with XXXX-XX-XX
-powershell -Command "(Get-Content ACTUAL.TXT) -replace '#[a-f0-9]{8}', '#XXXXXXXX' -replace '([a-f0-9]{8})( |$)', 'XXXXXXXX$2' -replace '\d{4}-\d{2}-\d{2}', 'XXXX-XX-XX' | Set-Content ACTUAL-NORMALIZED.TXT"
+cp EXPECTED.TXT EXPECTED-UNIX.TXT
+dos2unix EXPECTED-UNIX.TXT ACTUAL-NORMALIZED.TXT
 
-REM Normalize IDs and dates in EXPECTED.TXT
-powershell -Command "(Get-Content EXPECTED.TXT) -replace '#[a-f0-9]{8}', '#XXXXXXXX' -replace '([a-f0-9]{8})( |$)', 'XXXXXXXX$2' -replace '\d{4}-\d{2}-\d{2}', 'XXXX-XX-XX' | Set-Content EXPECTED-NORMALIZED.TXT"
+# Normalize the expected file too
+sed -E 's/#[a-f0-9]{8}/#XXXXXXXX/g' EXPECTED-UNIX.TXT > EXPECTED-NORMALIZED.TXT
+sed -E 's/[a-f0-9]{8}( |$)/XXXXXXXX\1/g' EXPECTED-NORMALIZED.TXT > EXPECTED-NORMALIZED2.TXT
+# Normalize dates in expected file
+sed -E 's/[0-9]{4}-[0-9]{2}-[0-9]{2}/XXXX-XX-XX/g' EXPECTED-NORMALIZED2.TXT > EXPECTED-NORMALIZED.TXT
 
-REM Compare normalized files
-FC ACTUAL-NORMALIZED.TXT EXPECTED-NORMALIZED.TXT >NUL && ECHO Test passed! || ECHO Test failed!
+diff EXPECTED-NORMALIZED.TXT ACTUAL-NORMALIZED.TXT
+if [ $? -eq 0 ]
+then
+    echo "Test passed!"
+    exit 0
+else
+    echo "Test failed!"
+    exit 1
+fi
