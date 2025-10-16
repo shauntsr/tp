@@ -47,15 +47,15 @@ public class Parser {
         String[] inputs = userCommand.trim().split(" ");
         String command = inputs[0].toLowerCase();
         return switch (command) {
-            case "bye" -> new ExitCommand();
-            case "list" -> parseListNoteCommand(userCommand);
-            case "new" -> parseNewNoteCommand(userCommand);
-            case "delete" -> parseDeleteNoteCommand(inputs);
-            case "pin" -> parsePinNoteCommand(inputs, true);
-            case "unpin" -> parsePinNoteCommand(inputs, false);
-            case "init" -> parseInitCommand(userCommand);
-            case "find" -> parseFindNoteCommand(userCommand);
-            default -> throw new InvalidInputException(command);
+        case "bye" -> new ExitCommand();
+        case "list" -> parseListNoteCommand(userCommand);
+        case "new" -> parseNewNoteCommand(userCommand);
+        case "delete" -> parseDeleteNoteCommand(inputs);
+        case "pin" -> parsePinNoteCommand(inputs, true);
+        case "unpin" -> parsePinNoteCommand(inputs, false);
+        case "init" -> parseInitCommand(userCommand);
+        case "find" -> parseFindNoteCommand(userCommand);
+        default -> throw new InvalidInputException(command);
         };
     }
 
