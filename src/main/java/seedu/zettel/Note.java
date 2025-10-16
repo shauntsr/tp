@@ -10,6 +10,9 @@ public class Note {
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
 
+    // ID length constant
+    private static final int ID_LENGTH = 8;
+
     // Static counter for tracking total notes
     private static int numberOfNotes = 0;
     // Instance fields
@@ -43,6 +46,7 @@ public class Note {
     public Note(String id, String title, String filename, String body,
                 Instant createdAt, Instant modifiedAt, boolean pinned,
                 boolean archived, String archiveName, List<String> logs) {
+        assert id.length() == ID_LENGTH : "Note ID must be " + ID_LENGTH + " characters long";
         this.id = id;
         this.title = title;
         this.filename = filename;
