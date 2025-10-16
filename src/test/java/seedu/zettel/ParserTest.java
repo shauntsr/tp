@@ -66,13 +66,23 @@ class ParserTest {
 
     @Test
     void testParseDeleteWithValidIdReturnsDeleteNoteCommand() throws ZettelException {
-        Command command = Parser.parse("delete 123456");
+        Command command = Parser.parse("delete 12345678");
         assertInstanceOf(DeleteNoteCommand.class, command);
     }
 
     @Test
+    void testParseDeleteWithSpecialCharactersThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete 1234-678"));
+    }
+
+    @Test
+    void testParseDeleteWithInvalidCharactersThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete 12@45678"));
+    }
+
+    @Test
     void testParseDeleteWithForceFlagReturnsDeleteNoteCommand() throws ZettelException {
-        Command command = Parser.parse("delete -f 123456");
+        Command command = Parser.parse("delete -f 12345678");
         assertInstanceOf(DeleteNoteCommand.class, command);
     }
 
@@ -82,20 +92,45 @@ class ParserTest {
     }
 
     @Test
+    void testParseDeleteWithTooShortIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete 123"));
+    }
+
+    @Test
+    void testParseDeleteWithTooLongIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete 123456789"));
+    }
+
+    @Test
     void testParsePinWithValidIdReturnsPinNoteCommand() throws ZettelException {
-        Command command = Parser.parse("pin 123456");
+        Command command = Parser.parse("pin 12345678");
         assertInstanceOf(PinNoteCommand.class, command);
     }
 
     @Test
     void testParseUnpinWithValidIdReturnsPinNoteCommand() throws ZettelException {
-        Command command = Parser.parse("unpin 654321");
+        Command command = Parser.parse("unpin abcdef12");
         assertInstanceOf(PinNoteCommand.class, command);
     }
 
     @Test
     void testParsePinWithoutIdThrowsEmptyDescriptionException() {
         assertThrows(EmptyDescriptionException.class, () -> Parser.parse("pin"));
+    }
+
+    @Test
+    void testParsePinWithSpecialCharactersThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("pin 1234-678"));
+    }
+
+    @Test
+    void testParsePinWithTooShortIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("pin 123"));
+    }
+
+    @Test
+    void testParsePinWithTooLongIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("pin 123456789"));
     }
 
     @Test

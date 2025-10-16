@@ -50,10 +50,6 @@ public class UI {
         System.out.println("Confirm deletion on '" + noteTitle + "', noteID " + id + "? (y/n)");
     }
 
-    public void showDeleteNotFound(String id) {
-        System.out.println("No note found with id " + id);
-    }
-
     public void showError(String message) {
         System.out.println(message);
     }
