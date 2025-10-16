@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
 import seedu.zettel.UI;
-import seedu.zettel.exceptions.NoNoteFoundException;
+import seedu.zettel.exceptions.InvalidNoteIdException;
 import seedu.zettel.exceptions.NoNotesException;
 import seedu.zettel.exceptions.ZettelException;
 
@@ -101,7 +101,7 @@ public class DeleteNoteCommandTest {
         DeleteNoteCommand cmd = new DeleteNoteCommand("99999999", true);
 
         // Should throw NoNoteFoundException because the noteId format is valid but the note doesn't exist
-        assertThrows(NoNoteFoundException.class, () -> {
+        assertThrows(InvalidNoteIdException.class, () -> {
             cmd.execute(notes, ui, storage);
         });
 
