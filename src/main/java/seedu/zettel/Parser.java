@@ -23,6 +23,9 @@ public class Parser {
     private static final String ID_EMPTY = "Please specify a Note ID to ";
     private static final String ID_INVALID = "Note ID must be exactly 8 alphanumeric characters: eg. 12345678 ";
     private static final String INIT_EMPTY = "Please specify a repo name!";
+    private static final String INIT_INVALID =
+        "Repo name can only contain alphanumeric characters, "
+        + "hyphens and underscores.";
     private static final int VALID_NOTE_ID_LENGTH = 8;
     private static final String VALID_NOTE_ID_REGEX = "^[a-zA-Z0-9]{" + VALID_NOTE_ID_LENGTH + "}$";
     private static final String INVALID_ID_LENGTH_FORMAT = "Note ID must be exactly " + VALID_NOTE_ID_LENGTH + 
@@ -59,6 +62,11 @@ public class Parser {
         String content = input.substring(4).trim();
         if (content.isEmpty()) {
             throw new EmptyDescriptionException(INIT_EMPTY);
+        }
+
+        // Validate input
+        if (!content.matches("[a-zA-Z0-9_-]+")) {
+            throw new InvalidInputException(INIT_INVALID);
         }
         return new InitCommand(content);
     }

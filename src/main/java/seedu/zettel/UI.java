@@ -105,4 +105,8 @@ public class UI {
     public void showJustPinnedNote(Note note, String noteId) {
         System.out.println(" Got it. I've " + (note.isPinned() ? "pinned" : "unpinned") + " this note: " + noteId);
     }
+
+    public void showRepoInit(String repoName) {
+        System.out.println(" Repository /" + repoName + " has been created.");
+    }
 }

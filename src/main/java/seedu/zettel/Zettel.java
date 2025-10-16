@@ -16,7 +16,7 @@ import seedu.zettel.exceptions.ZettelException;
  */
 public class Zettel {
 
-    private static final String DATA_FILE_PATH = "data/notes.txt";
+    private static final String DATA_FILE_PATH = "data/";
     private static final int READ_TIMEOUT_SECONDS = 240;
 
     private Storage storage;
@@ -31,6 +31,7 @@ public class Zettel {
     public Zettel() {
         this.ui = new UI();
         this.storage = new Storage(DATA_FILE_PATH);
+        storage.init();
         this.notes = storage.load();
         this.isRunning = true;
     }

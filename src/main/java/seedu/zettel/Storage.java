@@ -13,19 +13,88 @@ import java.util.stream.Collectors;
 
 
 public class Storage {
-    private final Path filePath;
+    static final String CONFIG_FILE = ".zettelConfig";
 
-    public Storage(String filePath) {
-        this.filePath = Paths.get(filePath);
+    // Folder and file names for the repos
+    static final String DEFAULT_REPO = "main";
+    static final String REPO_NOTES = "notes";
+    static final String REPO_ARCHIVE = "archive";
+    static final String REPO_INDEX = "index.txt";
+
+    static final String STORAGE_FILE = "zettel.txt"; // Placeholder until we migrate
+    private final Path rootPath; // Root directory path
+    private String repoName = DEFAULT_REPO;
+
+    /**
+     * Creates a Storage instance with the specified root directory.
+     *
+     * @param rootPath The root directory for storage.
+     */
+    public Storage(String rootPath) {
+        this.rootPath = Paths.get(rootPath);
     }
 
-    public ArrayList<Note> load() {
-        try {
-            if (!Files.exists(filePath)) {
-                Files.createDirectories(filePath.getParent());
-                return new ArrayList<>();
-            }
+    /**
+     * Initializes the storage by creating the root folder, config file,
+     * default repository, and default storage file.
+     */
+    public void init() {
+        createRootFolder();
 
+        createConfigFile();
+
+        // Initialise default repo if doesn't exist
+        Path defaultRepoPath = rootPath.resolve(DEFAULT_REPO);
+        if (Files.notExists(defaultRepoPath)) {
+            createRepo(DEFAULT_REPO);
+        }
+
+        // Can remove this portion after we use a folder of notes
+        createStorageFile(defaultRepoPath);
+    }
+
+    private void createRootFolder() {
+        try {
+            if (Files.notExists(rootPath)) {
+                Files.createDirectories(rootPath);
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating " + rootPath + " folder.");
+        }
+    }
+
+    private static void createStorageFile(Path defaultRepoPath) {
+        Path filePath = defaultRepoPath.resolve(REPO_NOTES).resolve(STORAGE_FILE);
+        try {
+            if (Files.notExists(filePath)) {
+                Files.createFile(filePath);
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating " + filePath + ".");
+        }
+    }
+
+    private void createConfigFile() {
+        Path configPath = rootPath.resolve(CONFIG_FILE);
+        try {
+            if (Files.notExists(configPath)) {
+                Files.createFile(configPath);
+                Files.writeString(configPath, DEFAULT_REPO);
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating " + CONFIG_FILE + ".");
+        }
+    }
+
+    /**
+     * Loads all notes from the current repository.
+     *
+     * @return An ArrayList of Note objects; empty list if loading fails.
+     */
+    public ArrayList<Note> load() {
+        Path repoPath = rootPath.resolve(repoName);
+        Path filePath = repoPath.resolve(REPO_NOTES).resolve(STORAGE_FILE);
+        try {
             return Files.lines(filePath)
                     .map(this::parseSaveFile)
                     .filter(Objects::nonNull)
@@ -36,9 +105,52 @@ public class Storage {
         }
     }
 
-    public void save(List<Note> notes) {
+    /**
+     * Creates a new repository with notes and archive folders, and an index file.
+     * Prints a message if the repository already exists.
+     *
+     * @param repoName The name of the repository to create.
+     */
+    public void createRepo(String repoName) {
+        Path repoPath = rootPath.resolve(repoName);
+        if (Files.exists(repoPath)) {
+            System.out.println("Repository /"+ repoName + " already exists.");
+            return;
+        }
         try {
-            Files.createDirectories(filePath.getParent()); // Ensure directory exists
+            Files.createDirectories(repoPath.resolve(REPO_NOTES));
+            Files.createDirectories(repoPath.resolve(REPO_ARCHIVE));
+            Files.createFile(repoPath.resolve(REPO_INDEX));
+        } catch (IOException e) {
+            System.out.println("Error initialising repository " + repoName) ;
+        }
+    }
+
+    /**
+     * Switches the current repository and updates the config file.
+     *
+     * @param repoName The repository to switch to.
+     */
+    public void changeRepo(String repoName) {
+        try {
+            this.repoName = repoName;
+            Path configPath = rootPath.resolve(CONFIG_FILE);
+            Files.writeString(configPath,repoName);
+        } catch (IOException e) {
+            System.out.println("Unable to change repository to " + repoName);
+        }
+    }
+
+    /**
+     * Saves a list of notes to the current repository.
+     *
+     * @param notes The notes to save.
+     */
+    public void save(List<Note> notes) {
+        Path repoPath = rootPath.resolve(repoName).resolve(REPO_NOTES);
+        Path filePath = repoPath.resolve(STORAGE_FILE);
+        try {
+            Files.createDirectories(repoPath); // Ensure directory exists
 
             List<String> lines = notes.stream()
                     .map(this::toSaveFormat)
@@ -49,6 +161,7 @@ public class Storage {
             System.out.println("Error writing to file: " + e.getMessage());
         }
     }
+
 
     private String toSaveFormat(Note note) {
         String logsStr = String.join(";;", note.getLogs());
@@ -72,7 +185,7 @@ public class Storage {
             return null;
         }
 
-        String[] fields = line.split(" \\| ");
+        String[] fields = line.split(" \\| ", -1);
         try {
             String id = fields[0];
             String title = fields[1];
