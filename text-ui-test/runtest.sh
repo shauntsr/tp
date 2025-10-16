@@ -14,8 +14,8 @@ java -jar $(find ../build/libs/ -mindepth 1 -print -quit) < input.txt > ACTUAL.T
 # 1. Replace 8-char lowercase hex IDs with # prefix: #abcd1234 -> #XXXXXXXX
 sed -E 's/#[0-9a-f]{8}/#XXXXXXXX/g' ACTUAL.TXT > ACTUAL-NORMALIZED.TXT
 
-# 2. Replace standalone 8-char lowercase hex IDs: abcd1234 -> XXXXXXXX
-sed -E 's/\b[0-9a-f]{8}\b/XXXXXXXX/g' ACTUAL-NORMALIZED.TXT > ACTUAL-NORMALIZED2.TXT
+# 2. Replace standalone 8-char lowercase hex IDs at end of line or before space
+sed -E 's/([^0-9a-f#]|^)([0-9a-f]{8})([^0-9a-f]|$)/\1XXXXXXXX\3/g' ACTUAL-NORMALIZED.TXT > ACTUAL-NORMALIZED2.TXT
 
 # 3. Normalize dates: YYYY-MM-DD -> XXXX-XX-XX
 sed -E 's/[0-9]{4}-[0-9]{2}-[0-9]{2}/XXXX-XX-XX/g' ACTUAL-NORMALIZED2.TXT > ACTUAL-NORMALIZED.TXT
@@ -29,7 +29,7 @@ dos2unix EXPECTED-UNIX.TXT ACTUAL-NORMALIZED.TXT 2>/dev/null || true
 sed -E 's/#[0-9a-f]{8}/#XXXXXXXX/g' EXPECTED-UNIX.TXT > EXPECTED-NORMALIZED.TXT
 
 # 2. Replace standalone 8-char lowercase hex IDs
-sed -E 's/\b[0-9a-f]{8}\b/XXXXXXXX/g' EXPECTED-NORMALIZED.TXT > EXPECTED-NORMALIZED2.TXT
+sed -E 's/([^0-9a-f#]|^)([0-9a-f]{8})([^0-9a-f]|$)/\1XXXXXXXX\3/g' EXPECTED-NORMALIZED.TXT > EXPECTED-NORMALIZED2.TXT
 
 # 3. Normalize dates in expected file
 sed -E 's/[0-9]{4}-[0-9]{2}-[0-9]{2}/XXXX-XX-XX/g' EXPECTED-NORMALIZED2.TXT > EXPECTED-NORMALIZED.TXT

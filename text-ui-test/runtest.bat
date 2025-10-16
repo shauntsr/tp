@@ -18,12 +18,12 @@ cd ..\..\text-ui-test
 
 REM Normalize IDs and dates in ACTUAL.TXT
 REM - Replace 8-char lowercase hex IDs (with # prefix) with #XXXXXXXX
-REM - Replace 8-char lowercase hex IDs (standalone or before space) with XXXXXXXX
+REM - Replace 8-char lowercase hex IDs (standalone) with XXXXXXXX
 REM - Replace dates in format YYYY-MM-DD with XXXX-XX-XX
-powershell -Command "(Get-Content ACTUAL.TXT) -replace '#[0-9a-f]{8}', '#XXXXXXXX' -replace '\b[0-9a-f]{8}\b', 'XXXXXXXX' -replace '\d{4}-\d{2}-\d{2}', 'XXXX-XX-XX' | Set-Content ACTUAL-NORMALIZED.TXT"
+powershell -Command "(Get-Content ACTUAL.TXT) -replace '#[0-9a-f]{8}', '#XXXXXXXX' -replace '(?<![0-9a-f#])[0-9a-f]{8}(?![0-9a-f])', 'XXXXXXXX' -replace '\d{4}-\d{2}-\d{2}', 'XXXX-XX-XX' | Set-Content ACTUAL-NORMALIZED.TXT"
 
 REM Normalize IDs and dates in EXPECTED.TXT
-powershell -Command "(Get-Content EXPECTED.TXT) -replace '#[0-9a-f]{8}', '#XXXXXXXX' -replace '\b[0-9a-f]{8}\b', 'XXXXXXXX' -replace '\d{4}-\d{2}-\d{2}', 'XXXX-XX-XX' | Set-Content EXPECTED-NORMALIZED.TXT"
+powershell -Command "(Get-Content EXPECTED.TXT) -replace '#[0-9a-f]{8}', '#XXXXXXXX' -replace '(?<![0-9a-f#])[0-9a-f]{8}(?![0-9a-f])', 'XXXXXXXX' -replace '\d{4}-\d{2}-\d{2}', 'XXXX-XX-XX' | Set-Content EXPECTED-NORMALIZED.TXT"
 
 REM Compare normalized files
 FC ACTUAL-NORMALIZED.TXT EXPECTED-NORMALIZED.TXT >NUL && ECHO Test passed! || ECHO Test failed!
