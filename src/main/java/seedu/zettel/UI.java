@@ -46,8 +46,8 @@ public class UI {
         System.out.println("Note at " + id + " deleted");
     }
 
-    public void showDeleteConfirmation(String note) {
-        System.out.println(note);
+    public void showDeleteConfirmation(String id, String noteTitle) {
+        System.out.println("Confirm deletion on '" + noteTitle + "', noteID " + id + "? (y/n)");
     }
 
     public void showDeleteNotFound(String id) {
