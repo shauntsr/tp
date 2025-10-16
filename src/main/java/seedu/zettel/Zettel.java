@@ -13,6 +13,7 @@ import seedu.zettel.exceptions.ZettelException;
 /**
  * Main class for the Zettel CLI application.
  * Handles initialization, storage setup, and the main program loop.
+ * Zettel is a note-taking system that uses hash-based IDs for notes.
  */
 public class Zettel {
 
@@ -26,7 +27,7 @@ public class Zettel {
 
     /**
      * Constructor for Zettel application.
-     * Initializes the UI, storage, and loads existing notes.
+     * Initializes the UI, storage, and loads existing notes from disk.
      */
     public Zettel() {
         this.ui = new UI();
@@ -39,6 +40,7 @@ public class Zettel {
     /**
      * Runs the main application loop.
      * Displays greeting, processes commands until exit command is received.
+     * Implements timeout handling to prevent hanging in CI environments.
      */
     public void run() {
 
@@ -94,7 +96,7 @@ public class Zettel {
     /**
      * Main entry-point for the Zettel application.
      *
-     * @param args command line arguments (not used)
+     * @param args Command line arguments (not used)
      */
     public static void main(String[] args) {
         new Zettel().run();
