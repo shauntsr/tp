@@ -21,6 +21,8 @@ public class NewNoteCommand extends Command {
 
     @Override
     public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
+        assert title != null;
+
         String id = UUID.randomUUID().toString().substring(0,8);
         String filename = title.replaceAll("\\s+", "_") + ".txt";
 

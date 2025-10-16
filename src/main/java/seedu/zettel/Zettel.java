@@ -1,20 +1,21 @@
 package seedu.zettel;
 
-import seedu.zettel.commands.Command;
-import seedu.zettel.exceptions.ZettelException;
-
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import seedu.zettel.commands.Command;
+import seedu.zettel.exceptions.ZettelException;
 
 /**
  * Main class for the Zettel CLI application.
  * Handles initialization, storage setup, and the main program loop.
  */
 public class Zettel {
+
     private static final String DATA_FILE_PATH = "data/notes.txt";
     private static final int READ_TIMEOUT_SECONDS = 240;
 
@@ -39,6 +40,7 @@ public class Zettel {
      * Displays greeting, processes commands until exit command is received.
      */
     public void run() {
+
         ui.showWelcome();
         ExecutorService executor = Executors.newSingleThreadExecutor();
 

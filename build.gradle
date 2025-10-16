@@ -44,4 +44,5 @@ checkstyle {
 run{
     jvmArgs '-ea'
     standardInput = System.in
+    enableAssertions = true
 }
