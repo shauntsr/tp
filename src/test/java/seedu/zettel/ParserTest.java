@@ -110,6 +110,12 @@ class ParserTest {
     }
 
     @Test
+    void parse_initWithInvalidRepoName_throwsInvalidInputException() {
+        assertThrows(InvalidInputException.class, () -> Parser.parse("init my/repo"));
+        assertThrows(InvalidInputException.class, () -> Parser.parse("init my repo"));
+    }
+
+    @Test
     void parse_findWithSearchTerm_returnsFindNoteCommand() throws ZettelException {
         Command command = Parser.parse("find test");
         assertInstanceOf(FindNoteCommand.class, command);
