@@ -14,17 +14,22 @@ import java.util.stream.Collectors;
 
 public class Storage {
     static final String CONFIG_FILE = ".zettelConfig";
+
+    // Folder and file names for the repos
+    static final String DEFAULT_REPO = "main";
+    static final String REPO_NOTES = "notes";
+    static final String REPO_ARCHIVE = "archive";
+    static final String REPO_INDEX = "index.txt";
+
     static final String STORAGE_FILE = "zettel.txt"; // Placeholder until we migrate
     private final Path rootPath; // Root directory path
+    private String repoName = DEFAULT_REPO;
 
     public Storage(String rootPath) {
         this.rootPath = Paths.get(rootPath);
     }
 
     public void init() {
-        Path configPath = rootPath.resolve(CONFIG_FILE);
-        Path filePath = rootPath.resolve(STORAGE_FILE);
-
         // Create root folder
         try {
             if (Files.notExists(rootPath)) {
@@ -35,16 +40,25 @@ public class Storage {
         }
 
         // Create config file
+        Path configPath = rootPath.resolve(CONFIG_FILE);
         try {
             if (Files.notExists(configPath)) {
                 Files.createFile(configPath);
+                Files.writeString(configPath, DEFAULT_REPO);
             }
         } catch (IOException e) {
             System.out.println("Error creating " + CONFIG_FILE + ".");
         }
 
+        // Initialise default repo if doesn't exist
+        Path defaultRepoPath = rootPath.resolve(DEFAULT_REPO);
+        if (Files.notExists(defaultRepoPath)) {
+            createRepo(DEFAULT_REPO);
+        }
+
         // Create storage file
         // Can remove this portion after we use a folder of notes
+        Path filePath = defaultRepoPath.resolve(REPO_NOTES).resolve(STORAGE_FILE);
         try {
             if (Files.notExists(filePath)) {
                 Files.createFile(filePath);
@@ -55,7 +69,8 @@ public class Storage {
     }
 
     public ArrayList<Note> load() {
-        Path filePath = rootPath.resolve(STORAGE_FILE);
+        Path repoPath = rootPath.resolve(repoName);
+        Path filePath = repoPath.resolve(REPO_NOTES).resolve(STORAGE_FILE);
         try {
             return Files.lines(filePath)
                     .map(this::parseSaveFile)
@@ -67,10 +82,32 @@ public class Storage {
         }
     }
 
-    public void save(List<Note> notes) {
-        Path filePath = rootPath.resolve(STORAGE_FILE);
+    public void createRepo(String repoName) {
+        Path repoPath = rootPath.resolve(repoName);
         try {
-            Files.createDirectories(rootPath); // Ensure directory exists
+            Files.createDirectories(repoPath.resolve(REPO_NOTES));
+            Files.createDirectories(repoPath.resolve(REPO_ARCHIVE));
+            Files.createFile(repoPath.resolve(REPO_INDEX));
+        } catch (IOException e) {
+            System.out.println("Error initialising repository " + repoName) ;
+        }
+    }
+
+    public void changeRepo(String repoName) {
+        try {
+            this.repoName = repoName;
+            Path configPath = rootPath.resolve(CONFIG_FILE);
+            Files.writeString(configPath,repoName);
+        } catch (IOException e) {
+            System.out.println("Unable to change repository to " + repoName);
+        }
+    }
+
+    public void save(List<Note> notes) {
+        Path repoPath = rootPath.resolve(repoName).resolve(REPO_NOTES);
+        Path filePath = repoPath.resolve(STORAGE_FILE);
+        try {
+            Files.createDirectories(repoPath); // Ensure directory exists
 
             List<String> lines = notes.stream()
                     .map(this::toSaveFormat)
@@ -81,6 +118,7 @@ public class Storage {
             System.out.println("Error writing to file: " + e.getMessage());
         }
     }
+
 
     private String toSaveFormat(Note note) {
         String logsStr = String.join(";;", note.getLogs());
@@ -104,7 +142,7 @@ public class Storage {
             return null;
         }
 
-        String[] fields = line.split(" \\| ");
+        String[] fields = line.split(" \\| ", -1);
         try {
             String id = fields[0];
             String title = fields[1];
