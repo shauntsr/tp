@@ -13,10 +13,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Unit tests for the Note class.
+ * Tests note creation, getters, setters, and hash-based ID functionality.
+ */
 public class NoteTest {
 
     private Note note;
-    private final String id = "a1b2c3d4"; // 8 characters
+    private final String id = "a1b2c3d4"; // 8-character lowercase hex ID
     private final String title = "Test Title";
     private final String filename = "test_note.txt";
     private final String body = "This is the body of the test note.";
@@ -25,14 +29,14 @@ public class NoteTest {
 
     @BeforeEach
     void setUp() {
-        // This setup runs before each test, providing a fresh note instance.
+        // This setup runs before each test, providing a fresh note instance
         note = new Note(id, title, filename, body, createdAt, modifiedAt);
     }
 
     @Test
     @DisplayName("Test primary constructor for new note creation")
     void testNewNoteConstructor() {
-        // The note from setUp is created with this constructor.
+        // The note from setUp is created with this constructor
         assertEquals(id, note.getId());
         assertEquals(title, note.getTitle());
         assertEquals(filename, note.getFilename());
@@ -51,7 +55,8 @@ public class NoteTest {
     @DisplayName("Test full constructor for loading a note")
     void testFullConstructor() {
         List<String> logs = List.of("Log entry 1", "Log entry 2");
-        Note loadedNote = new Note(id, title, filename, body, createdAt, modifiedAt, true, true, "my-archive", logs);
+        Note loadedNote = new Note(id, title, filename, body, createdAt, modifiedAt,
+                true, true, "my-archive", logs);
 
         assertEquals(id, loadedNote.getId());
         assertEquals(title, loadedNote.getTitle());
@@ -65,7 +70,8 @@ public class NoteTest {
     @Test
     @DisplayName("Test full constructor with null logs list")
     void testFullConstructorWithNullLogs() {
-        Note loadedNote = new Note(id, title, filename, body, createdAt, modifiedAt, false, false, null, null);
+        Note loadedNote = new Note(id, title, filename, body, createdAt, modifiedAt,
+                false, false, null, null);
         assertNotNull(loadedNote.getLogs(), "Logs list should be initialized to an empty list, not null.");
         assertTrue(loadedNote.getLogs().isEmpty(), "Logs list should be empty when loaded with null.");
     }
@@ -121,7 +127,6 @@ public class NoteTest {
         assertTrue(note.getModifiedAt().isAfter(initialModifiedAt), "setPinned should update modifiedAt.");
     }
 
-
     @Test
     @DisplayName("addLog should add an entry to the logs")
     void testAddLog() {
@@ -169,20 +174,20 @@ public class NoteTest {
         assertEquals(id, parts[2]);
 
         // Verify the date part matches the yyyy-MM-dd pattern
-        // This is a more robust way to test without accessing the private formatter.
         assertTrue(parts[1].matches("\\d{4}-\\d{2}-\\d{2}"), "Date part should be in yyyy-MM-dd format.");
     }
 
     @Test
     @DisplayName("Static note counter should increment on object creation")
     void testNumberOfNotesCounter() {
-        // This test is self-contained to avoid interference from other tests' object creations.
+        // This test is self-contained to avoid interference from other tests' object creations
         int countBefore = Note.getNumberOfNotes();
 
-        Note note1 = new Note("12345678", "t1", "f1", "b1", Instant.now(), Instant.now());
+        // Use lowercase hex IDs
+        Note note1 = new Note("abcd1234", "t1", "f1", "b1", Instant.now(), Instant.now());
         assertEquals(countBefore + 1, Note.getNumberOfNotes());
 
-        Note note2 = new Note("abcdefgh", "t2", "f2", "b2", Instant.now(), Instant.now());
+        Note note2 = new Note("def56789", "t2", "f2", "b2", Instant.now(), Instant.now());
         assertEquals(countBefore + 2, Note.getNumberOfNotes());
     }
 }
