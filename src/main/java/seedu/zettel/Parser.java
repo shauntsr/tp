@@ -1,6 +1,5 @@
 package seedu.zettel;
 
-
 import seedu.zettel.commands.Command;
 import seedu.zettel.commands.DeleteNoteCommand;
 import seedu.zettel.commands.ExitCommand;
@@ -14,7 +13,13 @@ import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.InvalidInputException;
 import seedu.zettel.exceptions.ZettelException;
 
+/**
+ * Parses user input commands and converts them into executable Command objects.
+ * This class handles validation and extraction of command parameters from raw user input strings.
+ */
 public class Parser {
+    // Error messages to be printed when encountering errors
+    // Categorised between empty, format and invalid
     private static final String LIST_FORMAT = "List format should be: list [-p]";
     private static final String PIN_FORMAT = "Pin format should be: pin/unpin <NOTE_ID>";
     private static final String DELETE_FORMAT = "Delete format should be: delete [-f] <NOTE_ID> ";
@@ -24,30 +29,46 @@ public class Parser {
     private static final String ID_INVALID = "Note ID must be exactly 8 alphanumeric characters: eg. 12345678 ";
     private static final String INIT_EMPTY = "Please specify a repo name!";
     private static final String INIT_INVALID =
-        "Repo name can only contain alphanumeric characters, "
-        + "hyphens and underscores.";
+            "Repo name can only contain alphanumeric characters, "
+                    + "hyphens and underscores.";
     private static final int VALID_NOTE_ID_LENGTH = 8;
     private static final String VALID_NOTE_ID_REGEX = "^[a-zA-Z0-9]{" + VALID_NOTE_ID_LENGTH + "}$";
-    private static final String INVALID_ID_LENGTH_FORMAT = "Note ID must be exactly " + VALID_NOTE_ID_LENGTH + 
-                                                                " characters long.";
+    private static final String INVALID_ID_LENGTH_FORMAT = "Note ID must be exactly " + VALID_NOTE_ID_LENGTH +
+            " characters long.";
 
-    public static Command parse(String userCommand) throws ZettelException {
-        String[] inputs = userCommand.trim().split(" ");
-        String command = inputs[0].toLowerCase();
+    /**
+     * Parses a user command string and returns the corresponding Command object.
+     * Supported commands include: bye, list, new, delete, pin, unpin, init, and find.
+     *
+     * @param input The raw user input string to parse.
+     * @return A Command object corresponding to the user's input.
+     * @throws ZettelException If the command format is invalid or parameters are missing.
+     */
+    public static Command parse(String input) throws ZettelException {
+        String[] inputs = input.trim().split(" "); //split input based on spaces in between
+        String command = inputs[0].toLowerCase(); //first word of user input
         return switch (command) {
         case "bye" -> new ExitCommand();
-        case "list" -> parseListNoteCommand(userCommand);
-        case "new" -> parseNewNoteCommand(userCommand);
+        case "list" -> parseListNoteCommand(input);
+        case "new" -> parseNewNoteCommand(input);
         case "delete" -> parseDeleteNoteCommand(inputs);
         case "pin" -> parsePinNoteCommand(inputs, true);
         case "unpin" -> parsePinNoteCommand(inputs, false);
-        case "init" -> parseInitCommand(userCommand);
-        case "find" -> parseFindNoteCommand(userCommand);
+        case "init" -> parseInitCommand(input);
+        case "find" -> parseFindNoteCommand(input);
         default -> throw new InvalidInputException(command);
         };
 
     }
 
+    /**
+     * Parses a list command to display notes.
+     * Accepts an optional -p flag to show only pinned notes.
+     *
+     * @param input The full user input string starting with "list".
+     * @return A ListNoteCommand object with the appropriate filter flag.
+     * @throws ZettelException If the command format is invalid.
+     */
     private static Command parseListNoteCommand(String input) throws ZettelException {
         String content = input.substring(4).trim();
         if (content.isEmpty()) {
@@ -58,6 +79,14 @@ public class Parser {
         return new ListNoteCommand(true);
     }
 
+    /**
+     * Parses an init command to initialize a new repository.
+     * The repository name must contain only alphanumeric characters, hyphens, and underscores.
+     *
+     * @param input The full user input string starting with "init".
+     * @return An InitCommand object with the specified repository name.
+     * @throws ZettelException If the repository name is empty or contains invalid characters.
+     */
     private static Command parseInitCommand(String input) throws ZettelException {
         String content = input.substring(4).trim();
         if (content.isEmpty()) {
@@ -66,11 +95,19 @@ public class Parser {
 
         // Validate input
         if (!content.matches("[a-zA-Z0-9_-]+")) {
-            throw new InvalidInputException(INIT_INVALID);
+            throw new InvalidFormatException(INIT_INVALID);
         }
         return new InitCommand(content);
     }
 
+    /**
+     * Parses a new note command to create a new note with a title and optional body.
+     * Expected format: new -t TITLE [-b BODY]
+     *
+     * @param input The full user input string starting with "new".
+     * @return A NewNoteCommand object with the extracted title and body.
+     * @throws ZettelException If the format is invalid, title flag is missing, or title is empty.
+     */
     private static Command parseNewNoteCommand(String input) throws ZettelException {
         try {
             String content = input.substring(3).trim();
@@ -102,6 +139,14 @@ public class Parser {
         }
     }
 
+    /**
+     * Parses a find command to search for notes.
+     * Expected format: find SEARCH_TERM
+     *
+     * @param input The full user input string starting with "find".
+     * @return A FindNoteCommand object with the search query.
+     * @throws ZettelException If the search query is empty.
+     */
     private static Command parseFindNoteCommand(String input) throws ZettelException {
         String content = input.substring(4).trim();
         if (content.isEmpty()) {
@@ -110,15 +155,32 @@ public class Parser {
         return new FindNoteCommand(content);
     }
 
-
+    /**
+     * Parses a pin or unpin command to toggle a note's pinned status.
+     * Expected format: pin/unpin NOTE_ID
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @param isPin True if pinning the note, false if unpinning.
+     * @return A PinNoteCommand object with the note ID and pin status.
+     * @throws ZettelException If the format is invalid or note ID is missing/malformed.
+     */
     private static Command parsePinNoteCommand(String[] inputs, boolean isPin) throws ZettelException {
         if (inputs.length > 2) {
             throw new InvalidFormatException(PIN_FORMAT);
         }
-        String noteId = parseNoteID(inputs, "pin/unpin");
+        String noteId = parseNoteId(inputs, "pin/unpin");
         return new PinNoteCommand(noteId, isPin);
     }
 
+    /**
+     * Parses a delete command to remove a note.
+     * Accepts an optional -f flag for force deletion.
+     * Expected format: delete [-f] NOTE_ID
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return A DeleteNoteCommand object with the note ID and force flag.
+     * @throws ZettelException If the format is invalid or note ID is missing/malformed.
+     */
     private static Command parseDeleteNoteCommand(String[] inputs) throws ZettelException {
         boolean forceDelete = false;
 
@@ -130,14 +192,23 @@ public class Parser {
             }
             forceDelete = true;
         }
-        String noteId = parseNoteID(inputs, "delete");
-        
+        String noteId = parseNoteId(inputs, "delete");
+
 
         return new DeleteNoteCommand(noteId, forceDelete);
     }
 
-
-    private static String parseNoteID(String[] inputs, String actionName) throws ZettelException {
+    /**
+     * Extracts and validates a note ID from the input array.
+     * The note ID must be exactly 8 alphanumeric characters.
+     * Helper function used to validate NoteId during parsing
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @param actionName The name of the action requesting the ID (for error messages).
+     * @return The validated note ID string.
+     * @throws ZettelException If the ID is missing, has incorrect length, or contains invalid characters.
+     */
+    private static String parseNoteId(String[] inputs, String actionName) throws ZettelException {
         if (inputs.length < 2) {
             throw new EmptyDescriptionException(ID_EMPTY + actionName + "!");
         }

@@ -22,8 +22,8 @@ public class Note {
     private String body; // body of the note
     private Instant createdAt; // timestamp when the note was created at
     private Instant modifiedAt; // timestamp of the note when it was last modified
-    private boolean pinned; // whether or not the note is a pinned note or not
-    private boolean archived; // whether or not the note has been archived or not
+    private boolean pinned; // indicates whether this note is pinned.
+    private boolean archived; // indicates whether this note is archived.
     private String archiveName; // name of the archive the note belongs to
     private List<String> logs; // history/log data of that individual note
 
