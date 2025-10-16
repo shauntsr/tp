@@ -31,6 +31,7 @@ public class Zettel {
     public Zettel() {
         this.ui = new UI();
         this.storage = new Storage(DATA_FILE_PATH);
+        storage.init();
         this.notes = storage.load();
         this.isRunning = true;
     }

@@ -1,5 +1,6 @@
 package seedu.zettel;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,19 +14,35 @@ import java.util.stream.Collectors;
 
 
 public class Storage {
-    private final Path filePath;
+    static final String CONFIG_FILE = ".zettelConfig";
+    private final Path filePath; // Root file path
 
     public Storage(String filePath) {
         this.filePath = Paths.get(filePath);
     }
 
+    public void init() {
+        Path parentDir = filePath.getParent();
+        Path configPath = parentDir.resolve(CONFIG_FILE);
+        try {
+            if (Files.notExists(parentDir)) {
+                Files.createDirectories(parentDir);
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating " + parentDir + " folder.");
+        }
+
+        try {
+            if (Files.notExists(configPath)) {
+                Files.createFile(configPath);
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating " + CONFIG_FILE + ".");
+        }
+    }
+
     public ArrayList<Note> load() {
         try {
-            if (!Files.exists(filePath)) {
-                Files.createDirectories(filePath.getParent());
-                return new ArrayList<>();
-            }
-
             return Files.lines(filePath)
                     .map(this::parseSaveFile)
                     .filter(Objects::nonNull)
