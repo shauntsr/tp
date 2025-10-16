@@ -17,8 +17,8 @@ public class Storage {
     static final String STORAGE_FILE = "zettel.txt"; // Placeholder until we migrate
     private final Path rootPath; // Root directory path
 
-    public Storage(String filePath) {
-        this.rootPath = Paths.get(filePath);
+    public Storage(String rootPath) {
+        this.rootPath = Paths.get(rootPath);
     }
 
     public void init() {
