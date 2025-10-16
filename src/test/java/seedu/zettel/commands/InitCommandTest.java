@@ -28,7 +28,7 @@ public class InitCommandTest {
     }
 
     @Test
-    void show_repo_init_prints_correct_message() {
+    void testNewRepoInitShowsCreatedMessage() {
         String repoName = "myRepo";
         ui.showRepoInit(repoName);
 
