@@ -43,6 +43,7 @@ public class Note {
     public Note(String id, String title, String filename, String body,
                 Instant createdAt, Instant modifiedAt, boolean pinned,
                 boolean archived, String archiveName, List<String> logs) {
+        assert (id.length() == 8);
         this.id = id;
         this.title = title;
         this.filename = filename;

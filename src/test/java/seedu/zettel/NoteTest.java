@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class NoteTest {
 
     private Note note;
-    private final String id = "testId123";
+    private final String id = "a1b2c3d4"; // 8 characters
     private final String title = "Test Title";
     private final String filename = "test_note.txt";
     private final String body = "This is the body of the test note.";
@@ -162,7 +162,7 @@ public class NoteTest {
         String noteString = note.toString();
 
         // Expected format: "FILENAME yyyy-MM-dd NOTEID"
-        // Example: test_note.txt 2025-10-14 testId123
+        // Example: test_note.txt 2025-10-14 a1b2c3d4
         String[] parts = noteString.split(" ");
 
         assertEquals(3, parts.length, "toString() output should have 3 parts separated by spaces.");
@@ -180,10 +180,10 @@ public class NoteTest {
         // This test is self-contained to avoid interference from other tests' object creations.
         int countBefore = Note.getNumberOfNotes();
 
-        Note note1 = new Note("id1", "t1", "f1", "b1", Instant.now(), Instant.now());
+        Note note1 = new Note("12345678", "t1", "f1", "b1", Instant.now(), Instant.now());
         assertEquals(countBefore + 1, Note.getNumberOfNotes());
 
-        Note note2 = new Note("id2", "t2", "f2", "b2", Instant.now(), Instant.now());
+        Note note2 = new Note("abcdefgh", "t2", "f2", "b2", Instant.now(), Instant.now());
         assertEquals(countBefore + 2, Note.getNumberOfNotes());
     }
 }
