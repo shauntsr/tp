@@ -17,6 +17,10 @@ import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.InvalidInputException;
 import seedu.zettel.exceptions.ZettelException;
 
+/**
+ * Unit tests for the Parser class.
+ * Tests parsing of all commands and validation of hexadecimal note IDs.
+ */
 class ParserTest {
 
     @Test
@@ -65,24 +69,31 @@ class ParserTest {
     }
 
     @Test
-    void testParseDeleteWithValidIdReturnsDeleteNoteCommand() throws ZettelException {
-        Command command = Parser.parse("delete 12345678");
+    void testParseDeleteWithValidHexIdReturnsDeleteNoteCommand() throws ZettelException {
+        Command command = Parser.parse("delete abcd1234");
         assertInstanceOf(DeleteNoteCommand.class, command);
     }
 
     @Test
+    void testParseDeleteWithUppercaseHexThrowsInvalidFormatException() {
+        // IDs must be lowercase hex only
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete ABCD1234"));
+    }
+
+    @Test
     void testParseDeleteWithSpecialCharactersThrowsInvalidFormatException() {
-        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete 1234-678"));
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete abcd-234"));
     }
 
     @Test
     void testParseDeleteWithInvalidCharactersThrowsInvalidFormatException() {
-        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete 12@45678"));
+        // 'g' is not a valid hex character
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete abcdefgh"));
     }
 
     @Test
     void testParseDeleteWithForceFlagReturnsDeleteNoteCommand() throws ZettelException {
-        Command command = Parser.parse("delete -f 12345678");
+        Command command = Parser.parse("delete -f abcd1234");
         assertInstanceOf(DeleteNoteCommand.class, command);
     }
 
@@ -93,23 +104,23 @@ class ParserTest {
 
     @Test
     void testParseDeleteWithTooShortIdThrowsInvalidFormatException() {
-        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete 123"));
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete abc"));
     }
 
     @Test
     void testParseDeleteWithTooLongIdThrowsInvalidFormatException() {
-        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete 123456789"));
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete abcdef123"));
     }
 
     @Test
-    void testParsePinWithValidIdReturnsPinNoteCommand() throws ZettelException {
-        Command command = Parser.parse("pin 12345678");
+    void testParsePinWithValidHexIdReturnsPinNoteCommand() throws ZettelException {
+        Command command = Parser.parse("pin abcd1234");
         assertInstanceOf(PinNoteCommand.class, command);
     }
 
     @Test
-    void testParseUnpinWithValidIdReturnsPinNoteCommand() throws ZettelException {
-        Command command = Parser.parse("unpin abcdef12");
+    void testParseUnpinWithValidHexIdReturnsPinNoteCommand() throws ZettelException {
+        Command command = Parser.parse("unpin def56789");
         assertInstanceOf(PinNoteCommand.class, command);
     }
 
@@ -120,17 +131,23 @@ class ParserTest {
 
     @Test
     void testParsePinWithSpecialCharactersThrowsInvalidFormatException() {
-        assertThrows(InvalidFormatException.class, () -> Parser.parse("pin 1234-678"));
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("pin abcd-234"));
     }
 
     @Test
     void testParsePinWithTooShortIdThrowsInvalidFormatException() {
-        assertThrows(InvalidFormatException.class, () -> Parser.parse("pin 123"));
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("pin abc"));
     }
 
     @Test
     void testParsePinWithTooLongIdThrowsInvalidFormatException() {
-        assertThrows(InvalidFormatException.class, () -> Parser.parse("pin 123456789"));
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("pin abcdef123"));
+    }
+
+    @Test
+    void testParsePinWithUppercaseHexThrowsInvalidFormatException() {
+        // IDs must be lowercase hex only
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("pin ABCD1234"));
     }
 
     @Test

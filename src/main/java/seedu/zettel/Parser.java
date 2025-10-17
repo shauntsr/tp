@@ -22,11 +22,11 @@ public class Parser {
     // Categorised between empty, format and invalid
     private static final String LIST_FORMAT = "List format should be: list [-p]";
     private static final String PIN_FORMAT = "Pin format should be: pin/unpin <NOTE_ID>";
-    private static final String DELETE_FORMAT = "Delete format should be: delete [-f] <NOTE_ID> ";
+    private static final String DELETE_FORMAT = "Delete format should be: delete [-f] <NOTE_ID>";
     private static final String NOTE_FORMAT = "New note format should be: new -t <TITLE> [-b <BODY>]";
     private static final String NOTE_EMPTY = "Note title cannot be empty!";
     private static final String ID_EMPTY = "Please specify a Note ID to ";
-    private static final String ID_INVALID = "Note ID must be exactly 8 alphanumeric characters: eg. 12345678 ";
+    private static final String ID_INVALID = "Note ID must be exactly 8 hexadecimal characters (0-9, a-f)";
     private static final String INIT_EMPTY = "Please specify a repo name!";
     private static final String INIT_INVALID =
             "Repo name can only contain alphanumeric characters, "
@@ -58,7 +58,6 @@ public class Parser {
         case "find" -> parseFindNoteCommand(input);
         default -> throw new InvalidInputException(command);
         };
-
     }
 
     /**
@@ -93,7 +92,7 @@ public class Parser {
             throw new EmptyDescriptionException(INIT_EMPTY);
         }
 
-        // Validate input
+        // Validate input - only alphanumeric, hyphens, and underscores
         if (!content.matches("[a-zA-Z0-9_-]+")) {
             throw new InvalidFormatException(INIT_INVALID);
         }
@@ -186,7 +185,7 @@ public class Parser {
 
         if (inputs.length > 3) {
             throw new InvalidFormatException(DELETE_FORMAT);
-        } else if (inputs.length == 3){
+        } else if (inputs.length == 3) {
             if (!inputs[1].equals("-f")) {
                 throw new InvalidInputException(DELETE_FORMAT);
             }
@@ -215,7 +214,7 @@ public class Parser {
         String idString = inputs[inputs.length - 1].trim();
         assert !idString.isEmpty() : "ID string should not be empty after trim";
 
-        // Validate noteId format
+        // Validate noteId format - must be exactly 8 lowercase hex characters
         if (!idString.matches(VALID_NOTE_ID_REGEX)) {
             throw new InvalidFormatException(ID_INVALID);
         }

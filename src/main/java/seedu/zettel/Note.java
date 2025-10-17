@@ -1,34 +1,51 @@
 package seedu.zettel;
+
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a note in the Zettel system.
+ * Each note has a unique 8-character hash-based ID, title, body, and metadata.
+ */
 public class Note {
     // Date formatter for toString method
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
 
-    // ID length constant
+    // ID length constant - all note IDs must be exactly 8 characters
     private static final int ID_LENGTH = 8;
 
-    // Static counter for tracking total notes
+    // Static counter for tracking total notes created
     private static int numberOfNotes = 0;
-    // Instance fields
-    private final String id; // id hash of the note
-    private String title; // title of the note
-    private String filename; // actual filename on disk
-    private String body; // body of the note
-    private Instant createdAt; // timestamp when the note was created at
-    private Instant modifiedAt; // timestamp of the note when it was last modified
-    private boolean pinned; // indicates whether this note is pinned.
-    private boolean archived; // indicates whether this note is archived.
-    private String archiveName; // name of the archive the note belongs to
-    private List<String> logs; // history/log data of that individual note
 
-    // Constructor for creating a new note by the user
-    public Note(String id, String title, String filename, String body, Instant createdAt, Instant modifiedAt) {
+    // Instance fields
+    private final String id; // 8-character hash-based unique identifier
+    private String title; // Title of the note
+    private String filename; // Actual filename on disk
+    private String body; // Body content of the note
+    private Instant createdAt; // Timestamp when the note was created
+    private Instant modifiedAt; // Timestamp when the note was last modified
+    private boolean pinned; // Whether the note is pinned
+    private boolean archived; // Whether the note has been archived
+    private String archiveName; // Name of the archive the note belongs to
+    private List<String> logs; // History/log data of that individual note
+
+    /**
+     * Constructor for creating a new note by the user.
+     * Initializes with default values for pinned, archived, and logs.
+     *
+     * @param id The unique 8-character hash-based ID
+     * @param title The title of the note
+     * @param filename The filename for storage on disk
+     * @param body The body content of the note
+     * @param createdAt The timestamp when the note was created
+     * @param modifiedAt The timestamp when the note was last modified
+     */
+    public Note(String id, String title, String filename, String body,
+                Instant createdAt, Instant modifiedAt) {
         this.id = id;
         this.title = title;
         this.filename = filename;
@@ -42,7 +59,21 @@ public class Note {
         numberOfNotes++;
     }
 
-    // Constructor with all fields (for loading from storage)
+    /**
+     * Constructor with all fields for loading a note from storage.
+     * Validates that the ID is exactly 8 characters long.
+     *
+     * @param id The unique 8-character hash-based ID
+     * @param title The title of the note
+     * @param filename The filename for storage on disk
+     * @param body The body content of the note
+     * @param createdAt The timestamp when the note was created
+     * @param modifiedAt The timestamp when the note was last modified
+     * @param pinned Whether the note is pinned
+     * @param archived Whether the note is archived
+     * @param archiveName The archive name if archived, null otherwise
+     * @param logs The list of log entries for this note
+     */
     public Note(String id, String title, String filename, String body,
                 Instant createdAt, Instant modifiedAt, boolean pinned,
                 boolean archived, String archiveName, List<String> logs) {
@@ -61,89 +92,190 @@ public class Note {
     }
 
     // Getters
+
+    /**
+     * Gets the unique 8-character ID of this note.
+     *
+     * @return The note ID
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Gets the title of this note.
+     *
+     * @return The note title
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Gets the filename used for storing this note on disk.
+     *
+     * @return The filename
+     */
     public String getFilename() {
         return filename;
     }
 
+    /**
+     * Gets the body content of this note.
+     *
+     * @return The note body
+     */
     public String getBody() {
         return body;
     }
 
+    /**
+     * Gets the timestamp when this note was created.
+     *
+     * @return The creation timestamp
+     */
     public Instant getCreatedAt() {
         return createdAt;
     }
 
+    /**
+     * Gets the timestamp when this note was last modified.
+     *
+     * @return The last modification timestamp
+     */
     public Instant getModifiedAt() {
         return modifiedAt;
     }
 
+    /**
+     * Checks if this note is pinned.
+     *
+     * @return true if pinned, false otherwise
+     */
     public boolean isPinned() {
         return pinned;
     }
 
+    /**
+     * Checks if this note is archived.
+     *
+     * @return true if archived, false otherwise
+     */
     public boolean isArchived() {
         return archived;
     }
 
+    /**
+     * Gets the archive name if this note is archived.
+     *
+     * @return The archive name, or null if not archived
+     */
     public String getArchiveName() {
         return archiveName;
     }
 
+    /**
+     * Gets a defensive copy of the logs list for this note.
+     *
+     * @return A new ArrayList containing the log entries
+     */
     public List<String> getLogs() {
         return new ArrayList<>(logs); // Return copy to maintain encapsulation
     }
 
+    /**
+     * Gets the total number of notes created since the application started.
+     *
+     * @return The total number of notes
+     */
     public static int getNumberOfNotes() {
         return numberOfNotes;
     }
 
     // Setters
+
+    /**
+     * Sets a new title for this note and updates the modified timestamp.
+     *
+     * @param title The new title
+     */
     public void setTitle(String title) {
         this.title = title;
         updateModifiedAt();
     }
 
+    /**
+     * Sets a new filename for this note.
+     * Does not update the modified timestamp.
+     *
+     * @param filename The new filename
+     */
     public void setFilename(String filename) {
         this.filename = filename;
     }
 
+    /**
+     * Sets new body content for this note and updates the modified timestamp.
+     *
+     * @param body The new body content
+     */
     public void setBody(String body) {
         this.body = body;
         updateModifiedAt();
     }
 
+    /**
+     * Sets the pinned status of this note and updates the modified timestamp.
+     *
+     * @param pinned true to pin the note, false to unpin
+     */
     public void setPinned(boolean pinned) {
         this.pinned = pinned;
         updateModifiedAt();
     }
 
+    /**
+     * Sets the archived status of this note and updates the modified timestamp.
+     *
+     * @param archived true to archive the note, false to unarchive
+     */
     public void setArchived(boolean archived) {
         this.archived = archived;
         updateModifiedAt();
     }
 
+    /**
+     * Sets the archive name for this note and updates the modified timestamp.
+     *
+     * @param archiveName The name of the archive
+     */
     public void setArchiveName(String archiveName) {
         this.archiveName = archiveName;
         updateModifiedAt();
     }
 
+    /**
+     * Replaces the entire logs list with a new list.
+     *
+     * @param logs The new list of log entries, or null for an empty list
+     */
     public void setLogs(List<String> logs) {
         this.logs = logs != null ? new ArrayList<>(logs) : new ArrayList<>();
     }
 
+    /**
+     * Adds a single log entry to this note's history.
+     *
+     * @param logEntry The log entry to add
+     */
     public void addLog(String logEntry) {
         this.logs.add(logEntry);
     }
 
-    // Helper method to update modifiedAt timestamp
+    /**
+     * Updates the modifiedAt timestamp to the current time.
+     * Called automatically by setters that modify note content.
+     */
     public void updateModifiedAt() {
         this.modifiedAt = Instant.now();
     }
@@ -153,7 +285,7 @@ public class Note {
      * Format: FILENAME yyyy-MM-dd NOTEID
      * Example: my_note.txt 2025-10-14 a1b2c3d4
      *
-     * @return formatted string with filename, date, and note ID
+     * @return Formatted string with filename, creation date, and note ID
      */
     @Override
     public String toString() {
