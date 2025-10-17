@@ -2,6 +2,7 @@ package seedu.zettel.commands;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
@@ -18,6 +19,7 @@ import seedu.zettel.exceptions.ZettelException;
 public class PinNoteCommand extends Command {
     private static final int VALID_NOTE_ID_LENGTH = 8;
     private static final String VALID_NOTE_ID_REGEX = "^[a-f0-9]{8}$";
+    private static final Logger logger = Logger.getLogger(PinNoteCommand.class.getName());
 
     private final boolean isPin;
     private final String noteId;
@@ -61,6 +63,7 @@ public class PinNoteCommand extends Command {
      */
     @Override
     public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
+        logger.info("Executing PinNoteCommand for noteId: " + noteId);
         // Validation 1: Check if noteId format is valid
         validateNoteIdFormat(noteId);
 
