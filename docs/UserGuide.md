@@ -161,3 +161,10 @@ Got it. I've pinned this note: ccfd2e51
 ```
 
 ## Command Summary
+* Start a new Zettelkasten repository: `init <repository-name>`
+* Add a new note: `new -t <TITLE> [-b <BODY>]`
+* List all notes: `list`
+* List only pinned notes: `list -p`
+* Delete a note (with confirmation): `delete <NOTE_ID>`
+* Delete a note (without confirmation): `delete -f <NOTE_ID>`
+* Pin a note: `pin <NOTE_ID>`
