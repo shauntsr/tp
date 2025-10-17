@@ -12,17 +12,36 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 
+/**
+ * Handles all file and directory operations for Zettel repositories.
+ * <p>
+ * The Storage class is responsible for initializing repository folders,
+ * loading and saving notes, switching repositories, and maintaining
+ * a configuration file that tracks the currently active repository.
+ */
 public class Storage {
+    /** Configuration file storing the currently active repository name. */
     static final String CONFIG_FILE = ".zettelConfig";
 
-    // Folder and file names for the repos
+    /** Default repository name created during initialization. */
     static final String DEFAULT_REPO = "main";
+
+    /** Folder name for active notes. */
     static final String REPO_NOTES = "notes";
+
+    /** Folder name for archived notes. */
     static final String REPO_ARCHIVE = "archive";
+
+    /** Index file name for notes metadata. */
     static final String REPO_INDEX = "index.txt";
 
-    static final String STORAGE_FILE = "zettel.txt"; // Placeholder until we migrate
-    private final Path rootPath; // Root directory path
+    /** Temporary storage file for note persistence (to be migrated later). */
+    static final String STORAGE_FILE = "zettel.txt";
+
+    /** The root directory path under which repositories are stored; default is data/. */
+    private final Path rootPath;
+
+    /** The name of the currently active repository. */
     private String repoName = DEFAULT_REPO;
 
     /**
@@ -53,6 +72,7 @@ public class Storage {
         createStorageFile(defaultRepoPath);
     }
 
+    /** Creates the root folder ("data") for all repositories if it does not exist. */
     private void createRootFolder() {
         try {
             if (Files.notExists(rootPath)) {
@@ -63,6 +83,7 @@ public class Storage {
         }
     }
 
+    /** Creates a storage file in the default repository. */
     private static void createStorageFile(Path defaultRepoPath) {
         Path filePath = defaultRepoPath.resolve(REPO_NOTES).resolve(STORAGE_FILE);
         try {
@@ -74,6 +95,13 @@ public class Storage {
         }
     }
 
+    /**
+     * Creates the configuration file (".zettelConfig") in the root directory.
+     * The config file stores information about available repositories
+     * and the currently active repository name.
+     * <p>
+     * If the file already exists, no action is taken.
+     */
     private void createConfigFile() {
         Path configPath = rootPath.resolve(CONFIG_FILE);
         try {
@@ -163,6 +191,12 @@ public class Storage {
     }
 
 
+    /**
+     * Converts a Note object into a string format for saving.
+     *
+     * @param note The note to convert
+     * @return A string representation of the note for file storage
+     */
     private String toSaveFormat(Note note) {
         String logsStr = String.join(";;", note.getLogs());
         String archiveName = note.getArchiveName() != null ? note.getArchiveName() : "";
@@ -180,6 +214,13 @@ public class Storage {
                 logsStr);
     }
 
+    /**
+     * Parses a single line from the storage file into a Note object.
+     * Returns null if the line is empty or corrupted.
+     *
+     * @param line The line from the storage file
+     * @return A reconstructed Note object, or null if parsing fails
+     */
     private Note parseSaveFile(String line) {
         if (line.isBlank()) {
             return null;
