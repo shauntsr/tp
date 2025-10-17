@@ -20,20 +20,21 @@ ZettelCLI follows a layered architecture with clear separation of concerns:
 └────────┬────────┘
          │
 ┌────────▼────────┐
-│     Parser      │  (Input parsing layer)
+│      Parser     │  (Input parsing layer)
 └────────┬────────┘
          │
 ┌────────▼────────┐
-│    Commands     │  (Business logic layer)
+│     Commands    │  (Business logic layer)
+└────────┬────────┘
+         │
+┌────────▼────────┐
+│      Notes      │  (Data model layer)
 └────────┬────────┘
          │
 ┌────────▼────────┐
 │     Storage     │  (Data persistence layer)
 └─────────────────┘
-         │
-┌────────▼────────┐
-│      Notes      │  (Data model layer)
-└─────────────────┘
+
 ```
 
 ### Main Application Component (Zettel)
