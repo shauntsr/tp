@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 
 public class Storage {
-    private static final Logger logger = Logger.getLogger(Storage.class.getName());
     static final String CONFIG_FILE = ".zettelConfig";
 
     // Folder and file names for the repos
@@ -22,8 +21,10 @@ public class Storage {
     static final String REPO_NOTES = "notes";
     static final String REPO_ARCHIVE = "archive";
     static final String REPO_INDEX = "index.txt";
-
     static final String STORAGE_FILE = "zettel.txt"; // Placeholder until we migrate
+
+    private static final Logger logger = Logger.getLogger(Storage.class.getName());
+
     private final Path rootPath; // Root directory path
     private String repoName = DEFAULT_REPO;
 
