@@ -9,10 +9,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 
 public class Storage {
+    private static final Logger logger = Logger.getLogger(Storage.class.getName());
     static final String CONFIG_FILE = ".zettelConfig";
 
     // Folder and file names for the repos
@@ -121,6 +123,8 @@ public class Storage {
             Files.createDirectories(repoPath.resolve(REPO_NOTES));
             Files.createDirectories(repoPath.resolve(REPO_ARCHIVE));
             Files.createFile(repoPath.resolve(REPO_INDEX));
+
+            logger.info("Repository " + repoName + " successfully created at " + repoPath);
         } catch (IOException e) {
             System.out.println("Error initialising repository " + repoName) ;
         }
