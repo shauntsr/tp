@@ -9,13 +9,38 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Command to list notes in the current repository.
+ * <p>
+ * Notes are sorted by creation time in descending order (most recent first).
+ * Can optionally filter to display only pinned notes.
+ * </p>
+ */
 public class ListNoteCommand extends Command{
     private final boolean showsPinnedOnly;
 
+    /**
+     * Constructs a ListNoteCommand.
+     *
+     * @param showsPinnedOnly If true, only pinned notes will be listed;
+     *                        if false, all notes are listed.
+     */
     public ListNoteCommand(boolean showsPinnedOnly) {
         this.showsPinnedOnly = showsPinnedOnly;
     }
 
+    /**
+     * Executes the command to display notes.
+     * <p>
+     * The notes are first sorted by creation time (newest first),
+     * then filtered based on the showsPinnedOnly flag.
+     * If no notes are found, appropriate UI messages are displayed.
+     *
+     * @param notes   The list of all notes
+     * @param ui      The UI instance for user interaction
+     * @param storage The storage instance (not used)
+     * @throws ZettelException If an error occurs during command execution
+     */
     @Override
     public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException{
         // Add notes

@@ -4,14 +4,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Handles all user interface interactions for Zettel.
+ * The UI class manages input reading and output display,
+ * such as welcome or goodbye messages, note listing and error messages.
+ */
 public class UI {
     private static final String LINE = "____________________________________________________________";
     private final Scanner scanner;
 
+    /**
+     * Constructs a UI object and initializes the Scanner for reading user input.
+     */
     public UI() {
         this.scanner = new Scanner(System.in);
     }
 
+    /**
+     * Reads a command from the user input.
+     *
+     * @return The raw user input string, or "bye" if no input is available.
+     */
     public String readCommand() {
         if (!scanner.hasNextLine()) {
             return "bye";  // Auto-exit when no more input (prevents hanging in CI)
@@ -19,6 +32,10 @@ public class UI {
         return scanner.nextLine();
     }
 
+    /**
+     * Displays the welcome message when the application starts,
+     * including a list of available commands.
+     */
     public void showWelcome() {
         printLine();
         System.out.println(" Hello! I'm Zettel");
@@ -38,37 +55,78 @@ public class UI {
         printLine();
     }
 
+
+    /**
+     * Displays a message indicating that a deletion was cancelled.
+     */
     public void showDeletionCancelled() {
         System.out.println("Deletion cancelled");
     }
 
+    /**
+     * Displays a message confirming that a note has been deleted.
+     *
+     * @param id The ID of the deleted note.
+     */
     public void showNoteDeleted(String id) {
         System.out.println("Note at " + id + " deleted");
     }
 
+    /**
+     * Displays a confirmation prompt before deleting a note.
+     *
+     * @param id The ID of the note to delete.
+     * @param noteTitle The title of the note to delete.
+     */
     public void showDeleteConfirmation(String id, String noteTitle) {
         System.out.println("Confirm deletion on '" + noteTitle + "', noteID " + id + "? (y/n)");
     }
 
+    /**
+     * Displays a generic error message.
+     *
+     * @param message The error message to display.
+     */
     public void showError(String message) {
         System.out.println(message);
     }
 
+    /**
+     * Displays the goodbye message when the application exits.
+     */
     public void showBye() {
         System.out.println(" Bye. Hope to see you again soon!");
     }
 
+    /**
+     * Displays a message confirming that a note was added.
+     *
+     * @param note The note that was added.
+     */
     public void showAddedNote(Note note) {
         System.out.println("Note created: " + note.getFilename() + " #" + note.getId());
     }
+
+    /**
+     * Displays a message when no pinned notes are found.
+     */
     public void showNoPinnedNotes() {
         System.out.println("No pinned notes found. Pin a note to add to this list.\n");
     }
 
+    /**
+     * Displays a message when no notes exist in the repository.
+     */
     public void showNoNotes() {
         System.out.println("No notes found.\n");
     }
 
+    /**
+     * Displays a list of notes.
+     *
+     * @param notes The list of notes to display.
+     * @param isPinned True if displaying only pinned notes; false otherwise.
+     */
     public void showNoteList(List<Note> notes, boolean isPinned) {
         // Show number of notes found.
         if (isPinned) {
@@ -83,18 +141,33 @@ public class UI {
         }
     }
 
+    /**
+     * Prints a horizontal line separator for formatting output.
+     */
     public void printLine() {
         System.out.println(LINE);
     }
 
+    /**
+     * Closes the scanner.
+     * Called when the application terminates.
+     */
     public void close() {
         scanner.close();
     }
 
+    /**
+     * Displays a message when no notes match a search query.
+     */
     public void showNoNotesFoundMessage() {
         System.out.println(" No notes found matching the search criteria.");
     }
 
+    /**
+     * Displays a list of notes that match a search query.
+     *
+     * @param matchedNotes The list of notes matching the search.
+     */
     public void showFoundNotesMessage(ArrayList<Note> matchedNotes) {
         System.out.println(" Here are the matching notes in your list:");
         for (int i = 0; i < matchedNotes.size(); i++) {
@@ -102,10 +175,21 @@ public class UI {
         }
     }
 
+    /**
+     * Displays a message confirming that a note has been pinned or unpinned.
+     *
+     * @param note The note being pinned or unpinned.
+     * @param noteId The ID of the note.
+     */
     public void showJustPinnedNote(Note note, String noteId) {
         System.out.println(" Got it. I've " + (note.isPinned() ? "pinned" : "unpinned") + " this note: " + noteId);
     }
 
+    /**
+     * Displays a message confirming that a repository has been initialized.
+     *
+     * @param repoName The name of the newly created repository.
+     */
     public void showRepoInit(String repoName) {
         System.out.println(" Repository /" + repoName + " has been created.");
     }

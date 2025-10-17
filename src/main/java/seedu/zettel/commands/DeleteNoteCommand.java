@@ -3,6 +3,7 @@ package seedu.zettel.commands;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
@@ -16,8 +17,10 @@ import seedu.zettel.exceptions.ZettelException;
  * Supports optional force deletion to skip confirmation prompt.
  */
 public class DeleteNoteCommand extends Command {
+    private static final Logger logger = Logger.getLogger(DeleteNoteCommand.class.getName());
+
     private final String noteId;
-    private boolean force;
+    private final boolean isForce;
 
     /**
      * Constructs a DeleteNoteCommand with the specified note ID and force flag.
@@ -27,7 +30,7 @@ public class DeleteNoteCommand extends Command {
      */
     public DeleteNoteCommand(String noteId, boolean force) {
         this.noteId = noteId;
-        this.force = force;
+        this.isForce = force;
     }
 
     /**
@@ -58,8 +61,8 @@ public class DeleteNoteCommand extends Command {
         Note note = maybe.get();
         assert note != null : "Note should not be null after validation";
 
-        boolean shouldDelete = force;
-        if (!force) {
+        boolean shouldDelete = isForce;
+        if (!isForce) {
             ui.showDeleteConfirmation(noteId, note.getTitle());
 
             Scanner scanner = new Scanner(System.in);
@@ -70,6 +73,7 @@ public class DeleteNoteCommand extends Command {
         if (shouldDelete) {
             notes.remove(note);
             storage.save(notes);
+            logger.info("Note " + note.getTitle() + ", id " + noteId + " deleted.");
             ui.showNoteDeleted(noteId);
         } else {
             ui.showDeletionCancelled();
