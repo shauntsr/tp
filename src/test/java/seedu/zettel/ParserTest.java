@@ -153,12 +153,17 @@ class ParserTest {
     @Test
     void testParseInitWithRepoNameReturnsInitCommand() throws ZettelException {
         Command command = Parser.parse("init myRepo");
-        assertInstanceOf(InitCommand.class, command);
+        assertInstanceOf(InitCommand.class,command);
     }
 
     @Test
     void testParseInitWithoutRepoNameThrowsEmptyDescriptionException() {
         assertThrows(EmptyDescriptionException.class, () -> Parser.parse("init"));
+    }
+
+    @Test
+    void testParseInitWithInvalidFormatThrowsInvalidInputException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("init my repo!"));
     }
 
     @Test

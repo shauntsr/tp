@@ -22,6 +22,7 @@ public class InitCommand extends Command {
      * @param repoName The name of the repository to create
      */
     public InitCommand(String repoName) {
+        assert repoName != null: "Repo name should not be null." ;
         this.repoName = repoName;
     }
 
