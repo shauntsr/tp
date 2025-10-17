@@ -160,6 +160,28 @@ pin ccfd2e51
 Got it. I've pinned this note: ccfd2e51
 ```
 
+### Unpinning a Note: `unpin`
+
+Unpins a note in the repository.
+
+**Format:**
+
+```
+unpin <NOTE_ID>
+```
+
+**Example:**
+
+```
+unpin ccfd2e51
+```
+
+**Expected Output:**
+
+```
+Got it. I've unpinned this note: ccfd2e51
+```
+
 ## Command Summary
 * Start a new Zettelkasten repository: `init <repository-name>`
 * Add a new note: `new -t <TITLE> [-b <BODY>]`
@@ -168,3 +190,4 @@ Got it. I've pinned this note: ccfd2e51
 * Delete a note (with confirmation): `delete <NOTE_ID>`
 * Delete a note (without confirmation): `delete -f <NOTE_ID>`
 * Pin a note: `pin <NOTE_ID>`
+* Unpin a note: `unpin <NOTE_ID>`
