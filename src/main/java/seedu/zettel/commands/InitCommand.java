@@ -12,6 +12,7 @@ public class InitCommand extends Command {
     private final String repoName;
 
     public InitCommand(String repoName) {
+        assert repoName != null: "Repo name should not be null." ;
         this.repoName = repoName;
     }
 

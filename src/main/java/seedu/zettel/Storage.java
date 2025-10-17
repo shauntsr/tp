@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 
@@ -20,8 +21,10 @@ public class Storage {
     static final String REPO_NOTES = "notes";
     static final String REPO_ARCHIVE = "archive";
     static final String REPO_INDEX = "index.txt";
-
     static final String STORAGE_FILE = "zettel.txt"; // Placeholder until we migrate
+
+    private static final Logger logger = Logger.getLogger(Storage.class.getName());
+
     private final Path rootPath; // Root directory path
     private String repoName = DEFAULT_REPO;
 
@@ -121,6 +124,8 @@ public class Storage {
             Files.createDirectories(repoPath.resolve(REPO_NOTES));
             Files.createDirectories(repoPath.resolve(REPO_ARCHIVE));
             Files.createFile(repoPath.resolve(REPO_INDEX));
+
+            logger.info("Repository " + repoName + " successfully created at " + repoPath);
         } catch (IOException e) {
             System.out.println("Error initialising repository " + repoName) ;
         }
