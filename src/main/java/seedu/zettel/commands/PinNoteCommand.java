@@ -11,33 +11,54 @@ import seedu.zettel.exceptions.InvalidNoteIdException;
 import seedu.zettel.exceptions.NoNotesException;
 import seedu.zettel.exceptions.ZettelException;
 
+/**
+ * Command to pin or unpin a note by its ID.
+ * Pinned notes can be listed separately for quick access.
+ */
 public class PinNoteCommand extends Command {
     private static final int VALID_NOTE_ID_LENGTH = 8;
+    private static final String VALID_NOTE_ID_REGEX = "^[a-f0-9]{8}$";
+
     private final boolean isPin;
     private final String noteId;
 
+    /**
+     * Constructs a PinNoteCommand with the specified note ID and pin status.
+     *
+     * @param noteId The 8-character hexadecimal note ID
+     * @param isPin true to pin the note, false to unpin
+     */
     public PinNoteCommand(String noteId, boolean isPin) {
         this.noteId = noteId;
         this.isPin = isPin;
     }
 
     /**
-     * Validates that the noteId has the correct format (8 alphanumeric characters).
+     * Validates that the noteId has the correct format.
+     * Must be exactly 8 lowercase hexadecimal characters (0-9, a-f).
      *
-     * @param noteId The noteId to validate.
-     * @throws InvalidFormatException If the noteId format is invalid.
+     * @param noteId The noteId to validate
+     * @throws InvalidFormatException If the noteId format is invalid
      */
     private void validateNoteIdFormat(String noteId) throws InvalidFormatException {
         if (noteId == null || noteId.length() != VALID_NOTE_ID_LENGTH) {
             throw new InvalidFormatException(
-                "Note ID must be exactly " + VALID_NOTE_ID_LENGTH + " characters long.");
+                    "Note ID must be exactly " + VALID_NOTE_ID_LENGTH + " characters long.");
         }
-        if (!noteId.matches("[a-zA-Z0-9]+")) {
+        if (!noteId.matches(VALID_NOTE_ID_REGEX)) {
             throw new InvalidFormatException(
-                "Note ID must contain only alphanumeric characters.");
+                    "Note ID must contain only lowercase hexadecimal characters (0-9, a-f).");
         }
     }
 
+    /**
+     * Executes the pin/unpin command on the specified note.
+     *
+     * @param notes The list of all notes
+     * @param ui The UI instance for user interaction
+     * @param storage The storage instance for persistence
+     * @throws ZettelException If the note ID is invalid or the note doesn't exist
+     */
     @Override
     public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
         // Validation 1: Check if noteId format is valid

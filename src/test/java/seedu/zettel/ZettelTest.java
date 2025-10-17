@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for the Zettel main class.
+ * Tests application initialization and configuration.
  */
 class ZettelTest {
 
@@ -37,7 +38,7 @@ class ZettelTest {
     }
 
     @Test
-    void testConstructorInitializesDependenciesSuccessfully() {
+    void constructor_initializesDependenciesSuccessfully() {
         assertDoesNotThrow(() -> {
             Zettel zettel = new Zettel();
             assertNotNull(zettel, "Zettel instance should not be null");
@@ -45,7 +46,7 @@ class ZettelTest {
     }
 
     @Test
-    void testConstructorCreatesUIAndStorageAndNotesList() {
+    void constructor_createsUIAndStorageAndNotesList() {
         Zettel zettel = new Zettel();
 
         // Use reflection to access private fields
@@ -67,14 +68,14 @@ class ZettelTest {
     }
 
     @Test
-    void testMainMethodExistsAndDoesNotThrow() {
+    void mainMethod_existsAndDoesNotThrow() {
         assertDoesNotThrow(() -> {
             Zettel.class.getDeclaredMethod("main", String[].class);
         }, "Zettel should have a main method");
     }
 
     @Test
-    void testMultipleInstancesCanBeCreatedIndependently() {
+    void multipleInstances_canBeCreatedIndependently() {
         assertDoesNotThrow(() -> {
             Zettel z1 = new Zettel();
             Zettel z2 = new Zettel();

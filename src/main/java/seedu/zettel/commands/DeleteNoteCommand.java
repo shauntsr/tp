@@ -11,15 +11,34 @@ import seedu.zettel.exceptions.NoNoteFoundException;
 import seedu.zettel.exceptions.NoNotesException;
 import seedu.zettel.exceptions.ZettelException;
 
+/**
+ * Command to delete a note by its ID.
+ * Supports optional force deletion to skip confirmation prompt.
+ */
 public class DeleteNoteCommand extends Command {
     private final String noteId;
     private boolean force;
 
+    /**
+     * Constructs a DeleteNoteCommand with the specified note ID and force flag.
+     *
+     * @param noteId The 8-character hexadecimal note ID to delete
+     * @param force true to skip confirmation, false to prompt user
+     */
     public DeleteNoteCommand(String noteId, boolean force) {
         this.noteId = noteId;
         this.force = force;
     }
 
+    /**
+     * Executes the delete command on the specified note.
+     * Prompts for confirmation unless force flag is set.
+     *
+     * @param notes The list of all notes
+     * @param ui The UI instance for user interaction
+     * @param storage The storage instance for persistence
+     * @throws ZettelException If the notes list is empty or the note doesn't exist
+     */
     @Override
     public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
 
@@ -36,10 +55,8 @@ public class DeleteNoteCommand extends Command {
         }
 
         // Happy path: Execute the delete operation
-
         Note note = maybe.get();
-
-        assert note != null;
+        assert note != null : "Note should not be null after validation";
 
         boolean shouldDelete = force;
         if (!force) {
