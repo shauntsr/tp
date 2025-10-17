@@ -5,12 +5,16 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Represents a note in the Zettel system.
  * Each note has a unique 8-character hash-based ID, title, body, and metadata.
  */
 public class Note {
+    // Logger for this class
+    private static final Logger logger = Logger.getLogger(Note.class.getName());
+
     // Date formatter for toString method
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
@@ -57,6 +61,7 @@ public class Note {
         this.archiveName = null;
         this.logs = new ArrayList<>();
         numberOfNotes++;
+        logger.info("New note created: ID=" + id + ", title='" + title + "'");
     }
 
     /**
