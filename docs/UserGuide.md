@@ -7,7 +7,7 @@ ZettelCLI is a desktop Command Line Interface (CLI) application used for managin
 
 ## Quick Start
 1. Ensure that you have Java 17 or above installed. 
-2. Down the latest version of `Duke` from [here](http://link.to/duke).
+2. Download the latest version of `Duke` from [here](http://link.to/duke).
 3. Run the application
 ```bash
 java -jar zettel.jar
