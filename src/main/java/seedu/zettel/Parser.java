@@ -31,10 +31,12 @@ public class Parser {
     private static final String INIT_INVALID =
             "Repo name can only contain alphanumeric characters, "
                     + "hyphens and underscores.";
+ // Note ID validation constants
     private static final int VALID_NOTE_ID_LENGTH = 8;
-    private static final String VALID_NOTE_ID_REGEX = "^[a-zA-Z0-9]{" + VALID_NOTE_ID_LENGTH + "}$";
-    private static final String INVALID_ID_LENGTH_FORMAT = "Note ID must be exactly " + VALID_NOTE_ID_LENGTH +
-            " characters long.";
+    private static final String VALID_NOTE_ID_REGEX = "^[a-f0-9]{" + VALID_NOTE_ID_LENGTH + "}$";
+    private static final String INVALID_ID_LENGTH_FORMAT =
+            "Note ID must be exactly " + VALID_NOTE_ID_LENGTH + " characters long.";
+
 
     /**
      * Parses a user command string and returns the corresponding Command object.
