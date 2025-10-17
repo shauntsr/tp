@@ -1,4 +1,4 @@
-package seedu.zettel;
+package seedu.zettel.util;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

@@ -1,6 +1,6 @@
 package seedu.zettel.commands;
 
-import seedu.zettel.IdGenerator;
+import seedu.zettel.util.IdGenerator;
 import seedu.zettel.exceptions.InvalidInputException;
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
