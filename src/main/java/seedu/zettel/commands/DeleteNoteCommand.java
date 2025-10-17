@@ -7,7 +7,7 @@ import java.util.Scanner;
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
 import seedu.zettel.UI;
-import seedu.zettel.exceptions.InvalidNoteIdException;
+import seedu.zettel.exceptions.NoNoteFoundException;
 import seedu.zettel.exceptions.NoNotesException;
 import seedu.zettel.exceptions.ZettelException;
 
@@ -32,7 +32,7 @@ public class DeleteNoteCommand extends Command {
         Optional<Note> maybe = notes.stream().filter(n -> n.getId().equals(noteId)).findFirst();
 
         if (maybe.isEmpty()) {
-            throw new InvalidNoteIdException("Note with ID '" + noteId + "' does not exist.");
+            throw new NoNoteFoundException("Note with ID '" + noteId + "' does not exist.");
         }
 
         // Happy path: Execute the delete operation
