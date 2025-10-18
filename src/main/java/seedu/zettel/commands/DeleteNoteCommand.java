@@ -59,6 +59,7 @@ public class DeleteNoteCommand extends Command {
 
         // Happy path: Execute the delete operation
         Note note = maybe.get();
+
         assert note != null : "Note should not be null after validation";
 
         boolean shouldDelete = isForce;
