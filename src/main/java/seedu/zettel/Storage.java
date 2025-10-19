@@ -54,6 +54,7 @@ public class Storage {
     /** The name of the currently active repository. */
     private String repoName = DEFAULT_REPO;
 
+    private ArrayList<String> repoList = new ArrayList<>();
 
     /**
      * Creates a Storage instance with the specified root directory.
@@ -118,10 +119,49 @@ public class Storage {
         try {
             if (Files.notExists(configPath)) {
                 Files.createFile(configPath);
-                Files.writeString(configPath, DEFAULT_REPO);
+                List<String> lines = List.of(DEFAULT_REPO, DEFAULT_REPO);
+                Files.write(configPath, lines);
             }
         } catch (IOException e) {
             System.out.println("Error creating " + CONFIG_FILE + ".");
+        }
+    }
+
+    public void loadConfig() {
+        createConfigFile();
+        Path configFile = rootPath.resolve(CONFIG_FILE);
+
+        try {
+            List<String> lines = Files.readAllLines(configFile);
+            String firstLine = lines.isEmpty() ? DEFAULT_REPO : lines.get(0); // if empty (shouldn't be), use main
+            repoList = Arrays.stream(firstLine.split("\\|"))
+                    .map(String::trim)
+                    .collect(Collectors.toCollection(ArrayList::new));
+        } catch (IOException e) {
+            System.out.println("Error reading .zettelConfig, defaulting to main: " + e.getMessage());
+            repoList = new ArrayList<>();
+            repoList.add("main");
+        }
+    }
+
+    public void updateConfig(String newRepo) throws ZettelException {
+        createConfigFile();
+        Path configFile = rootPath.resolve(CONFIG_FILE);
+
+        try (Stream<String> stream = Files.lines(configFile)){
+            List<String> lines = stream.collect(Collectors.toList());
+            if (lines.isEmpty()) {
+                lines.add(DEFAULT_REPO);
+                lines.add(newRepo);
+            } else if (lines.size() == 1) {
+                lines.add(newRepo);
+            } else {
+                lines.set(1, newRepo);
+            }
+            Files.write(configFile, lines);
+
+        } catch (IOException e) {
+            throw new ZettelException("Failed to update checked-out repo in .zettelConfig: " + e.getMessage());
         }
     }
 
@@ -266,15 +306,20 @@ public class Storage {
     /**
      * Switches the current repository and updates the config file.
      *
-     * @param repoName The repository to switch to.
+     * @param newRepo The repository to switch to.
      */
-    public void changeRepo(String repoName) {
+    public void changeRepo(String newRepo) {
+        if (!repoList.contains(newRepo)) {
+            System.out.println("Repo '" + newRepo + "' does not exist. Falling back to 'main'.");
+            newRepo = "main";
+        }
+
+        this.repoName = newRepo;
+
         try {
-            this.repoName = repoName;
-            Path configPath = rootPath.resolve(CONFIG_FILE);
-            Files.writeString(configPath,repoName);
-        } catch (IOException e) {
-            System.out.println("Unable to change repository to " + repoName);
+            updateConfig(newRepo);
+        } catch (ZettelException e) {
+            System.out.println("Error switching repo: " + e.getMessage());
         }
     }
 
