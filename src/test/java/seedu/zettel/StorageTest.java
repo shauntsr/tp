@@ -7,15 +7,18 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
+import seedu.zettel.exceptions.ZettelException;
 
 public class StorageTest {
 
     @TempDir
-    private static Path tempDir;
+    private Path tempDir;
     private Storage storage;
 
     @BeforeEach
@@ -24,46 +27,109 @@ public class StorageTest {
     }
 
     @Test
-    void initCreatesRootFolderAndConfig() throws IOException {
+    void testInitCreatesRootFolderAndConfig() throws IOException {
         Path configPath = tempDir.resolve(".zettelConfig");
         Path defaultRepoNotes = tempDir.resolve("main").resolve("notes");
         Path defaultRepoArchive = tempDir.resolve("main").resolve("archive");
-        Path storageFile = defaultRepoNotes.resolve("zettel.txt");
+        Path defaultIndexFile = tempDir.resolve("main").resolve("index.txt");
 
-        // Before init, nothing exists
         assertFalse(Files.exists(configPath));
         assertFalse(Files.exists(defaultRepoNotes));
         assertFalse(Files.exists(defaultRepoArchive));
-        assertFalse(Files.exists(storageFile));
 
         storage.init();
 
-        // After init, config and default repo structure exist
         assertTrue(Files.exists(configPath));
-        assertEquals("main", Files.readString(configPath).trim());
+        List<String> lines = Files.readAllLines(configPath);
+        assertEquals("main", lines.get(0));
+        assertEquals("main", lines.get(1));
 
         assertTrue(Files.exists(defaultRepoNotes));
         assertTrue(Files.exists(defaultRepoArchive));
-        assertTrue(Files.exists(storageFile));
+        assertTrue(Files.exists(defaultIndexFile));
     }
 
     @Test
-    void createRepoCreatesNewRepoStructure() throws IOException {
-        String repoName = "testRepo";
-        Path notesPath = tempDir.resolve(repoName).resolve("notes");
-        Path archivePath = tempDir.resolve(repoName).resolve("archive");
+    void testCreateRepo() throws IOException {
+        // should create new repo structure, and update config
+        String repoName = "newRepo";
+        Path repoNotes = tempDir.resolve(repoName).resolve("notes");
+        Path repoArchive = tempDir.resolve(repoName).resolve("archive");
         Path indexFile = tempDir.resolve(repoName).resolve("index.txt");
-
-        // Repo should not exist initially
-        assertFalse(Files.exists(notesPath));
-        assertFalse(Files.exists(archivePath));
-        assertFalse(Files.exists(indexFile));
 
         storage.createRepo(repoName);
 
-        // Repo directories and index file should exist
-        assertTrue(Files.exists(notesPath));
-        assertTrue(Files.exists(archivePath));
+        assertTrue(Files.exists(repoNotes));
+        assertTrue(Files.exists(repoArchive));
         assertTrue(Files.exists(indexFile));
+
+        Path configFile = tempDir.resolve(".zettelConfig");
+        List<String> lines = Files.readAllLines(configFile);
+        assertTrue(lines.get(0).contains(repoName));
+    }
+
+    @Test
+    void testCreateStorageFileWritesNoteBody() throws IOException {
+        storage.init();
+
+        Note note = new Note(
+                "88888888",
+                "title",
+                "title",
+                "Hello World",
+                Instant.now(),
+                Instant.now(),
+                false,
+                false,
+                null,
+                new ArrayList<>()
+        );
+
+        storage.createStorageFile(note);
+
+        Path noteFile = tempDir.resolve("main").resolve("notes").resolve("title.txt");
+
+        assertTrue(Files.exists(noteFile));
+        assertEquals("Hello World", Files.readString(noteFile));
+    }
+
+    @Test
+    void testSaveAndLoadNotesWorks() throws IOException {
+        storage.init();
+
+        Note note1 = new Note("88888889", "Title1", "Title1", "Body1", Instant.now(), Instant.now(), false, false, null, new ArrayList<>());
+        Note note2 = new Note("99999999", "Title2", "Title2", "Body2", Instant.now(), Instant.now(), true, false, null, new ArrayList<>());
+
+        List<Note> notes = List.of(note1, note2);
+        storage.createStorageFile(note1);
+        storage.createStorageFile(note2);
+        storage.save(notes);
+
+        ArrayList<Note> loadedNotes = storage.load();
+        assertEquals(2, loadedNotes.size());
+        assertEquals("Title1", loadedNotes.get(0).getTitle());
+        assertEquals("Body1", loadedNotes.get(0).getBody());
+        assertEquals("Title2", loadedNotes.get(1).getTitle());
+        assertEquals("Body2", loadedNotes.get(1).getBody());
+    }
+
+    @Test
+    void testChangeRepo() throws IOException {
+        // should switch repo and update config
+        storage.init();
+        storage.createRepo("testRepo");
+
+        storage.changeRepo("testRepo");
+        assertEquals("testRepo", storage.readCurrRepo());
+    }
+
+    @Test
+    void testUpdateConfigAppendsNewRepoToConfig() throws IOException, ZettelException {
+        storage.init();
+        storage.updateConfig("anotherRepo");
+
+        List<String> lines = Files.readAllLines(tempDir.resolve(".zettelConfig"));
+        assertEquals("main", lines.get(0).trim()); // first line unchanged
+        assertEquals("anotherRepo", lines.get(1).trim()); // second line updated
     }
 }
