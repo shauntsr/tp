@@ -69,6 +69,8 @@ public class NewNoteCommand extends Command {
         );
 
         notes.add(newNote);
+
+        storage.createStorageFile(newNote);
         storage.save(notes);
         ui.showAddedNote(newNote);
     }
