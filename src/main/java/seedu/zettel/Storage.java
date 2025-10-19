@@ -1,16 +1,23 @@
 package seedu.zettel;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import seedu.zettel.exceptions.InvalidRepoException;
+import seedu.zettel.exceptions.ZettelException;
 
 
 /**
@@ -125,15 +132,111 @@ public class Storage {
      */
     public ArrayList<Note> load() {
         Path repoPath = rootPath.resolve(repoName);
-        Path filePath = repoPath.resolve(REPO_NOTES).resolve(STORAGE_FILE);
+        Path notesDir = repoPath.resolve(REPO_NOTES);
+        Path indexFile = repoPath.resolve(REPO_INDEX);
+
+        ArrayList<Note> notes = new ArrayList<>();
+
+        // Validate repo layout before attempting to read
         try {
-            return Files.lines(filePath)
-                    .map(this::parseSaveFile)
+            validateRepo(repoName);
+        } catch (ZettelException e) {
+            System.out.println("Error validating repo: " + e.getMessage());
+            return notes;
+        }
+
+        try (Stream<String> lines = Files.lines(indexFile)){
+            return lines.map(this::parseSaveFile)
                     .filter(Objects::nonNull)
+                    .map(note -> {
+                        Path bodyFile = notesDir.resolve(note.getFilename() + ".txt");
+                        try {
+                            String body = Files.readString(bodyFile);
+                            note.setBody(body);
+                        } catch (IOException e) {
+                            System.out.println("Warning: cannot read body file for '" + note.getTitle() + "': " + e.getMessage());
+                            note.setBody("");
+                        }
+                        return note;
+                    })
                     .collect(Collectors.toCollection(ArrayList::new));
         } catch (IOException e) {
-            System.out.println("Error loading file: " + filePath);
+            System.out.println("Error loading file: " + indexFile);
             return new ArrayList<>();
+        }
+    }
+
+    private void validateRepo(String repoName) throws ZettelException {
+        Path repoPath = rootPath.resolve(repoName);
+        Path notesDir = repoPath.resolve(REPO_NOTES);
+        Path archiveDir = repoPath.resolve(REPO_ARCHIVE);
+        Path indexFile = repoPath.resolve(REPO_INDEX);
+        Path configFile = rootPath.resolve(CONFIG_FILE);
+
+        // critical; .zettelConfig should always exist
+        if (!Files.exists(configFile)) {
+            throw new InvalidRepoException(".zettelConfig missing at " + configFile.toAbsolutePath());
+        }
+
+        createIfMissing(repoPath, "repository folder: " + repoName, true);
+        createIfMissing(notesDir, "notes/ for repo: " + repoName, true);
+        createIfMissing(archiveDir, "archive/ for repo: " + repoName, true);
+        createIfMissing(indexFile, "index.txt for repo: " + repoName, false);
+
+        // Track expected body files
+        Set<String> expectedFiles = new HashSet<>();
+
+        try (Stream<String> lines = Files.lines(indexFile)) {
+            lines.map(this::parseSaveFile)
+                    .filter(Objects::nonNull)
+                    .forEach(note -> {
+                        String fileName = note.getFilename() + ".txt";
+                        expectedFiles.add(fileName);
+
+                        Path bodyFile = notesDir.resolve(fileName);
+                        try {
+                            createIfMissing(bodyFile, "body file for note '" + note.getTitle() + "'", false);
+                        } catch (ZettelException e) {
+                            System.out.println("Warning: " + e.getMessage());
+                        }
+                    });
+        } catch (IOException e) {
+            throw new ZettelException("Failed to read index.txt: " + e.getMessage());
+        }
+
+        detectOrphans(notesDir, expectedFiles, repoName);
+    }
+
+    private void createIfMissing(Path path, String description, boolean isDirectory) throws ZettelException {
+        try {
+            if (Files.notExists(path)) {
+                if (isDirectory) {
+                    Files.createDirectories(path);
+                } else {
+                    Files.createFile(path);
+                }
+                System.out.println("Created missing " + description);
+            }
+        } catch (IOException e) {
+            throw new ZettelException("Failed to create " + description + ": " + e.getMessage());
+        }
+    }
+
+    private void detectOrphans(Path notesDir, Set<String> expectedFiles, String repoName) throws ZettelException {
+        try (DirectoryStream<Path> notesStream = Files.newDirectoryStream(notesDir, "*.txt")) {
+            List<String> orphans = new ArrayList<>();
+            // for every .txt in notes/, if it is not referenced in index.txt, add it to orphans list
+            for (Path p : notesStream) {
+                if (!expectedFiles.contains(p.getFileName().toString())) {
+                    orphans.add(p.getFileName().toString());
+                }
+            }
+            if (!orphans.isEmpty()) {
+                System.out.println("Notice: Found " + orphans.size() + " orphan note file(s) in repo '" + repoName + "':");
+                orphans.forEach(f -> System.out.println("  - " + f));
+            }
+        } catch (IOException e) {
+            throw new ZettelException("Failed to scan notes directory for orphans: " + e.getMessage());
         }
     }
 
@@ -210,7 +313,7 @@ public class Storage {
         String filename = note.getFilename() != null ? note.getFilename() : "";
         String archiveName = note.getArchiveName() != null ? note.getArchiveName() : "";
 
-        return String.format("%s | %s | %s | %s | %s | %s | %s | %s | %s | %s",
+        return String.format("%s | %s | %s | %s | %s | %s | %s | %s | %s",
                 note.getId(),
                 note.getTitle(),
                 filename,
@@ -239,7 +342,7 @@ public class Storage {
             String id = fields[0];
             String title = fields[1];
             String filename = fields[2];
-            String body = fields[3].replace("\\n", "\n"); // Unescape newlines
+            String body = ""; // set temporary empty body
             Instant createdAt = Instant.parse(fields[4]);
             Instant modifiedAt = Instant.parse(fields[5]);
             boolean pinned = fields[6].equals("1");
