@@ -80,8 +80,38 @@ public class Storage {
             createRepo(DEFAULT_REPO);
         }
 
-        // Can remove this portion after we use a folder of notes
-        createStorageFile(defaultRepoPath);
+        try {
+            loadConfig();
+
+            String checkedOutRepo = readCurrRepo();
+            changeRepo(checkedOutRepo);
+
+            // validate every repo in repoList
+            for (String repo : repoList) {
+                validateRepo(repo);
+            }
+        } catch (ZettelException e) {
+            System.out.println("Error during init: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Reads the currently checked-out repository from .zettelConfig.
+     * Defaults to "main" if line 2 is missing or file is malformed.
+     */
+    private String readCurrRepo() {
+        Path configFile = rootPath.resolve(CONFIG_FILE);
+        try {
+            if (Files.exists(configFile)) {
+                List<String> lines = Files.readAllLines(configFile);
+                if (lines.size() == 2 && !lines.get(1).isBlank()) {
+                    return lines.get(1).trim();
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Warning: failed to read checked-out repo: " + e.getMessage());
+        }
+        return DEFAULT_REPO;
     }
 
     /** Creates the root folder ("data") for all repositories if it does not exist. */
