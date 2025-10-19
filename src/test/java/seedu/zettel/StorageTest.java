@@ -1,5 +1,9 @@
 package seedu.zettel;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -10,8 +14,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 import seedu.zettel.exceptions.ZettelException;
 
@@ -94,11 +96,13 @@ public class StorageTest {
     }
 
     @Test
-    void testSaveAndLoadNotesWorks() throws IOException {
+    void testSaveAndLoadNotesWorks() {
         storage.init();
 
-        Note note1 = new Note("88888889", "Title1", "Title1.txt", "Body1", Instant.now(), Instant.now(), false, false, null, new ArrayList<>());
-        Note note2 = new Note("99999999", "Title2", "Title2.txt", "Body2", Instant.now(), Instant.now(), true, false, null, new ArrayList<>());
+        Note note1 = new Note("88888889", "Title1", "Title1.txt", "Body1",
+                Instant.now(), Instant.now(), false, false, null, new ArrayList<>());
+        Note note2 = new Note("99999999", "Title2", "Title2.txt", "Body2",
+                Instant.now(), Instant.now(), true, false, null, new ArrayList<>());
 
         List<Note> notes = List.of(note1, note2);
 
@@ -116,7 +120,7 @@ public class StorageTest {
     }
 
     @Test
-    void testChangeRepo() throws IOException {
+    void testChangeRepo() {
         // should switch repo and update config
         storage.init();
         storage.createRepo("testRepo");

@@ -235,7 +235,8 @@ public class Storage {
                             String body = Files.readString(bodyFile);
                             note.setBody(body);
                         } catch (IOException e) {
-                            System.out.println("Warning: cannot read body file for '" + note.getTitle() + "': " + e.getMessage());
+                            System.out.println("Warning: cannot read body file for '" +
+                                    note.getTitle() + "': " + e.getMessage());
                             note.setBody("");
                         }
                         return note;
@@ -313,7 +314,8 @@ public class Storage {
                 }
             }
             if (!orphans.isEmpty()) {
-                System.out.println("Notice: Found " + orphans.size() + " orphan note file(s) in repo '" + repoName + "':");
+                System.out.println("Notice: Found " + orphans.size() +
+                        " orphan note file(s) in repo '" + repoName + "':");
                 orphans.forEach(f -> System.out.println("  - " + f));
             }
         } catch (IOException e) {

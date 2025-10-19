@@ -31,14 +31,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class NewNoteCommandTest {
     private static final String FILE_PATH = "./data/zettel.txt";
 
+    @TempDir
+    Path tempDir;
+
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     private final PrintStream originalOutputStream = System.out;
     private ArrayList<Note> notes;
     private UI ui;
     private Storage storage;
-
-    @TempDir
-    Path tempDir;
 
     @BeforeEach
     void setUp() {
