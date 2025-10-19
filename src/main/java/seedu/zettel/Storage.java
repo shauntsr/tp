@@ -43,9 +43,6 @@ public class Storage {
     /** Index file name for notes metadata. */
     static final String REPO_INDEX = "index.txt";
 
-    /** Temporary storage file for note persistence (to be migrated later). */
-    static final String STORAGE_FILE = "zettel.txt";
-
     private static final Logger logger = Logger.getLogger(Storage.class.getName());
   
     /** The root directory path under which repositories are stored; default is data/. */
@@ -99,7 +96,7 @@ public class Storage {
      * Reads the currently checked-out repository from .zettelConfig.
      * Defaults to "main" if line 2 is missing or file is malformed.
      */
-    private String readCurrRepo() {
+    public String readCurrRepo() {
         Path configFile = rootPath.resolve(CONFIG_FILE);
         try {
             if (Files.exists(configFile)) {
@@ -125,15 +122,34 @@ public class Storage {
         }
     }
 
-    /** Creates a storage file in the default repository. */
-    private static void createStorageFile(Path defaultRepoPath) {
-        Path filePath = defaultRepoPath.resolve(REPO_NOTES).resolve(STORAGE_FILE);
+    /**
+     * Creates a per-note .txt file for the given Note in the current repository.
+     * Ensures that the repository structure (notes/, archive/, index.txt) exists.
+     *
+     * @param note The Note object to create a file for
+     */
+    public void createStorageFile(Note note) {
+        Path repoPath = rootPath.resolve(repoName);
+        Path notesDir = repoPath.resolve(REPO_NOTES);
+
         try {
-            if (Files.notExists(filePath)) {
-                Files.createFile(filePath);
+            // Ensure repo structure exists
+            validateRepo(repoName);
+
+            Path noteFile = notesDir.resolve(note.getFilename() + ".txt");
+            if (Files.notExists(noteFile)) {
+                Files.createFile(noteFile);
+                System.out.println("Created note file: " + noteFile);
+            } else {
+                System.out.println("Note file already exists: " + noteFile);
             }
+
+            Files.writeString(noteFile, note.getBody() != null ? note.getBody() : "");
+
+        } catch (ZettelException e) {
+            System.out.println("Error validating repo before creating note: " + e.getMessage());
         } catch (IOException e) {
-            System.out.println("Error creating " + filePath + ".");
+            System.out.println("Error writing note file: " + e.getMessage());
         }
     }
 
@@ -327,9 +343,41 @@ public class Storage {
             Files.createDirectories(repoPath.resolve(REPO_ARCHIVE));
             Files.createFile(repoPath.resolve(REPO_INDEX));
 
+            addToConfig(repoName);
+            
             logger.info("Repository " + repoName + " successfully created at " + repoPath);
         } catch (IOException e) {
             System.out.println("Error initialising repository " + repoName) ;
+        }
+    }
+
+    /**
+     * Appends a new repo name to the first line of .zettelConfig if it doesn't already exist.
+     *
+     * @param repoName The repository name to add
+     */
+    private void addToConfig(String repoName) {
+        createConfigFile();
+        Path configFile = rootPath.resolve(CONFIG_FILE);
+
+        try {
+            List<String> lines = Files.readAllLines(configFile);
+
+            // First line contains all available repo names, pipe separated
+            String firstLine = lines.isEmpty() ? DEFAULT_REPO : lines.get(0);
+            String secondLine = (lines.size() < 2) ? DEFAULT_REPO : lines.get(1);
+
+            if (!firstLine.contains(repoName)) {
+                firstLine = firstLine.concat(" | " + repoName);
+                Files.write(configFile, Arrays.asList(firstLine, secondLine));
+
+                if (!repoList.contains(repoName)) {
+                    repoList.add(repoName);
+                }
+            }
+
+        } catch (IOException e) {
+            System.out.println("Error updating .zettelConfig: " + e.getMessage());
         }
     }
 
@@ -418,15 +466,15 @@ public class Storage {
             String title = fields[1];
             String filename = fields[2];
             String body = ""; // set temporary empty body
-            Instant createdAt = Instant.parse(fields[4]);
-            Instant modifiedAt = Instant.parse(fields[5]);
-            boolean pinned = fields[6].equals("1");
-            boolean archived = fields[7].equals("1");
-            String archiveName = fields[8].isEmpty() ? null : fields[8];
+            Instant createdAt = Instant.parse(fields[3]);
+            Instant modifiedAt = Instant.parse(fields[4]);
+            boolean pinned = fields[5].equals("1");
+            boolean archived = fields[6].equals("1");
+            String archiveName = fields[7].isEmpty() ? null : fields[7];
 
             List<String> logs = new ArrayList<>();
-            if (fields.length > 9 && !fields[9].isEmpty()) {
-                logs = Arrays.asList(fields[9].split(";;"));
+            if (fields.length > 8 && !fields[8].isEmpty()) {
+                logs = Arrays.asList(fields[8].split(";;"));
             }
 
             return new Note(id, title, filename, body, createdAt, modifiedAt,
