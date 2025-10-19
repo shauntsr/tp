@@ -133,21 +133,16 @@ public class Storage {
         Path notesDir = repoPath.resolve(REPO_NOTES);
 
         try {
-            // Ensure repo structure exists
-            validateRepo(repoName);
-
-            Path noteFile = notesDir.resolve(note.getFilename() + ".txt");
+            Path noteFile = notesDir.resolve(note.getFilename());
             if (Files.notExists(noteFile)) {
                 Files.createFile(noteFile);
                 System.out.println("Created note file: " + noteFile);
             } else {
-                System.out.println("Note file already exists: " + noteFile);
+                System.out.println("Note file already exists. Overwriting... " + noteFile);
             }
 
             Files.writeString(noteFile, note.getBody() != null ? note.getBody() : "");
 
-        } catch (ZettelException e) {
-            System.out.println("Error validating repo before creating note: " + e.getMessage());
         } catch (IOException e) {
             System.out.println("Error writing note file: " + e.getMessage());
         }
@@ -235,7 +230,7 @@ public class Storage {
             return lines.map(this::parseSaveFile)
                     .filter(Objects::nonNull)
                     .map(note -> {
-                        Path bodyFile = notesDir.resolve(note.getFilename() + ".txt");
+                        Path bodyFile = notesDir.resolve(note.getFilename());
                         try {
                             String body = Files.readString(bodyFile);
                             note.setBody(body);
@@ -276,7 +271,7 @@ public class Storage {
             lines.map(this::parseSaveFile)
                     .filter(Objects::nonNull)
                     .forEach(note -> {
-                        String fileName = note.getFilename() + ".txt";
+                        String fileName = note.getFilename();
                         expectedFiles.add(fileName);
 
                         Path bodyFile = notesDir.resolve(fileName);
@@ -410,7 +405,6 @@ public class Storage {
         Path indexDir = rootPath.resolve(repoName);   // e.g data/<repoName>
         Path filePath = indexDir.resolve(REPO_INDEX); // data/<repoName>/index.txt
 
-        /* TODO: validateRepo here, once implemented */
         try {
             Files.createDirectories(indexDir); // Ensure directory exists
 
@@ -419,8 +413,12 @@ public class Storage {
                     .collect(Collectors.toList());
 
             Files.write(filePath, lines);
+
+            validateRepo(repoName);
         } catch (IOException e) {
             System.out.println("Error writing to index file: " + e.getMessage());
+        } catch (ZettelException e) {
+            System.out.println("Error while validating repo: " + e.getMessage());
         }
     }
 
