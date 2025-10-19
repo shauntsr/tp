@@ -181,10 +181,12 @@ public class Storage {
      * @param notes The notes to save.
      */
     public void save(List<Note> notes) {
-        Path repoPath = rootPath.resolve(repoName).resolve(REPO_NOTES);
-        Path filePath = repoPath.resolve(STORAGE_FILE);
+        Path indexDir = rootPath.resolve(repoName);   // e.g data/<repoName>
+        Path filePath = indexDir.resolve(REPO_INDEX); // data/<repoName>/index.txt
+
+        /* TODO: validateRepo here, once implemented */
         try {
-            Files.createDirectories(repoPath); // Ensure directory exists
+            Files.createDirectories(indexDir); // Ensure directory exists
 
             List<String> lines = notes.stream()
                     .map(this::toSaveFormat)
@@ -192,7 +194,7 @@ public class Storage {
 
             Files.write(filePath, lines);
         } catch (IOException e) {
-            System.out.println("Error writing to file: " + e.getMessage());
+            System.out.println("Error writing to index file: " + e.getMessage());
         }
     }
 
@@ -205,13 +207,13 @@ public class Storage {
      */
     private String toSaveFormat(Note note) {
         String logsStr = String.join(";;", note.getLogs());
+        String filename = note.getFilename() != null ? note.getFilename() : "";
         String archiveName = note.getArchiveName() != null ? note.getArchiveName() : "";
 
         return String.format("%s | %s | %s | %s | %s | %s | %s | %s | %s | %s",
                 note.getId(),
                 note.getTitle(),
-                note.getFilename(),
-                note.getBody().replace("\n", "\\n"), // Escape newlines in body
+                filename,
                 note.getCreatedAt().toString(),
                 note.getModifiedAt().toString(),
                 note.isPinned() ? "1" : "0",
@@ -228,7 +230,7 @@ public class Storage {
      * @return A reconstructed Note object, or null if parsing fails
      */
     private Note parseSaveFile(String line) {
-        if (line.isBlank()) {
+        if (line == null || line.isBlank()) {
             return null;
         }
 
