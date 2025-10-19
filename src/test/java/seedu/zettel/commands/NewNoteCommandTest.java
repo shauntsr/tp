@@ -3,6 +3,8 @@ package seedu.zettel.commands;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
 import seedu.zettel.exceptions.InvalidInputException;
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
@@ -10,7 +12,10 @@ import seedu.zettel.Storage;
 import seedu.zettel.UI;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 
@@ -32,12 +37,16 @@ public class NewNoteCommandTest {
     private UI ui;
     private Storage storage;
 
+    @TempDir
+    Path tempDir;
+
     @BeforeEach
     void setUp() {
         System.setOut(new PrintStream(outputStream));
         notes = new ArrayList<>();
         ui = new UI();
-        storage = new Storage(FILE_PATH);
+        storage = new Storage(tempDir.toString());
+        storage.init();
     }
 
     @AfterEach
@@ -118,5 +127,29 @@ public class NewNoteCommandTest {
         // Both should be valid hex IDs
         assertTrue(id1.matches("[a-f0-9]{8}"), "First ID should be valid hex");
         assertTrue(id2.matches("[a-f0-9]{8}"), "Second ID should be valid hex");
+    }
+
+
+    @Test
+    void testAddsNewNoteAndCreatesFile() throws ZettelException, IOException {
+        String title = "TestNote";
+        String body = "Test body";
+
+        NewNoteCommand cmd = new NewNoteCommand(title, body);
+        cmd.execute(notes, ui, storage);
+
+        // Verify note added to list
+        assertEquals(1, notes.size());
+        Note note = notes.get(0);
+        assertEquals(title, note.getTitle());
+        assertEquals(body, note.getBody());
+
+        // Verify file exists in notes/ folder
+        Path noteFile = tempDir.resolve("main").resolve("notes").resolve("TestNote.txt");
+
+        System.out.println("Checking note file: " + noteFile);
+        System.out.println("Exists? " + Files.exists(noteFile));
+        assertTrue(Files.exists(noteFile), "Note file should be created");
+        assertEquals(body, Files.readString(noteFile), "Note file should contain the body");
     }
 }

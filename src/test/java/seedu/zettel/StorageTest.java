@@ -75,7 +75,7 @@ public class StorageTest {
         Note note = new Note(
                 "88888888",
                 "title",
-                "title",
+                "title.txt",
                 "Hello World",
                 Instant.now(),
                 Instant.now(),
@@ -97,12 +97,14 @@ public class StorageTest {
     void testSaveAndLoadNotesWorks() throws IOException {
         storage.init();
 
-        Note note1 = new Note("88888889", "Title1", "Title1", "Body1", Instant.now(), Instant.now(), false, false, null, new ArrayList<>());
-        Note note2 = new Note("99999999", "Title2", "Title2", "Body2", Instant.now(), Instant.now(), true, false, null, new ArrayList<>());
+        Note note1 = new Note("88888889", "Title1", "Title1.txt", "Body1", Instant.now(), Instant.now(), false, false, null, new ArrayList<>());
+        Note note2 = new Note("99999999", "Title2", "Title2.txt", "Body2", Instant.now(), Instant.now(), true, false, null, new ArrayList<>());
 
         List<Note> notes = List.of(note1, note2);
+
         storage.createStorageFile(note1);
         storage.createStorageFile(note2);
+
         storage.save(notes);
 
         ArrayList<Note> loadedNotes = storage.load();
