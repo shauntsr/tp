@@ -12,13 +12,10 @@ for /f "tokens=*" %%a in (
     set jarloc=%%a
 )
 
-
-REM --- Go to test directory ---
-cd ..\..\text-ui-test
 REM --- Remove previous test data directory (if exists) ---
-if exist data (
-  echo Removing existing test data directory: .\data
-  rd /s /q data
+if exist ..\..\text-ui-test\data (
+  echo Removing existing test data directory
+  rd /s /q ..\..\text-ui-test\data
 )
 
 java -jar %jarloc% < ..\..\text-ui-test\input.txt > ..\..\text-ui-test\ACTUAL.TXT
