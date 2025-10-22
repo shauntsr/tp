@@ -14,14 +14,17 @@ ____________________________________________________________
    bye                        - Exit the application
 
 ____________________________________________________________
-Note created: test1.txt #XXXXXXXX
-Note created: test2.txt #XXXXXXXX
-Note created: test3.txt #XXXXXXXX
+Created note file: data/main/notes/test1.txt
+Note created: test1.txt #db620e53
+Created note file: data/main/notes/test2.txt
+Note created: test2.txt #e0bb2613
+Created note file: data/main/notes/test3.txt
+Note created: test3.txt #dde249af
 You have 3 notes:
-    1. test3.txt 2025-10-15 XXXXXXXX
-    2. test2.txt 2025-10-15 XXXXXXXX
-    3. test1.txt 2025-10-15 XXXXXXXX
+    1. test3.txt 2025-10-22 dde249af
+    2. test2.txt 2025-10-22 e0bb2613
+    3. test1.txt 2025-10-22 db620e53
  Here are the matching notes in your list:
- 1. test3.txt 2025-10-15 XXXXXXXX
- 2. test2.txt 2025-10-15 XXXXXXXX
- 3. test1.txt 2025-10-15 XXXXXXXX
+ 1. test3.txt 2025-10-22 dde249af
+ 2. test2.txt 2025-10-22 e0bb2613
+ 3. test1.txt 2025-10-22 db620e53
