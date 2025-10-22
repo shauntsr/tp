@@ -131,12 +131,13 @@ public class Storage {
     public void createStorageFile(Note note) {
         Path repoPath = rootPath.resolve(repoName);
         Path notesDir = repoPath.resolve(REPO_NOTES);
+        String noteName = note.getFilename();
 
         try {
-            Path noteFile = notesDir.resolve(note.getFilename());
+            Path noteFile = notesDir.resolve(noteName);
             if (Files.notExists(noteFile)) {
                 Files.createFile(noteFile);
-                System.out.println("Created note file: " + noteFile);
+                System.out.println("Created note file: " + noteName);
             } else {
                 System.out.println("Note file already exists. Overwriting... " + noteFile);
             }
