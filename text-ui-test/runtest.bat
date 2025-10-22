@@ -1,5 +1,5 @@
 @echo off
-setlocal enableextensions enabledelayedexpansion
+setlocal enableextensions
 pushd %~dp0
 
 cd ..
@@ -24,7 +24,7 @@ REM Run jar and feed input.txt line by line with delay
 (
 for /f "usebackq delims=" %%L in ("input.txt") do (
     echo %%L
-    timeout /t 1 /nobreak >nul
+    ping -n 2 127.0.0.1 >nul
 )
 ) | java -jar ..\build\libs\%jarloc% > ACTUAL.TXT
 
