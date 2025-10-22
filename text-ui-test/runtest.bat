@@ -20,14 +20,7 @@ if exist data (
   rd /s /q data
 )
 
-REM Run jar and feed input.txt line by line with delay
-(
-for /f "usebackq delims=" %%L in ("input.txt") do (
-    echo %%L
-    ping -n 2 127.0.0.1 >nul
-)
-) | java -jar ..\build\libs\%jarloc% > ACTUAL.TXT
-
+java -jar "..\build\libs\%jarloc%" < input.txt > ACTUAL.TXT
 
 REM Normalize IDs and dates in ACTUAL.TXT
 REM - Replace 8-char lowercase hex IDs (with # prefix) with #XXXXXXXX

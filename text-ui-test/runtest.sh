@@ -14,14 +14,7 @@ if [ -d data ]; then
   rm -rf data
 fi
 
-# Run jar and feed input.txt line by line
-JAR=$(find ../build/libs/ -mindepth 1 -print -quit)
-(
-while IFS= read -r line; do
-    echo "$line"
-    sleep 1   # slight delay for deterministic timestamps
-done < input.txt
-) | java -jar "$JAR" > ACTUAL.TXT
+java -jar $(find ../build/libs/ -mindepth 1 -print -quit) < input.txt > ACTUAL.TXT
 
 # Normalize ACTUAL.TXT:
 # 1. Replace 8-char lowercase hex IDs with # prefix: #abcd1234 -> #XXXXXXXX
