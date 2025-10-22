@@ -1,5 +1,5 @@
 @echo off
-setlocal enableextensions
+setlocal enableextensions enabledelayedexpansion
 pushd %~dp0
 
 cd ..
@@ -12,15 +12,22 @@ for /f "tokens=*" %%a in (
     set jarloc=%%a
 )
 
-REM --- Remove previous test data directory (if exists) ---
-if exist ..\..\text-ui-test\data (
-  echo Removing existing test data directory
-  rd /s /q ..\..\text-ui-test\data
-)
-
-java -jar %jarloc% < ..\..\text-ui-test\input.txt > ..\..\text-ui-test\ACTUAL.TXT
 
 cd ..\..\text-ui-test
+REM --- Remove previous test data directory (if exists) ---
+if exist data (
+  echo Removing existing test data directory
+  rd /s /q data
+)
+
+REM Run jar and feed input.txt line by line with delay
+(
+for /f "usebackq delims=" %%L in ("input.txt") do (
+    echo %%L
+    timeout /t 1 /nobreak >nul
+)
+) | java -jar ..\build\libs\%jarloc% > ACTUAL.TXT
+
 
 REM Normalize IDs and dates in ACTUAL.TXT
 REM - Replace 8-char lowercase hex IDs (with # prefix) with #XXXXXXXX
