@@ -8,6 +8,12 @@ cd ..
 
 cd text-ui-test
 
+# Remove previous test data directory so tests start clean
+if [ -d data ]; then
+  echo "Removing existing test data directory: ./data"
+  rm -rf data
+fi
+
 java -jar $(find ../build/libs/ -mindepth 1 -print -quit) < input.txt > ACTUAL.TXT
 
 # Normalize ACTUAL.TXT:
