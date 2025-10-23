@@ -1,3 +1,13 @@
+<<<<<<< HEAD
+package seedu.zettel.storage;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+=======
 package seedu.zettel;
 
 import java.io.IOException;
@@ -12,10 +22,42 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+>>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+<<<<<<< HEAD
+import seedu.zettel.exceptions.ZettelException;
+import seedu.zettel.Note;
+
+
+/**
+ * Orchestrates storage operations for Zettel repositories.
+ * Manages repository state and coordinates file system and serialization operations.
+ */
+public class Storage {
+    static final String DEFAULT_REPO = "main";
+
+    private static final Logger logger = Logger.getLogger(Storage.class.getName());
+
+    private final FileSystemManager fileSystemManager;
+    private final NoteSerializer noteSerializer;
+
+    private String repoName = DEFAULT_REPO;
+    private ArrayList<String> repoList = new ArrayList<>();
+
+    public Storage(String rootPath) {
+        this.fileSystemManager = new FileSystemManager(rootPath);
+        this.noteSerializer = new NoteSerializer();
+    }
+
+    public void init() {
+        fileSystemManager.createRootFolder();
+        fileSystemManager.createConfigFile(DEFAULT_REPO);
+
+        Path defaultRepoPath = fileSystemManager.getRootPath().resolve(DEFAULT_REPO);
+=======
 import seedu.zettel.exceptions.InvalidRepoException;
 import seedu.zettel.exceptions.ZettelException;
 
@@ -73,17 +115,24 @@ public class Storage {
 
         // Initialise default repo if doesn't exist
         Path defaultRepoPath = rootPath.resolve(DEFAULT_REPO);
+>>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
         if (Files.notExists(defaultRepoPath)) {
             createRepo(DEFAULT_REPO);
         }
 
         try {
             loadConfig();
+<<<<<<< HEAD
+            String checkedOutRepo = readCurrRepo();
+            changeRepo(checkedOutRepo);
+
+=======
 
             String checkedOutRepo = readCurrRepo();
             changeRepo(checkedOutRepo);
 
             // validate every repo in repoList
+>>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
             for (String repo : repoList) {
                 validateRepo(repo);
             }
@@ -92,12 +141,17 @@ public class Storage {
         }
     }
 
+<<<<<<< HEAD
+    public String readCurrRepo() {
+        Path configFile = fileSystemManager.getConfigPath();
+=======
     /**
      * Reads the currently checked-out repository from .zettelConfig.
      * Defaults to "main" if line 2 is missing or file is malformed.
      */
     public String readCurrRepo() {
         Path configFile = rootPath.resolve(CONFIG_FILE);
+>>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
         try {
             if (Files.exists(configFile)) {
                 List<String> lines = Files.readAllLines(configFile);
@@ -111,6 +165,19 @@ public class Storage {
         return DEFAULT_REPO;
     }
 
+<<<<<<< HEAD
+    public void createStorageFile(Note note) {
+        fileSystemManager.createNoteFile(note.getFilename(), note.getBody(), repoName);
+    }
+
+    public void loadConfig() {
+        fileSystemManager.createConfigFile(DEFAULT_REPO);
+        Path configFile = fileSystemManager.getConfigPath();
+
+        try {
+            List<String> lines = Files.readAllLines(configFile);
+            String firstLine = lines.isEmpty() ? DEFAULT_REPO : lines.get(0);
+=======
     /** Creates the root folder ("data") for all repositories if it does not exist. */
     private void createRootFolder() {
         try {
@@ -176,6 +243,7 @@ public class Storage {
         try {
             List<String> lines = Files.readAllLines(configFile);
             String firstLine = lines.isEmpty() ? DEFAULT_REPO : lines.get(0); // if empty (shouldn't be), use main
+>>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
             repoList = Arrays.stream(firstLine.split("\\|"))
                     .map(String::trim)
                     .collect(Collectors.toCollection(ArrayList::new));
@@ -187,10 +255,17 @@ public class Storage {
     }
 
     public void updateConfig(String newRepo) throws ZettelException {
+<<<<<<< HEAD
+        fileSystemManager.createConfigFile(DEFAULT_REPO);
+        Path configFile = fileSystemManager.getConfigPath();
+
+        try (Stream<String> stream = Files.lines(configFile)) {
+=======
         createConfigFile();
         Path configFile = rootPath.resolve(CONFIG_FILE);
 
         try (Stream<String> stream = Files.lines(configFile)){
+>>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
             List<String> lines = stream.collect(Collectors.toList());
             if (lines.isEmpty()) {
                 lines.add(DEFAULT_REPO);
@@ -201,12 +276,21 @@ public class Storage {
                 lines.set(1, newRepo);
             }
             Files.write(configFile, lines);
+<<<<<<< HEAD
+=======
 
+>>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
         } catch (IOException e) {
             throw new ZettelException("Failed to update checked-out repo in .zettelConfig: " + e.getMessage());
         }
     }
 
+<<<<<<< HEAD
+    public ArrayList<Note> load() {
+        Path indexPath = fileSystemManager.getIndexPath(repoName);
+        Path notesDir = fileSystemManager.getNotesPath(repoName);
+
+=======
     /**
      * Loads all notes from the current repository.
      *
@@ -220,10 +304,36 @@ public class Storage {
         ArrayList<Note> notes = new ArrayList<>();
 
         // Validate repo layout before attempting to read
+>>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
         try {
             validateRepo(repoName);
         } catch (ZettelException e) {
             System.out.println("Error validating repo: " + e.getMessage());
+<<<<<<< HEAD
+            return new ArrayList<>();
+        }
+
+        return noteSerializer.loadNotes(indexPath, notesDir);
+    }
+
+    private void validateRepo(String repoName) throws ZettelException {
+        Path indexPath = fileSystemManager.getIndexPath(repoName);
+        List<String> expectedFiles = noteSerializer.getExpectedFilenames(indexPath);
+        fileSystemManager.validateRepoStructure(repoName, expectedFiles);
+    }
+
+    public void createRepo(String repoName) {
+        boolean created = fileSystemManager.createRepoStructure(repoName);
+        if (created) {
+            addToConfig(repoName);
+            logger.info("Repository " + repoName + " successfully created");
+        }
+    }
+
+    private void addToConfig(String repoName) {
+        fileSystemManager.createConfigFile(DEFAULT_REPO);
+        Path configFile = fileSystemManager.getConfigPath();
+=======
             return notes;
         }
 
@@ -357,11 +467,15 @@ public class Storage {
     private void addToConfig(String repoName) {
         createConfigFile();
         Path configFile = rootPath.resolve(CONFIG_FILE);
+>>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
 
         try {
             List<String> lines = Files.readAllLines(configFile);
 
+<<<<<<< HEAD
+=======
             // First line contains all available repo names, pipe separated
+>>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
             String firstLine = lines.isEmpty() ? DEFAULT_REPO : lines.get(0);
             String secondLine = (lines.size() < 2) ? DEFAULT_REPO : lines.get(1);
 
@@ -373,17 +487,23 @@ public class Storage {
                     repoList.add(repoName);
                 }
             }
+<<<<<<< HEAD
+=======
 
+>>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
         } catch (IOException e) {
             System.out.println("Error updating .zettelConfig: " + e.getMessage());
         }
     }
 
+<<<<<<< HEAD
+=======
     /**
      * Switches the current repository and updates the config file.
      *
      * @param newRepo The repository to switch to.
      */
+>>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
     public void changeRepo(String newRepo) {
         if (!repoList.contains(newRepo)) {
             System.out.println("Repo '" + newRepo + "' does not exist. Falling back to 'main'.");
@@ -399,6 +519,14 @@ public class Storage {
         }
     }
 
+<<<<<<< HEAD
+    public void save(List<Note> notes) {
+        Path indexPath = fileSystemManager.getIndexPath(repoName);
+
+        try {
+            Files.createDirectories(indexPath.getParent());
+            noteSerializer.saveNotes(notes, indexPath);
+=======
     /**
      * Saves a list of notes to the current repository.
      *
@@ -417,6 +545,7 @@ public class Storage {
 
             Files.write(filePath, lines);
 
+>>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
             validateRepo(repoName);
         } catch (IOException e) {
             System.out.println("Error writing to index file: " + e.getMessage());
@@ -424,6 +553,8 @@ public class Storage {
             System.out.println("Error while validating repo: " + e.getMessage());
         }
     }
+<<<<<<< HEAD
+=======
 
 
     /**
@@ -485,4 +616,5 @@ public class Storage {
             return null;
         }
     }
+>>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
 }

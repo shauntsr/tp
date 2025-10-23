@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
 import seedu.zettel.UI;
-import seedu.zettel.Storage;
+import seedu.zettel.storage.Storage;
 
 public class FindNoteCommandTest {
     @Test

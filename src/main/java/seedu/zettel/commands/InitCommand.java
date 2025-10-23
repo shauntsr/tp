@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
-import seedu.zettel.Storage;
+import seedu.zettel.storage.Storage;
 import seedu.zettel.UI;
 
 /**
