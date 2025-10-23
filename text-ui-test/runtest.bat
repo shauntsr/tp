@@ -12,9 +12,15 @@ for /f "tokens=*" %%a in (
     set jarloc=%%a
 )
 
-java -jar %jarloc% < ..\..\text-ui-test\input.txt > ..\..\text-ui-test\ACTUAL.TXT
 
 cd ..\..\text-ui-test
+REM --- Remove previous test data directory (if exists) ---
+if exist data (
+  echo Removing existing test data directory
+  rd /s /q data
+)
+
+java -jar "..\build\libs\%jarloc%" < input.txt > ACTUAL.TXT
 
 REM Normalize IDs and dates in ACTUAL.TXT
 REM - Replace 8-char lowercase hex IDs (with # prefix) with #XXXXXXXX
