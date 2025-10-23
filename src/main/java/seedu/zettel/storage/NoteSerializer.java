@@ -1,7 +1,5 @@
 package seedu.zettel.storage;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -114,10 +112,4 @@ public class NoteSerializer {
             return null;
         }
     }
-=======
-public class NoteSerializer {
->>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
-=======
-public class NoteSerializer {
->>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
 }

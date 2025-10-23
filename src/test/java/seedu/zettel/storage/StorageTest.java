@@ -17,7 +17,6 @@ import java.util.List;
 
 import seedu.zettel.Note;
 import seedu.zettel.exceptions.ZettelException;
-import seedu.zettel.storage.Storage;
 
 public class StorageTest {
 

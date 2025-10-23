@@ -1,7 +1,5 @@
 package seedu.zettel.storage;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -103,10 +101,4 @@ public class FileSystemManagerTest {
         assertEquals(tempDir.resolve("myrepo").resolve("index.txt"), fs.getIndexPath("myrepo"));
         assertEquals(tempDir.resolve("myrepo").resolve("notes"), fs.getNotesPath("myrepo"));
     }
-=======
-public class FileSystemManagerTest {
->>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
-=======
-public class FileSystemManagerTest {
->>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
 }

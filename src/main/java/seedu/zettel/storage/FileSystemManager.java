@@ -1,7 +1,5 @@
 package seedu.zettel.storage;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -166,10 +164,5 @@ public class FileSystemManager {
     public Path getConfigPath() {
         return rootPath.resolve(CONFIG_FILE);
     }
-=======
-public class FileSystemManager {
->>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
-=======
-public class FileSystemManager {
->>>>>>> d554bc875ae81450b2aa87f1b218f975a31de1b9
+
 }
