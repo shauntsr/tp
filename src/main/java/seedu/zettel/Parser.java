@@ -8,6 +8,7 @@ import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.ListNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.PinNoteCommand;
+import seedu.zettel.commands.TagNoteCommand;
 import seedu.zettel.exceptions.EmptyDescriptionException;
 import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.InvalidInputException;
@@ -24,6 +25,8 @@ public class Parser {
     private static final String PIN_FORMAT = "Pin format should be: pin/unpin <NOTE_ID>";
     private static final String DELETE_FORMAT = "Delete format should be: delete [-f] <NOTE_ID>";
     private static final String NOTE_FORMAT = "New note format should be: new -t <TITLE> [-b <BODY>]";
+    private static final String TAG_FORMAT = "Tag command requires a subcommand: new/add";
+    private static final String TAG_NOTE_FORMAT = "Tag note command format should be: tag <NOTE_ID> <TAG>";
     private static final String NOTE_EMPTY = "Note title cannot be empty!";
     private static final String ID_EMPTY = "Please specify a Note ID to ";
     private static final String ID_INVALID = "Note ID must be exactly 8 hexadecimal characters (0-9, a-f)";
@@ -57,6 +60,7 @@ public class Parser {
         case "unpin" -> parsePinNoteCommand(inputs, false);
         case "init" -> parseInitCommand(input);
         case "find" -> parseFindNoteCommand(input);
+        case "tag" -> parseTagCommand(inputs);
         default -> throw new InvalidInputException(command);
         };
     }
@@ -224,5 +228,44 @@ public class Parser {
         }
 
         return idString;
+    }
+
+    private  static Command parseTagCommand(String[] inputs) throws ZettelException {
+        if (inputs.length < 2) {
+            throw new InvalidFormatException(TAG_FORMAT);
+        }
+
+        String subCommand = inputs[1].toLowerCase();
+
+        return switch (subCommand) {
+        case "add" -> parseTagNoteCommand(inputs);
+        default -> throw new InvalidFormatException(TAG_FORMAT);
+        };
+    }
+    /**
+     * Parses a tag command to add a tag to a note.
+     * Expected format: tag NOTE_ID TAG
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return A TagNoteCommand object with the note ID and tag.
+     * @throws ZettelException If the format is invalid or parameters are missing.
+     */
+    private static Command parseTagNoteCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 4) {
+            throw new InvalidFormatException(TAG_NOTE_FORMAT);
+        }
+
+        String noteId = inputs[2].trim();
+        if (!noteId.matches(VALID_NOTE_ID_REGEX)) {
+            throw new InvalidFormatException(ID_INVALID);
+        }
+
+        String tag = inputs[3].trim();
+
+        if (tag.isEmpty()) {
+            throw new EmptyDescriptionException("Tag cannot be empty!");
+        }
+
+        return new TagNoteCommand(noteId, tag);
     }
 }

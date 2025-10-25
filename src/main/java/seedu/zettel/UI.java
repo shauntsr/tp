@@ -43,14 +43,16 @@ public class UI {
         printLine();
         System.out.println();
         System.out.println(" Available Commands:");
-        System.out.println("   init <repo-name>           - Initialize a new repository");
-        System.out.println("   new -t <title> [-b <body>] - Create a new note");
-        System.out.println("   list [-p]                  - List all notes (or pinned only)");
-        System.out.println("   delete [-f] <note-id>      - Delete a note by ID");
-        System.out.println("   pin <note-id>              - Pin a note");
-        System.out.println("   unpin <note-id>            - Unpin a note");
-        System.out.println("   find <text>                - Search for notes");
-        System.out.println("   bye                        - Exit the application");
+        System.out.println("   init <repo-name>             - Initialize a new repository");
+        System.out.println("   new -t <title> [-b <body>]   - Create a new note");
+        System.out.println("   list [-p]                    - List all notes (or pinned only)");
+        System.out.println("   delete [-f] <note-id>        - Delete a note by ID");
+        System.out.println("   pin <note-id>                - Pin a note");
+        System.out.println("   unpin <note-id>              - Unpin a note");
+        System.out.println("   tag new <tag-name>           - Adds a tag");
+        System.out.println("   tag add <note-id> <tag-name> - Tag a note");
+        System.out.println("   find <text>                  - Search for notes");
+        System.out.println("   bye                          - Exit the application");
         System.out.println();
         printLine();
     }
@@ -194,4 +196,7 @@ public class UI {
         System.out.println(" Repository /" + repoName + " has been created.");
     }
 
+    public void showTaggedNote(String noteID, String tag) {
+        System.out.println(" Note #"+ noteID + " has been tagged with '"+ tag + "'");
+    }
 }

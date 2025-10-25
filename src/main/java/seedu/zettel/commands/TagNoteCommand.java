@@ -50,6 +50,7 @@ public class TagNoteCommand extends Command {
         }
 
         note.addTag(tag);
+        ui.showTaggedNote(noteID, tag);
     }
 
     /**
