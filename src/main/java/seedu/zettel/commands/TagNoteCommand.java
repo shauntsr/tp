@@ -49,6 +49,12 @@ public class TagNoteCommand extends Command {
             throw new TagExistsException("This note is already tagged with '" + tag + "'");
         }
 
+        if (!tags.contains(tag)) {
+            tags.add(tag);
+            storage.updateTags(tags);
+            ui.showTagAdded(tag);
+        }
+
         note.addTag(tag);
         ui.showTaggedNote(noteID, tag);
     }
