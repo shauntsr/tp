@@ -1,4 +1,4 @@
-package seedu.zettel;
+package seedu.zettel.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import seedu.zettel.Note;
 import seedu.zettel.exceptions.ZettelException;
 
 public class StorageTest {

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import seedu.zettel.Note;
-import seedu.zettel.Storage;
+import seedu.zettel.storage.Storage;
 import seedu.zettel.UI;
 import seedu.zettel.exceptions.NoNoteFoundException;
 import seedu.zettel.exceptions.NoNotesException;

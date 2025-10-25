@@ -3,7 +3,7 @@ package seedu.zettel.commands;
 import java.util.ArrayList;
 
 import seedu.zettel.Note;
-import seedu.zettel.Storage;
+import seedu.zettel.storage.Storage;
 import seedu.zettel.UI;
 import seedu.zettel.exceptions.NoNotesException;
 import seedu.zettel.exceptions.ZettelException;

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.io.TempDir;
 import seedu.zettel.exceptions.InvalidInputException;
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
-import seedu.zettel.Storage;
+import seedu.zettel.storage.Storage;
 import seedu.zettel.UI;
 
 import java.io.ByteArrayOutputStream;
