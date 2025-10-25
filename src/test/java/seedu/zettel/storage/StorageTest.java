@@ -140,4 +140,19 @@ public class StorageTest {
         assertEquals("main", lines.get(0).trim()); // first line unchanged
         assertEquals("anotherRepo", lines.get(1).trim()); // second line updated
     }
+
+    @Test
+    void testUpdateTagsWritesToConfig() throws ZettelException, Exception {
+        List<String> tags = List.of("urgent", "work", "personal");
+
+        storage.updateTags(tags);
+
+        Path configFile = tempDir.resolve(".zettelConfig");
+        List<String> lines = Files.readAllLines(configFile);
+
+        assertTrue(lines.size() >= 3, "Config should have at least 3 lines");
+        assertEquals("main", lines.get(0).trim(), "First line should remain the default repo list");
+        assertEquals("main", lines.get(1).trim(), "Second line should remain the current repo");
+        assertEquals("urgent | work | personal", lines.get(2).trim(), "Third line should contain tags");
+    }
 }
