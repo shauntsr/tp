@@ -191,7 +191,9 @@ public class Note {
         return new ArrayList<>(logs); // Return copy to maintain encapsulation
     }
 
-    public List<String> getTags() {return new ArrayList<>(tags);}
+    public List<String> getTags() {
+        return new ArrayList<>(tags);
+    }
     /**
      * Gets the total number of notes created since the application started.
      *
@@ -281,7 +283,10 @@ public class Note {
         this.logs.add(logEntry);
     }
 
-    public void addTag(String tag) {this.tags.add(tag);}
+    public void addTag(String tag) {
+        this.tags.add(tag);
+    }
+
     /**
      * Updates the modifiedAt timestamp to the current time.
      * Called automatically by setters that modify note content.
