@@ -105,8 +105,9 @@ public class NoteSerializer {
                 logs = Arrays.asList(fields[8].split(";;"));
             }
 
+            List<String> tags = new ArrayList<>();
             return new Note(id, title, filename, body, createdAt, modifiedAt,
-                    pinned, archived, archiveName, logs);
+                    pinned, archived, archiveName, logs, tags);
         } catch (Exception e) {
             System.out.println("Skipping corrupted line: " + line);
             return null;
