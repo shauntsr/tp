@@ -1,6 +1,7 @@
 package seedu.zettel.commands;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
@@ -32,12 +33,13 @@ public class InitCommand extends Command {
      * notifies the user of successful initialization.
      *
      * @param notes   The list of notes (not used)
+     * @param tags
      * @param ui      The UI instance for user interaction
      * @param storage The storage instance for file and directory management
      * @throws ZettelException If an error occurs during repository creation
      */
     @Override
-    public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
+    public void execute(ArrayList<Note> notes, List<String> tags, UI ui, Storage storage) throws ZettelException {
         storage.createRepo(repoName);
         ui.showRepoInit(repoName);
     }

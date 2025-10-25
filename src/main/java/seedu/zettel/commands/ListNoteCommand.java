@@ -37,12 +37,13 @@ public class ListNoteCommand extends Command{
      * If no notes are found, appropriate UI messages are displayed.
      *
      * @param notes   The list of all notes
+     * @param tags    The list of current tags.
      * @param ui      The UI instance for user interaction
      * @param storage The storage instance (not used)
      * @throws ZettelException If an error occurs during command execution
      */
     @Override
-    public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException{
+    public void execute(ArrayList<Note> notes, List<String> tags, UI ui, Storage storage) throws ZettelException{
         // Add notes
         notes.sort(Comparator.comparing(Note::getCreatedAt).reversed());
 

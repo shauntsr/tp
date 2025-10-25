@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,11 +25,13 @@ public class ListNoteCommandTest {
     private ArrayList<Note> notes;
     private UI ui;
     private Storage storage;
+    private List<String> tags;
 
     @BeforeEach
     void setUp() {
         System.setOut(new PrintStream(outputStream));
         notes = new ArrayList<>();
+        tags = new ArrayList<>();
         ui = new UI();
         storage = new Storage(FILE_PATH);
     }
@@ -50,7 +53,7 @@ public class ListNoteCommandTest {
         notes.add(newer);
 
         ListNoteCommand cmd = new ListNoteCommand(false);
-        cmd.execute(notes, ui, storage);
+        cmd.execute(notes, tags, ui, storage);
 
         String output = outputStream.toString();
 
@@ -67,7 +70,7 @@ public class ListNoteCommandTest {
     @Test
     void testPrintNoNotes() throws ZettelException {
         ListNoteCommand cmd = new ListNoteCommand(false);
-        cmd.execute(notes, ui, storage);
+        cmd.execute(notes, tags, ui, storage);
 
         String output = outputStream.toString();
         assertTrue(output.contains("No notes found"),
@@ -77,7 +80,7 @@ public class ListNoteCommandTest {
     @Test
     void testPrintNoPinnedNotes() throws ZettelException {
         ListNoteCommand cmd = new ListNoteCommand(true);
-        cmd.execute(notes, ui, storage);
+        cmd.execute(notes, tags, ui, storage);
 
         String output = outputStream.toString();
         assertTrue(output.contains("No pinned notes found. Pin a note to add to this list."),
@@ -101,7 +104,7 @@ public class ListNoteCommandTest {
         notes.add(unpinned);
 
         ListNoteCommand cmd = new ListNoteCommand(true);
-        cmd.execute(notes, ui, storage);
+        cmd.execute(notes, tags, ui, storage);
 
         String output = outputStream.toString();
         assertTrue(output.contains("You have 1 pinned notes:"),
@@ -123,7 +126,7 @@ public class ListNoteCommandTest {
         notes.add(newer);
 
         ListNoteCommand cmd = new ListNoteCommand(false);
-        cmd.execute(notes, ui, storage);
+        cmd.execute(notes, tags, ui, storage);
 
         String output = outputStream.toString();
         assertTrue(output.contains("You have 2 notes"),

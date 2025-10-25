@@ -1,6 +1,7 @@
 package seedu.zettel.commands;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -37,13 +38,14 @@ public class DeleteNoteCommand extends Command {
      * Executes the delete command on the specified note.
      * Prompts for confirmation unless force flag is set.
      *
-     * @param notes The list of all notes
-     * @param ui The UI instance for user interaction
+     * @param notes   The list of all notes
+     * @param tags    The list of current tags.
+     * @param ui      The UI instance for user interaction
      * @param storage The storage instance for persistence
      * @throws ZettelException If the notes list is empty or the note doesn't exist
      */
     @Override
-    public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
+    public void execute(ArrayList<Note> notes, List<String> tags, UI ui, Storage storage) throws ZettelException {
 
         // Validation 1: Check if the notes list is empty
         if (notes.isEmpty()) {

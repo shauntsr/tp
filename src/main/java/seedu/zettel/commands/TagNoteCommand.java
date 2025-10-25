@@ -26,7 +26,7 @@ public class TagNoteCommand extends Command {
     }
 
     @Override
-    public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
+    public void execute(ArrayList<Note> notes, List<String> tags, UI ui, Storage storage) throws ZettelException {
         // Validate Inputs
         validateNoteIdFormat(noteID);
         validateTag(tag);

@@ -79,7 +79,7 @@ public class Zettel {
                 }
 
                 // Execute the command
-                command.execute(notes, ui, storage);
+                command.execute(notes, tags, ui, storage);
 
                 // Save notes after each command (auto-save)
                 storage.save(notes);

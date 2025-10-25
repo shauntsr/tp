@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,11 +40,13 @@ public class NewNoteCommandTest {
     private ArrayList<Note> notes;
     private UI ui;
     private Storage storage;
+    private List<String> tags;
 
     @BeforeEach
     void setUp() {
         System.setOut(new PrintStream(outputStream));
         notes = new ArrayList<>();
+        tags = new ArrayList<>();
         ui = new UI();
         storage = new Storage(tempDir.toString());
         storage.init();
@@ -60,7 +63,7 @@ public class NewNoteCommandTest {
         String body = "Test body";
 
         NewNoteCommand cmd = new NewNoteCommand(title, body);
-        cmd.execute(notes, ui, storage); // storage ignored
+        cmd.execute(notes, tags, ui, storage); // storage ignored
 
         assertEquals(1, notes.size());
 
@@ -94,7 +97,7 @@ public class NewNoteCommandTest {
         NewNoteCommand cmd = new NewNoteCommand(title, body);
 
         ZettelException e = assertThrows(InvalidInputException.class, () -> {
-            cmd.execute(notes, ui, storage);
+            cmd.execute(notes, tags, ui, storage);
         });
         assertEquals("Invalid Input: Note already exists!", e.getMessage(),
                 "Exception thrown with correct message.");
@@ -112,8 +115,8 @@ public class NewNoteCommandTest {
         NewNoteCommand cmd1 = new NewNoteCommand(title1, body);
         NewNoteCommand cmd2 = new NewNoteCommand(title2, body);
 
-        cmd1.execute(notes, ui, storage);
-        cmd2.execute(notes, ui, storage);
+        cmd1.execute(notes, tags, ui, storage);
+        cmd2.execute(notes, tags, ui, storage);
 
         assertEquals(2, notes.size());
 
@@ -136,7 +139,7 @@ public class NewNoteCommandTest {
         String body = "Test body";
 
         NewNoteCommand cmd = new NewNoteCommand(title, body);
-        cmd.execute(notes, ui, storage);
+        cmd.execute(notes, tags, ui, storage);
 
         // Verify note added to list
         assertEquals(1, notes.size());

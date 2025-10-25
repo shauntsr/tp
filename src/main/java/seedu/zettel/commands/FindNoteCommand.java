@@ -1,6 +1,7 @@
 package seedu.zettel.commands;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import seedu.zettel.Note;
 import seedu.zettel.storage.Storage;
@@ -30,12 +31,13 @@ public class FindNoteCommand extends Command{
      * Displays the matching notes or a "no results" message if none are found.
      *
      * @param notes   The list of existing notes
+     * @param tags
      * @param ui      The UI instance for user interaction
      * @param storage The storage instance for persistence
      * @throws ZettelException If the notes list is empty
      */
     @Override
-    public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
+    public void execute(ArrayList<Note> notes, List<String> tags, UI ui, Storage storage) throws ZettelException {
         if (notes.isEmpty()) {
             throw new NoNotesException("There are no notes available to search.");
         }

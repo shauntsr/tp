@@ -1,6 +1,7 @@
 package seedu.zettel.commands;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
@@ -19,11 +20,13 @@ public abstract class Command {
      * This method must be implemented by subclasses to define specific command behavior.
      *
      * @param notes   The list of tasks to operate on.
+     * @param tags    The list of current tags.
      * @param ui      The UI object for displaying output to the user.
      * @param storage The storage object for reading or writing changes to file.
      * @throws ZettelException If an error occurs during command execution.
      */
-    public abstract void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException;
+    public abstract void execute(ArrayList<Note> notes, List<String> tags, UI ui, Storage storage)
+            throws ZettelException;
 
     /**
      * Checks if this command should terminate the application.
