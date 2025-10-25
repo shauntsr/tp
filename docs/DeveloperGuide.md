@@ -231,6 +231,271 @@ The `Command` abstract class defines the interface for all executable commands u
    - Displays farewell message
    - Returns true for `isExit()` check
 
+### PinNoteCommand Implementation
+
+**Overview:**
+
+`PinNoteCommand` provides the ability to mark notes as "pinned" for quick access. Pinned notes appear at the top of list views, making them easily accessible for frequently referenced information. The command supports both pinning (`pin <NOTE_ID>`) and unpinning (`unpin <NOTE_ID>`) operations.
+
+**Design Rationale:**
+
+The implementation uses a four-tier validation strategy to provide clear, specific error messages at each failure point:
+
+1. **Format Validation** - Validates the note ID format before any business logic
+2. **Empty List Check** - Ensures there are notes to operate on
+3. **Existence Check** - Confirms the specific note exists
+4. **State Check** - Prevents redundant operations (pinning already pinned notes, etc.)
+
+This layered approach provides users with precise feedback about what went wrong, rather than generic error messages.
+
+**Class Structure:**
+
+```
+┌─────────────────────────────────┐
+│      PinNoteCommand             │
+├─────────────────────────────────┤
+│ - noteId: String                │
+│ - isPin: boolean                │
+│ - VALID_NOTE_ID_LENGTH: int     │
+│ - VALID_NOTE_ID_REGEX: String   │
+│ - logger: Logger                │
+├─────────────────────────────────┤
+│ + PinNoteCommand(String, bool)  │
+│ + execute(ArrayList, UI, ...)   │
+│ - validateNoteIdFormat(String)  │
+└─────────────────────────────────┘
+```
+
+**Key Implementation Details:**
+
+**1. Note ID Format Validation:**
+
+The command enforces strict note ID format requirements to maintain data integrity:
+- Must be exactly 8 characters long
+- Must contain only lowercase hexadecimal characters (0-9, a-f)
+- Uses regex pattern: `^[a-f0-9]{8}$`
+
+This validation is performed in the private `validateNoteIdFormat()` method:
+
+```java
+private void validateNoteIdFormat(String noteId) throws InvalidFormatException {
+    if (noteId == null || noteId.length() != VALID_NOTE_ID_LENGTH) {
+        throw new InvalidFormatException(
+                "Note ID must be exactly " + VALID_NOTE_ID_LENGTH + " characters long.");
+    }
+    if (!noteId.matches(VALID_NOTE_ID_REGEX)) {
+        throw new InvalidFormatException(
+                "Note ID must contain only lowercase hexadecimal characters (0-9, a-f).");
+    }
+}
+```
+
+**Why this validation exists:**
+- Prevents invalid IDs from reaching the search logic
+- Provides immediate feedback for typos or formatting errors
+- Maintains consistency with the Note ID generation scheme
+- Separates format validation from business logic
+
+**2. Four-Tier Validation Strategy:**
+
+The `execute()` method implements validation in a specific order:
+
+```
+Input: pin a1b2c3d4
+  ↓
+[Validation 1] Format Check
+  ├─ Length = 8? ✓
+  ├─ Matches [a-f0-9]? ✓
+  └─ Pass → Continue
+  ↓
+[Validation 2] Empty List Check
+  ├─ notes.isEmpty()? 
+  ├─ If true → throw NoNotesException
+  └─ If false → Continue
+  ↓
+[Validation 3] Note Existence Check
+  ├─ Find note with ID
+  ├─ If not found → throw InvalidNoteIdException
+  └─ If found → Continue
+  ↓
+[Validation 4] State Check
+  ├─ Is note.isPinned() == isPin?
+  ├─ If true → throw AlreadyPinnedException
+  └─ If false → Continue
+  ↓
+[Happy Path] Execute Operation
+  ├─ Get note from Optional
+  ├─ Set pinned status
+  ├─ Display confirmation
+  └─ Save to storage
+```
+
+**Why this order:**
+1. **Format first** - Fastest check, catches obvious user errors immediately
+2. **Empty list second** - Provides context-specific error ("no notes to pin/unpin")
+3. **Existence third** - Only performs expensive stream search after other validations pass
+4. **State last** - Prevents redundant operations after confirming the note exists
+
+This ordering optimizes for both performance and user experience.
+
+**3. Dual-Purpose Design:**
+
+The command handles both pin and unpin operations through a single boolean flag:
+
+```java
+public PinNoteCommand(String noteId, boolean isPin) {
+    this.noteId = noteId;
+    this.isPin = isPin;  // true = pin, false = unpin
+}
+```
+
+**Why a single command class:**
+- Reduces code duplication (validation logic identical for both operations)
+- Simplifies testing (test both states in one test suite)
+- Makes the codebase more maintainable (single source of truth for pin logic)
+- The Parser creates the appropriate instance based on the command keyword
+
+**4. Stream-Based Note Lookup:**
+
+The command uses Java Streams API for note lookup:
+
+```java
+Optional<Note> maybe = notes.stream()
+    .filter(n -> n.getId().equals(noteId))
+    .findFirst();
+```
+
+**5. Automatic Timestamp Management:**
+
+The `Note.setPinned()` method automatically updates the `modifiedAt` timestamp:
+
+```java
+note.setPinned(isPin);  // Automatically calls updateModifiedAt() internally
+```
+
+This design ensures modification timestamps are always accurate without requiring explicit calls, maintaining data integrity through encapsulation.
+
+**Sequence Diagram - Pin Note Operation:**
+
+```
+User → Parser → PinNoteCommand → Notes → Note → UI → Storage
+ |       |            |            |      |     |       |
+ | pin a1b2c3d4       |            |      |     |       |
+ |------>|            |            |      |     |       |
+ |       | new PinNoteCommand      |      |     |       |
+ |       |----------->|            |      |     |       |
+ |       |            |            |      |     |       |
+ |       |   execute()|            |      |     |       |
+ |       |----------->|            |      |     |       |
+ |       |            | validateFormat()  |     |       |
+ |       |            |----        |      |     |       |
+ |       |            |    |       |      |     |       |
+ |       |            |<----       |      |     |       |
+ |       |            | isEmpty()? |      |     |       |
+ |       |            |----------->|      |     |       |
+ |       |            |<-----------|      |     |       |
+ |       |            | stream()   |      |     |       |
+ |       |            | filter()   |      |     |       |
+ |       |            | findFirst()|      |     |       |
+ |       |            |----------->|      |     |       |
+ |       |            |<-----------|      |     |       |
+ |       |            |                   |     |       |
+ |       |            | get()             |     |       |
+ |       |            |------------------>|     |       |
+ |       |            |                   |     |       |
+ |       |            | isPinned()        |     |       |
+ |       |            |------------------>|     |       |
+ |       |            |<------------------|     |       |
+ |       |            | (check if already pinned)       |
+ |       |            |----        |      |     |       |
+ |       |            |    |       |      |     |       |
+ |       |            |<----       |      |     |       |
+ |       |            |                   |     |       |
+ |       |            | setPinned(true)   |     |       |
+ |       |            |------------------>|     |       |
+ |       |            |                   | updateModifiedAt()
+ |       |            |                   |---  |       |
+ |       |            |                   |  |  |       |
+ |       |            |                   |<--  |       |
+ |       |            |<------------------|     |       |
+ |       |            |                   |     |       |
+ |       |            | showJustPinnedNote()    |       |
+ |       |            |------------------------>|       |
+ |       |            |                   |     |       |
+ |       |            | save(notes)             |       |
+ |       |            |------------------------------->|
+```
+
+**Error Handling Examples:**
+
+```
+Scenario 1: Invalid Format (too short)
+Input: pin abc
+  → InvalidFormatException: "Note ID must be exactly 8 characters long."
+
+Scenario 2: Invalid Format (special characters)
+Input: pin a1b2-3d4
+  → InvalidFormatException: "Note ID must contain only lowercase hexadecimal 
+                             characters (0-9, a-f)."
+
+Scenario 3: Empty Notes List
+Input: pin a1b2c3d4 (with empty list)
+  → NoNotesException: "You have no notes to pin/unpin."
+
+Scenario 4: Note Not Found
+Input: pin 99999999 (valid format, but doesn't exist)
+  → InvalidNoteIdException: "Note with ID '99999999' does not exist."
+
+Scenario 5: Already Pinned
+Input: pin a1b2c3d4 (note is already pinned)
+  → AlreadyPinnedException: "Note with ID 'a1b2c3d4' is already pinned."
+
+Scenario 6: Already Unpinned
+Input: unpin a1b2c3d4 (note is already unpinned)
+  → AlreadyPinnedException: "Note with ID 'a1b2c3d4' is already unpinned."
+
+Scenario 7: Success (Pin)
+Input: pin a1b2c3d4
+  → UI displays: "Pinned note: a1b2c3d4"
+  → Note's pinned status updated to true
+  → Modified timestamp updated automatically
+  → Changes saved to storage
+
+Scenario 8: Success (Unpin)
+Input: unpin a1b2c3d4
+  → UI displays: "Unpinned note: a1b2c3d4"
+  → Note's pinned status updated to false
+  → Modified timestamp updated automatically
+  → Changes saved to storage
+```
+
+**Testing Considerations:**
+
+The implementation is designed for comprehensive testing:
+
+1. **Format Validation Tests** - Handled in `ParserTest` (format validation happens in Parser)
+2. **Empty List Tests** - Handled in `PinNoteCommandTest`
+3. **Note Not Found Tests** - Handled in `PinNoteCommandTest`
+4. **Already Pinned/Unpinned Tests** - Handled in `PinNoteCommandTest`
+5. **Happy Path Tests** - Pin/unpin operations, state changes, timestamp updates
+
+This separation of concerns allows each layer to be tested independently.
+
+**Test Coverage:**
+
+The `PinNoteCommandTest` class includes:
+- `testInvalidFormatTooShortException()` - Tests ID too short
+- `testInvalidFormatTooLongException()` - Tests ID too long
+- `testInvalidFormatSpecialCharactersException()` - Tests invalid characters
+- `testInvalidFormatNullThrowsException()` - Tests null ID
+- `testEmptyNotesListException()` - Tests empty notes list
+- `testNoteIdNotFoundException()` - Tests non-existent note ID
+- `testPinAlreadyPinnedNoteThrowsException()` - Tests pinning an already pinned note
+- `testUnpinAlreadyUnpinnedNoteThrowsException()` - Tests unpinning an already unpinned note
+- `testValidPinNoteCommandNoteIsPinned()` - Tests successful pin operation
+- `testUnpinsNoteAtValidIndexUpdatesPinnedAndModifiedAt()` - Tests successful unpin operation
+
+
 **Command Execution Pattern:**
 
 Each command follows this pattern:
@@ -573,17 +838,15 @@ ZettelCLI solves the problem of **slow, bloated, cloud-dependent note-taking app
 | v2.0    | user                      | sort results by creation date                              | trace my thought evolution                                 |
 | v2.0    | forgetful user            | search notes case-insensitively                            | not have to remember names perfectly                       |
 | v2.0    | user                      | edit existing notes                                        | update and refine my thoughts                              |
-| v3.0    | user                      | link one note to another                                   | build a web of ideas                                       |
-| v3.0    | future-focused user       | create a placeholder link to a note that doesn't exist yet | fill it in later                                           |
-| v3.0    | user revising connections | unlink notes                                               | correct outdated associations                              |
-| v3.0    | busy student              | access linked notes                                        | study immediately related notes                            |
-| v3.0    | organised student         | link notes together                                        | not require much effort to organise them                   |
-| v4.0    | user                      | fuzzy search within content                                | retrieve notes even if I don't remember exact wording      |
-| v4.0    | tag-oriented user         | filter search results by tag                               | narrow scope                                               |
-| v4.0    | speed-focused user        | navigate search results with keyboard shortcuts            | stay efficient                                             |
-| v4.0    | pragmatic user            | rename a tag globally                                      | all affected notes update consistently                     |
-| v4.0    | careless typist           | be warned if I create two tags with similar spellings      | not fragment my notes                                      |
-| v4.0    | visual learner            | generate a graph of linked notes                           | visualise the relationships                                |
+| v2.0    | user                      | link one note to another                                   | build a web of ideas                                       |
+| v2.0    | user revising connections | unlink notes                                               | correct outdated associations                              |
+| v2.0    | busy student              | access linked notes                                        | study immediately related notes                            |
+| v2.0    | organised student         | link notes together                                        | not require much effort to organise them                   |
+| v2.0    | tag-oriented user         | filter search results by tag                               | narrow scope                                               |
+| v2.0    | speed-focused user        | navigate search results with keyboard shortcuts            | stay efficient                                             |
+| v2.0    | pragmatic user            | rename a tag globally                                      | all affected notes update consistently                     |
+| v2.0    | careless typist           | be warned if I create two tags with similar spellings      | not fragment my notes                                      |
+| v2.1    | visual learner            | generate a graph of linked notes                           | visualise the relationships                                |
 
 ## Non-Functional Requirements
 
@@ -647,7 +910,6 @@ ZettelCLI solves the problem of **slow, bloated, cloud-dependent note-taking app
 * **Backlink** - A reverse link showing which notes link to the current note
 * **Note Link** - A connection between two notes that represents a relationship or reference
 * **Placeholder Link** - A link to a note that doesn't exist yet, indicating future content to create
-* **Fuzzy Search** - A search method that finds approximate matches, allowing for typos and variations
 * **CLI** - Command Line Interface; a text-based interface for interacting with the application
 * **Root Path** - The base directory where all ZettelCLI repositories are stored (default: `data/`)
 * **Config File** - `.zettelConfig` file that stores the current active repository name
