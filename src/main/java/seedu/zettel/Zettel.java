@@ -1,6 +1,7 @@
 package seedu.zettel;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -23,7 +24,7 @@ public class Zettel {
 
     private Storage storage;
     private ArrayList<Note> notes;
-    private ArrayList<String> tags;
+    private List<String> tags;
     private UI ui;
     private boolean isRunning;
 
@@ -34,9 +35,9 @@ public class Zettel {
     public Zettel() {
         this.ui = new UI();
         this.storage = new Storage(DATA_FILE_PATH);
-
         storage.init();
         this.notes = storage.load();
+        this.tags = storage.readTagsLine();
         this.isRunning = true;
     }
 

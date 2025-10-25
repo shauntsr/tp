@@ -199,4 +199,8 @@ public class UI {
     public void showTaggedNote(String noteID, String tag) {
         System.out.println(" Note #"+ noteID + " has been tagged with '"+ tag + "'");
     }
+
+    public void showTagAdded(String tag) {
+        System.out.println(" Tag '"+ tag + "' has been added.");
+    }
 }
