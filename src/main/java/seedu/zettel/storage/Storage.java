@@ -143,6 +143,8 @@ public class Storage {
             } else if (lines.size() == 1) {
                 lines.add(newRepo);
                 lines.add(tagsLine);
+            } else if (lines.size() == 2) {
+                lines.add(tagsLine);
             } else {
                 lines.set(1, newRepo);
                 lines.set(2,tagsLine);
