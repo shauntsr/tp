@@ -23,6 +23,7 @@ public class Zettel {
 
     private Storage storage;
     private ArrayList<Note> notes;
+    private ArrayList<String> tags;
     private UI ui;
     private boolean isRunning;
 
@@ -33,6 +34,7 @@ public class Zettel {
     public Zettel() {
         this.ui = new UI();
         this.storage = new Storage(DATA_FILE_PATH);
+
         storage.init();
         this.notes = storage.load();
         this.isRunning = true;

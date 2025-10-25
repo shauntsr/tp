@@ -129,7 +129,7 @@ public class Storage {
         }
     }
 
-    public void updateConfig(String newRepo, List<String> tags) throws ZettelException {
+    public void updateTags(List<String> tags) throws ZettelException {
         fileSystemManager.createConfigFile(DEFAULT_REPO);
         Path configFile = fileSystemManager.getConfigPath();
 
@@ -138,15 +138,15 @@ public class Storage {
             String tagsLine = (tags == null) ? "" : String.join(" | ", tags);
             if (lines.isEmpty()) {
                 lines.add(DEFAULT_REPO);
-                lines.add(newRepo);
+                lines.add(repoName);
                 lines.add(tagsLine);
             } else if (lines.size() == 1) {
-                lines.add(newRepo);
+                lines.add(repoName);
                 lines.add(tagsLine);
             } else if (lines.size() == 2) {
                 lines.add(tagsLine);
             } else {
-                lines.set(1, newRepo);
+                lines.set(1, repoName);
                 lines.set(2,tagsLine);
             }
             Files.write(configFile, lines);
