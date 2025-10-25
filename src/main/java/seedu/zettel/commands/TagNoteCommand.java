@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Command to tag a specific note with a new tag.
+ */
 public class TagNoteCommand extends Command {
     private static final int VALID_NOTE_ID_LENGTH = 8;
     private static final String VALID_NOTE_ID_REGEX = "^[a-f0-9]{8}$";
@@ -20,11 +23,28 @@ public class TagNoteCommand extends Command {
     private final String noteID;
     private final String tag;
 
+    /**
+     * Constructs a TagNoteCommand for a given note ID and tag.
+     *
+     * @param noteID The ID of the note to tag.
+     * @param tag The tag to add to the note.
+     */
     public TagNoteCommand(String noteID, String tag) {
         this.noteID = noteID;
         this.tag = tag;
     }
 
+    /**
+     * Executes the tagging command.
+     * Adds the tag to the note if it does not already exist,
+     * updates global tags if necessary, and shows UI feedback.
+     *
+     * @param notes List of notes in the repository.
+     * @param tags Global list of tags.
+     * @param ui UI object to display messages.
+     * @param storage Storage object to persist changes.
+     * @throws ZettelException If note not found, tag exists, or validation fails.
+     */
     @Override
     public void execute(ArrayList<Note> notes, List<String> tags, UI ui, Storage storage) throws ZettelException {
         // Validate Inputs
