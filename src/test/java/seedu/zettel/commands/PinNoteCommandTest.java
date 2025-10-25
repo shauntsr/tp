@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
 import seedu.zettel.UI;
+import seedu.zettel.exceptions.AlreadyPinnedException;
 import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.InvalidNoteIdException;
 import seedu.zettel.exceptions.NoNotesException;
@@ -147,35 +148,47 @@ public class PinNoteCommandTest {
     }
 
     @Test
-    public void testPinAlreadyPinnedNoteRemainsPinned() throws Exception {
+    public void testPinAlreadyPinnedNoteThrowsException() throws Exception {
         ArrayList<Note> notes = new ArrayList<>();
         notes.add(new Note("abcd1234", "Title", "file.txt", "Body", Instant.now(), Instant.now()));
         Note target = notes.get(0);
 
+        // First, pin the note
         target.setPinned(true);
         assertTrue(target.isPinned());
 
         UI ui = new UI();
         Storage storage = new Storage("build/testdata/pinnote-test.txt");
 
-        new PinNoteCommand("abcd1234", true).execute(notes, ui, storage);
+        // Try to pin it again - should throw AlreadyPinnedException
+        PinNoteCommand command = new PinNoteCommand("abcd1234", true);
+        assertThrows(AlreadyPinnedException.class, () -> {
+            command.execute(notes, ui, storage);
+        });
 
-        assertTrue(target.isPinned(), "Note should still be pinned");
+        // Note should still be pinned
+        assertTrue(target.isPinned(), "Note should still be pinned after exception");
     }
 
     @Test
-    public void testUnpinAlreadyUnpinnedNoteRemainsUnpinned() throws Exception {
+    public void testUnpinAlreadyUnpinnedNoteThrowsException() throws Exception {
         ArrayList<Note> notes = new ArrayList<>();
         notes.add(new Note("abcd1234", "Title", "file.txt", "Body", Instant.now(), Instant.now()));
         Note target = notes.get(0);
 
+        // Note starts unpinned by default
         assertFalse(target.isPinned());
 
         UI ui = new UI();
         Storage storage = new Storage("build/testdata/pinnote-test.txt");
 
-        new PinNoteCommand("abcd1234", false).execute(notes, ui, storage);
+        // Try to unpin an already unpinned note - should throw AlreadyPinnedException
+        PinNoteCommand command = new PinNoteCommand("abcd1234", false);
+        assertThrows(AlreadyPinnedException.class, () -> {
+            command.execute(notes, ui, storage);
+        });
 
-        assertFalse(target.isPinned(), "Note should still be unpinned");
+        // Note should still be unpinned
+        assertFalse(target.isPinned(), "Note should still be unpinned after exception");
     }
 }

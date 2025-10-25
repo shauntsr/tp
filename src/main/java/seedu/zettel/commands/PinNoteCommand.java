@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import seedu.zettel.Note;
 import seedu.zettel.Storage;
 import seedu.zettel.UI;
+import seedu.zettel.exceptions.AlreadyPinnedException;
 import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.InvalidNoteIdException;
 import seedu.zettel.exceptions.NoNotesException;
@@ -80,6 +81,10 @@ public class PinNoteCommand extends Command {
 
         // Happy path: Execute the pin/unpin operation
         Note note = maybe.get();
+        if (note.isPinned() == isPin) {
+            throw new AlreadyPinnedException("Note with ID '" + noteId + "' is already " + 
+                    (isPin ? "pinned." : "unpinned."));
+        }
         note.setPinned(isPin);
         ui.showJustPinnedNote(note, noteId);
         storage.save(notes);
