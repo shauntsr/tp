@@ -1,5 +1,7 @@
 package seedu.zettel.commands;
 
+import seedu.zettel.exceptions.NoNoteFoundException;
+import seedu.zettel.exceptions.NoNotesException;
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
 import seedu.zettel.storage.Storage;
@@ -51,15 +53,14 @@ public class ListNoteCommand extends Command{
                 .filter(n -> !showsPinnedOnly || n.isPinned())
                 .toList();
 
-        // Handle no notes found
+        // Case 1: Cannot find any pinned notes to list
         if (filtered.isEmpty() && showsPinnedOnly) {
-            ui.showNoPinnedNotes();
-            return;
+            throw new NoNotesException("No pinned notes found. Pin a note to add to this list.");
         }
 
+        // Case 2: Cannot find any notes at all to list
         if (filtered.isEmpty()) {
-            ui.showNoNotes();
-            return;
+            throw new NoNotesException("No notes found.");
         }
 
         ui.showNoteList(filtered, showsPinnedOnly);
