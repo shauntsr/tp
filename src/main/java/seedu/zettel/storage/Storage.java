@@ -70,6 +70,24 @@ public class Storage {
         return DEFAULT_REPO;
     }
 
+    public List<String> readTagsLine() {
+        Path configFile = fileSystemManager.getConfigPath();
+        try {
+            List<String> lines = Files.readAllLines(configFile);
+            if (lines.size() >= 3) {
+                String tagsLine = lines.get(2).trim();
+                if (!tagsLine.isEmpty()) {
+                    return Arrays.stream(tagsLine.split("\\|"))
+                            .map(String::trim)
+                            .collect(Collectors.toList());
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Warning: failed to read tags line: " + e.getMessage());
+        }
+        return new ArrayList<>();
+    }
+
     public void createStorageFile(Note note) {
         fileSystemManager.createNoteFile(note.getFilename(), note.getBody(), repoName);
     }
@@ -108,6 +126,32 @@ public class Storage {
             Files.write(configFile, lines);
         } catch (IOException e) {
             throw new ZettelException("Failed to update checked-out repo in .zettelConfig: " + e.getMessage());
+        }
+    }
+
+    public void updateTags(List<String> tags) throws ZettelException {
+        fileSystemManager.createConfigFile(DEFAULT_REPO);
+        Path configFile = fileSystemManager.getConfigPath();
+
+        try (Stream<String> stream = Files.lines(configFile)) {
+            List<String> lines = stream.collect(Collectors.toList());
+            String tagsLine = (tags == null) ? "" : String.join(" | ", tags);
+            if (lines.isEmpty()) {
+                lines.add(DEFAULT_REPO);
+                lines.add(repoName);
+                lines.add(tagsLine);
+            } else if (lines.size() == 1) {
+                lines.add(repoName);
+                lines.add(tagsLine);
+            } else if (lines.size() == 2) {
+                lines.add(tagsLine);
+            } else {
+                lines.set(1, repoName);
+                lines.set(2,tagsLine);
+            }
+            Files.write(configFile, lines);
+        } catch (IOException e) {
+            throw new ZettelException("Failed to update tags line in .zettelConfig: " + e.getMessage());
         }
     }
 

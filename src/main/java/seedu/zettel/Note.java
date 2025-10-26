@@ -36,6 +36,7 @@ public class Note {
     private boolean archived; // Whether the note has been archived
     private String archiveName; // Name of the archive the note belongs to
     private List<String> logs; // History/log data of that individual note
+    private List<String> tags; // Tags for the note
 
     /**
      * Constructor for creating a new note by the user.
@@ -60,6 +61,7 @@ public class Note {
         this.archived = false;
         this.archiveName = null;
         this.logs = new ArrayList<>();
+        this.tags = new ArrayList<>();
         numberOfNotes++;
         logger.info("New note created: ID=" + id + ", title='" + title + "'");
     }
@@ -81,7 +83,7 @@ public class Note {
      */
     public Note(String id, String title, String filename, String body,
                 Instant createdAt, Instant modifiedAt, boolean pinned,
-                boolean archived, String archiveName, List<String> logs) {
+                boolean archived, String archiveName, List<String> logs, List<String> tags) {
         assert id.length() == ID_LENGTH : "Note ID must be " + ID_LENGTH + " characters long";
         this.id = id;
         this.title = title;
@@ -93,6 +95,7 @@ public class Note {
         this.archived = archived;
         this.archiveName = archiveName;
         this.logs = logs != null ? new ArrayList<>(logs) : new ArrayList<>();
+        this.tags = tags != null ? new ArrayList<>(tags) : new ArrayList<>();
         numberOfNotes++;
     }
 
@@ -188,6 +191,9 @@ public class Note {
         return new ArrayList<>(logs); // Return copy to maintain encapsulation
     }
 
+    public List<String> getTags() {
+        return new ArrayList<>(tags);
+    }
     /**
      * Gets the total number of notes created since the application started.
      *
@@ -275,6 +281,10 @@ public class Note {
      */
     public void addLog(String logEntry) {
         this.logs.add(logEntry);
+    }
+
+    public void addTag(String tag) {
+        this.tags.add(tag);
     }
 
     /**

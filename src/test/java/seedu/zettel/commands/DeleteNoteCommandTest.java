@@ -67,7 +67,7 @@ public class DeleteNoteCommandTest {
     @Test
     public void testEmptyNotesListThrowsException() {
         ArrayList<Note> notes = new ArrayList<>();
-
+        List<String> tags = new ArrayList<>();
         TestUI ui = new TestUI();
         Storage storage = new Storage(FILE_PATH) {
             @Override
@@ -78,7 +78,7 @@ public class DeleteNoteCommandTest {
 
         DeleteNoteCommand cmd = new DeleteNoteCommand("12345678", true);
         assertThrows(NoNotesException.class, () -> {
-            cmd.execute(notes, ui, storage);
+            cmd.execute(notes, tags, ui, storage);
         });
     }
     
@@ -86,6 +86,7 @@ public class DeleteNoteCommandTest {
     public void testNoteIdNotFoundException() {
         // Create a list with some notes
         ArrayList<Note> notes = new ArrayList<>();
+        List<String> tags = new ArrayList<>();
         notes.add(new Note("12345678", "Note One", "note1.txt", "Body 1", Instant.now(), Instant.now()));
         notes.add(new Note("abcdefgh", "Note Two", "note2.txt", "Body 2", Instant.now(), Instant.now()));
 
@@ -102,7 +103,7 @@ public class DeleteNoteCommandTest {
 
         // Should throw NoNoteFoundException because the noteId format is valid but the note doesn't exist
         assertThrows(NoNoteFoundException.class, () -> {
-            cmd.execute(notes, ui, storage);
+            cmd.execute(notes, tags, ui, storage);
         });
 
         // Verify that notes list is unchanged (nothing was deleted)
@@ -113,6 +114,7 @@ public class DeleteNoteCommandTest {
     @Test // test deleting an existing note with force
     public void testDeleteNoteWithForce() throws ZettelException {
         ArrayList<Note> notes = new ArrayList<>();
+        List<String> tags = new ArrayList<>();
         notes.add(new Note("12345678", "Note One", "note1.txt", "Body 1", Instant.now(), Instant.now()));
         notes.add(new Note("abcdefgh", "Note Two", "note2.txt", "Body 2", Instant.now(), Instant.now()));
 
@@ -125,7 +127,7 @@ public class DeleteNoteCommandTest {
         };
 
         DeleteNoteCommand cmd = new DeleteNoteCommand("12345678", true);
-        cmd.execute(notes, ui, storage);
+        cmd.execute(notes, tags, ui, storage);
 
         assertTrue(ui.containsEvent("noteDeleted:12345678"), "expected UI to record noteDeleted:12345678");
         assertEquals(1, notes.size());
@@ -137,6 +139,7 @@ public class DeleteNoteCommandTest {
         System.setIn(new ByteArrayInputStream(userInput.getBytes()));
 
         ArrayList<Note> notes = new ArrayList<>();
+        List<String> tags = new ArrayList<>();
         notes.add(new Note("12345678", "Note One", "note1.txt", "Body 1", Instant.now(), Instant.now()));
         notes.add(new Note("abcdefgh", "Note Two", "note2.txt", "Body 2", Instant.now(), Instant.now()));
 
@@ -149,7 +152,7 @@ public class DeleteNoteCommandTest {
         };
 
         DeleteNoteCommand cmd = new DeleteNoteCommand("abcdefgh", false);
-        cmd.execute(notes, ui, storage);
+        cmd.execute(notes, tags, ui, storage);
 
         assertTrue(ui.containsEvent("noteDeleted:abcdefgh"), "expected UI to record noteDeleted:abcdefgh");
         assertEquals(1, notes.size());
@@ -161,6 +164,7 @@ public class DeleteNoteCommandTest {
         System.setIn(new ByteArrayInputStream(userInput.getBytes()));
 
         ArrayList<Note> notes = new ArrayList<>();
+        List<String> tags = new ArrayList<>();
         notes.add(new Note("12345678", "Note One", "note1.txt", "Body 1", Instant.now(), Instant.now()));
         notes.add(new Note("abcdefgh", "Note Two", "note2.txt", "Body 2", Instant.now(), Instant.now()));
 
@@ -173,7 +177,7 @@ public class DeleteNoteCommandTest {
         };
 
         DeleteNoteCommand cmd = new DeleteNoteCommand("12345678", false);
-        cmd.execute(notes, ui, storage);
+        cmd.execute(notes, tags, ui, storage);
 
         assertTrue(ui.containsEvent("cancelled"), "expected UI to record cancelled");
         assertEquals(2, notes.size());
@@ -185,6 +189,7 @@ public class DeleteNoteCommandTest {
         System.setIn(new ByteArrayInputStream(userInput.getBytes()));
 
         ArrayList<Note> notes = new ArrayList<>();
+        List<String> tags = new ArrayList<>();
         notes.add(new Note("12345678", "Note One", "note1.txt", "Body 1", Instant.now(), Instant.now()));
 
         TestUI ui = new TestUI();
@@ -196,7 +201,7 @@ public class DeleteNoteCommandTest {
         };
 
         DeleteNoteCommand cmd = new DeleteNoteCommand("12345678", false);
-        cmd.execute(notes, ui, storage);
+        cmd.execute(notes, tags, ui, storage);
 
         assertTrue(ui.containsEvent("noteDeleted:12345678"), "expected UI to record noteDeleted:12345678");
         assertEquals(0, notes.size());

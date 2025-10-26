@@ -55,8 +55,9 @@ public class NoteTest {
     @DisplayName("Test full constructor for loading a note")
     void testFullConstructor() {
         List<String> logs = List.of("Log entry 1", "Log entry 2");
+        List<String> tags = List.of("Homework");
         Note loadedNote = new Note(id, title, filename, body, createdAt, modifiedAt,
-                true, true, "my-archive", logs);
+                true, true, "my-archive", logs, tags);
 
         assertEquals(id, loadedNote.getId());
         assertEquals(title, loadedNote.getTitle());
@@ -65,13 +66,15 @@ public class NoteTest {
         assertEquals("my-archive", loadedNote.getArchiveName());
         assertEquals(2, loadedNote.getLogs().size());
         assertEquals("Log entry 1", loadedNote.getLogs().get(0));
+        assertEquals(1, loadedNote.getTags().size());
+        assertEquals("Homework", loadedNote.getTags().get(0));
     }
 
     @Test
     @DisplayName("Test full constructor with null logs list")
     void testFullConstructorWithNullLogs() {
         Note loadedNote = new Note(id, title, filename, body, createdAt, modifiedAt,
-                false, false, null, null);
+                false, false, null, null,null);
         assertNotNull(loadedNote.getLogs(), "Logs list should be initialized to an empty list, not null.");
         assertTrue(loadedNote.getLogs().isEmpty(), "Logs list should be empty when loaded with null.");
     }

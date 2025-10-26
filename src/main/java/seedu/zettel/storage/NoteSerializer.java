@@ -19,6 +19,8 @@ import seedu.zettel.Note;
  */
 public class NoteSerializer {
 
+    static final String LIST_DELIM = ";;";
+
     public ArrayList<Note> loadNotes(Path indexPath, Path notesDir) {
         try (Stream<String> lines = Files.lines(indexPath)) {
             return lines.map(this::parseIndex)
@@ -67,11 +69,12 @@ public class NoteSerializer {
     }
 
     private String toIndexFormat(Note note) {
-        String logsStr = String.join(";;", note.getLogs());
+        String logsStr = String.join(LIST_DELIM, note.getLogs());
+        String tagsStr = String.join(LIST_DELIM, note.getTags());
         String filename = note.getFilename() != null ? note.getFilename() : "";
         String archiveName = note.getArchiveName() != null ? note.getArchiveName() : "";
 
-        return String.format("%s | %s | %s | %s | %s | %s | %s | %s | %s",
+        return String.format("%s | %s | %s | %s | %s | %s | %s | %s | %s | %s",
                 note.getId(),
                 note.getTitle(),
                 filename,
@@ -80,7 +83,9 @@ public class NoteSerializer {
                 note.isPinned() ? "1" : "0",
                 note.isArchived() ? "1" : "0",
                 archiveName,
-                logsStr);
+                logsStr,
+                tagsStr
+        );
     }
 
     private Note parseIndex(String line) {
@@ -102,11 +107,17 @@ public class NoteSerializer {
 
             List<String> logs = new ArrayList<>();
             if (fields.length > 8 && !fields[8].isEmpty()) {
-                logs = Arrays.asList(fields[8].split(";;"));
+                logs = Arrays.asList(fields[8].split(LIST_DELIM));
+            }
+
+            String tagsStr = fields[9];
+            List<String> tags = new ArrayList<>();
+            if (!tagsStr.isEmpty()) {
+                tags = Arrays.asList(tagsStr.split(LIST_DELIM));
             }
 
             return new Note(id, title, filename, body, createdAt, modifiedAt,
-                    pinned, archived, archiveName, logs);
+                    pinned, archived, archiveName, logs, tags);
         } catch (Exception e) {
             System.out.println("Skipping corrupted line: " + line);
             return null;

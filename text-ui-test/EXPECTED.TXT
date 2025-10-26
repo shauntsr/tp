@@ -4,27 +4,29 @@ ____________________________________________________________
 ____________________________________________________________
 
  Available Commands:
-   init <repo-name>           - Initialize a new repository
-   new -t <title> [-b <body>] - Create a new note
-   list [-p]                  - List all notes (or pinned only)
-   delete [-f] <note-id>      - Delete a note by ID
-   pin <note-id>              - Pin a note
-   unpin <note-id>            - Unpin a note
-   find <text>                - Search for notes
-   bye                        - Exit the application
+   init <repo-name>             - Initialize a new repository
+   new -t <title> [-b <body>]   - Create a new note
+   list [-p]                    - List all notes (or pinned only)
+   delete [-f] <note-id>        - Delete a note by ID
+   pin <note-id>                - Pin a note
+   unpin <note-id>              - Unpin a note
+   tag new <tag-name>           - Adds a tag
+   tag add <note-id> <tag-name> - Tag a note
+   find <text>                  - Search for notes
+   bye                          - Exit the application
 
 ____________________________________________________________
 Created note file: test1.txt
-Note created: test1.txt #9c425955
+Note created: test1.txt #0cd63872
 Created note file: test2.txt
-Note created: test2.txt #b68f6e65
+Note created: test2.txt #4d0474d5
 Created note file: test3.txt
-Note created: test3.txt #d7ea4477
+Note created: test3.txt #150f67b6
 You have 3 notes:
-    1. test3.txt 2025-10-22 d7ea4477
-    2. test2.txt 2025-10-22 b68f6e65
-    3. test1.txt 2025-10-22 9c425955
+    1. test3.txt 2025-10-26 150f67b6
+    2. test2.txt 2025-10-26 4d0474d5
+    3. test1.txt 2025-10-26 0cd63872
  Here are the matching notes in your list:
- 1. test3.txt 2025-10-22 d7ea4477
- 2. test2.txt 2025-10-22 b68f6e65
- 3. test1.txt 2025-10-22 9c425955
+ 1. test3.txt 2025-10-26 150f67b6
+ 2. test2.txt 2025-10-26 4d0474d5
+ 3. test1.txt 2025-10-26 0cd63872

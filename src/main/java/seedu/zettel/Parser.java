@@ -1,5 +1,6 @@
 package seedu.zettel;
 
+import seedu.zettel.commands.NewTagCommand;
 import seedu.zettel.commands.Command;
 import seedu.zettel.commands.DeleteNoteCommand;
 import seedu.zettel.commands.ExitCommand;
@@ -8,6 +9,7 @@ import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.ListNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.PinNoteCommand;
+import seedu.zettel.commands.TagNoteCommand;
 import seedu.zettel.exceptions.EmptyDescriptionException;
 import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.InvalidInputException;
@@ -24,7 +26,11 @@ public class Parser {
     private static final String PIN_FORMAT = "Pin format should be: pin/unpin <NOTE_ID>";
     private static final String DELETE_FORMAT = "Delete format should be: delete [-f] <NOTE_ID>";
     private static final String NOTE_FORMAT = "New note format should be: new -t <TITLE> [-b <BODY>]";
+    private static final String TAG_FORMAT = "Tag command requires a subcommand: new/add";
+    private static final String TAG_NOTE_FORMAT = "Tag note command format should be: tag <NOTE_ID> <TAG>";
+    private static final String NEW_TAG_FORMAT = "Tag add command format should be: tag add <TAG>";
     private static final String NOTE_EMPTY = "Note title cannot be empty!";
+    private static final String TAG_EMPTY = "Tag cannot be empty!";
     private static final String ID_EMPTY = "Please specify a Note ID to ";
     private static final String ID_INVALID = "Note ID must be exactly 8 hexadecimal characters (0-9, a-f)";
     private static final String INIT_EMPTY = "Please specify a repo name!";
@@ -57,6 +63,7 @@ public class Parser {
         case "unpin" -> parsePinNoteCommand(inputs, false);
         case "init" -> parseInitCommand(input);
         case "find" -> parseFindNoteCommand(input);
+        case "tag" -> parseTagCommand(inputs);
         default -> throw new InvalidInputException(command);
         };
     }
@@ -224,5 +231,65 @@ public class Parser {
         }
 
         return idString;
+    }
+
+    private static Command parseTagCommand(String[] inputs) throws ZettelException {
+        if (inputs.length < 2) {
+            throw new InvalidFormatException(TAG_FORMAT);
+        }
+
+        String subCommand = inputs[1].toLowerCase();
+
+        return switch (subCommand) {
+        case "add" -> parseTagNoteCommand(inputs);
+        case "new" -> parseNewTagCommand(inputs);
+        default -> throw new InvalidFormatException(TAG_FORMAT);
+        };
+    }
+
+    /**
+     * Parses a tag command to add a tag to a note.
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return A TagNoteCommand object with the note ID and tag.
+     * @throws ZettelException If the format is invalid or parameters are missing.
+     */
+    private static Command parseTagNoteCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 4) {
+            throw new InvalidFormatException(TAG_NOTE_FORMAT);
+        }
+
+        String noteId = inputs[2].trim();
+        if (!noteId.matches(VALID_NOTE_ID_REGEX)) {
+            throw new InvalidFormatException(ID_INVALID);
+        }
+
+        String tag = inputs[3].trim();
+
+        if (tag.isEmpty()) {
+            throw new EmptyDescriptionException(TAG_EMPTY);
+        }
+
+        return new TagNoteCommand(noteId, tag);
+    }
+
+    /**
+     * Parses a new tag command to add a new tag to the config file.
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return An AddTagCommand object with the tag to add.
+     * @throws ZettelException If the format is invalid or tag is missing.
+     */
+    private static Command parseNewTagCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 3) {
+            throw new InvalidFormatException(NEW_TAG_FORMAT);
+        }
+
+        String tag = inputs[2].trim();
+        if (tag.isEmpty()) {
+            throw new EmptyDescriptionException(TAG_EMPTY);
+        }
+
+        return new NewTagCommand(tag);
     }
 }

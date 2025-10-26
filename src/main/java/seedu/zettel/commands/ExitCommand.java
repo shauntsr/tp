@@ -6,6 +6,7 @@ import seedu.zettel.storage.Storage;
 import seedu.zettel.UI;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Command to exit the Zettel application.
@@ -16,10 +17,11 @@ public class ExitCommand extends Command {
     /**
      * Executes the exit command by displaying a goodbye message to the user.
      *
-     * @param ui The UI object for displaying the goodbye message.
+     * @param tags The list of current tags.
+     * @param ui   The UI object for displaying the goodbye message.
      */
     @Override
-    public void execute(ArrayList<Note> notes, UI ui, Storage storage) throws ZettelException {
+    public void execute(ArrayList<Note> notes, List<String> tags, UI ui, Storage storage) throws ZettelException {
         ui.showBye();
     }
 
