@@ -1,6 +1,5 @@
 package seedu.zettel.commands;
 
-import seedu.zettel.exceptions.NoNoteFoundException;
 import seedu.zettel.exceptions.NoNotesException;
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
