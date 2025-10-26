@@ -222,12 +222,22 @@ The `Command` abstract class defines the interface for all executable commands u
    - Searches in note body content
    - Returns all matching notes
 
-6. **InitCommand** - Initializes a repository
+6. **AddTagCommand** - Adds a tag
+    - Validates that tag does not already exist in `.zettelConfig`
+    - Update `.zettelConfig` with added tag
+    - Displays tag added message
+   
+7. **TagNoteCommand** - Adds a tag
+    - Validates that the note does not already have the tag
+    - Update `.zettelConfig` with added tag if it does not exist
+    - Displays tag added message
+
+8. **InitCommand** - Initializes a repository
    - Validates repository name format
    - Creates repository structure
    - Displays confirmation message
 
-7. **ExitCommand** - Exits the application
+9. **ExitCommand** - Exits the application
    - Displays farewell message
    - Returns true for `isExit()` check
 
