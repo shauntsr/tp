@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -37,6 +38,8 @@ public class Note {
     private String archiveName; // Name of the archive the note belongs to
     private List<String> logs; // History/log data of that individual note
     private List<String> tags; // Tags for the note
+    private HashSet<String> linkedTo; // note IDs that this note references
+    private HashSet<String> linkedBy; // note IDs of notes that reference this note
 
     /**
      * Constructor for creating a new note by the user.
@@ -62,6 +65,8 @@ public class Note {
         this.archiveName = null;
         this.logs = new ArrayList<>();
         this.tags = new ArrayList<>();
+        this.linkedTo = new HashSet<>();
+        this.linkedBy = new HashSet<>();
         numberOfNotes++;
         logger.info("New note created: ID=" + id + ", title='" + title + "'");
     }
@@ -96,6 +101,8 @@ public class Note {
         this.archiveName = archiveName;
         this.logs = logs != null ? new ArrayList<>(logs) : new ArrayList<>();
         this.tags = tags != null ? new ArrayList<>(tags) : new ArrayList<>();
+        this.linkedTo = linkedTo != null ? new HashSet<>(linkedTo) : new HashSet<>();
+        this.linkedBy = linkedBy != null ? new HashSet<>(linkedBy) : new HashSet<>();
         numberOfNotes++;
     }
 
@@ -173,6 +180,26 @@ public class Note {
         return archived;
     }
 
+    /** 
+     * Checks if another note is linked to this note.
+     *
+     * @param noteId The ID of the note to check
+     * @return true if the note is linked, false otherwise
+     */
+    public boolean isLinkedTo(String noteId) {
+        return linkedTo.contains(noteId);
+    }
+
+    /** 
+     * Checks if another note is linked by this note.
+     *
+     * @param noteId The ID of the note to check
+     * @return true if the note is linked, false otherwise
+     */
+    public boolean isLinkedBy(String noteId) {
+        return linkedBy.contains(noteId);
+    }
+
     /**
      * Gets the archive name if this note is archived.
      *
@@ -201,6 +228,24 @@ public class Note {
      */
     public static int getNumberOfNotes() {
         return numberOfNotes;
+    }
+
+    /** 
+     * Gets the set of noteIds that this note references.
+     *
+     * @return a hash set of note IDs that this note references
+     */
+    public HashSet<String> getLinkedTo() {
+        return new HashSet<>(linkedTo);
+    }
+
+    /** 
+     * Gets the set of noteIds that this note is referenced by.
+     *
+     * @return a hash set of note IDs that reference this note
+     */
+    public HashSet<String> getLinkedBy() {
+        return new HashSet<>(linkedBy);
     }
 
     // Setters
@@ -285,6 +330,23 @@ public class Note {
 
     public void addTag(String tag) {
         this.tags.add(tag);
+    }
+
+    /**
+     * Adds a note ID to the "linkedTo" set.
+     *
+     * @param noteId The note ID to add
+     */
+    public void addLinkedTo(String noteId) {
+        this.linkedTo.add(noteId);
+    }
+    /**
+     * Adds a note ID to the "linkedBy" set.
+     *
+     * @param noteId The note ID to add
+     */
+    public void addLinkedBy(String noteId) {
+        this.linkedBy.add(noteId);
     }
 
     /**

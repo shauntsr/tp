@@ -1,16 +1,16 @@
 package seedu.zettel.commands;
 
-import seedu.zettel.Note;
-import seedu.zettel.UI;
-import seedu.zettel.exceptions.InvalidFormatException;
-import seedu.zettel.exceptions.NoNoteFoundException;
-import seedu.zettel.exceptions.TagExistsException;
-import seedu.zettel.exceptions.ZettelException;
-import seedu.zettel.storage.Storage;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import seedu.zettel.Note;
+import seedu.zettel.UI;
+import seedu.zettel.exceptions.InvalidFormatException;
+import seedu.zettel.exceptions.InvalidNoteIdException;
+import seedu.zettel.exceptions.TagAlreadyExistsException;
+import seedu.zettel.exceptions.ZettelException;
+import seedu.zettel.storage.Storage;
 
 /**
  * Command to tag a specific note with a new tag.
@@ -56,7 +56,7 @@ public class TagNoteCommand extends Command {
                 .filter(n -> n.getId().equals(noteID))
                 .findFirst();
         if (noteOpt.isEmpty()) {
-            throw new NoNoteFoundException("Note with ID '"+ noteID + "' does not exist.");
+            throw new InvalidNoteIdException("Note with ID '"+ noteID + "' does not exist.");
         }
 
         Note note = noteOpt.get();
@@ -66,7 +66,7 @@ public class TagNoteCommand extends Command {
         boolean tagExists = tagList.stream()
                 .anyMatch(n -> n.equals(tag));
         if (tagExists) {
-            throw new TagExistsException("This note is already tagged with '" + tag + "'");
+            throw new TagAlreadyExistsException("This note is already tagged with '" + tag + "'");
         }
 
         if (!tags.contains(tag)) {

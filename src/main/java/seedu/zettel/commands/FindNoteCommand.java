@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import seedu.zettel.Note;
-import seedu.zettel.storage.Storage;
 import seedu.zettel.UI;
 import seedu.zettel.exceptions.NoNotesException;
 import seedu.zettel.exceptions.ZettelException;
+import seedu.zettel.storage.Storage;
 
 /**
  * Command to find notes containing a given keyword in their body.
@@ -49,9 +49,9 @@ public class FindNoteCommand extends Command{
             }
         }
         if (matchedNotes.isEmpty()) {
-            ui.showNoNotesFoundMessage();
+            ui.showNoNotesFound();
         } else {
-            ui.showFoundNotesMessage(matchedNotes);
+            ui.showFoundNotes(matchedNotes);
         }
     }
 }

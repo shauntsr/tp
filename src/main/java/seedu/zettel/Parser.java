@@ -1,13 +1,16 @@
 package seedu.zettel;
 
-import seedu.zettel.commands.NewTagCommand;
+import java.util.Arrays;
+
 import seedu.zettel.commands.Command;
 import seedu.zettel.commands.DeleteNoteCommand;
 import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.FindNoteCommand;
 import seedu.zettel.commands.InitCommand;
+import seedu.zettel.commands.LinkNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
+import seedu.zettel.commands.NewTagCommand;
 import seedu.zettel.commands.PinNoteCommand;
 import seedu.zettel.commands.TagNoteCommand;
 import seedu.zettel.exceptions.EmptyDescriptionException;
@@ -24,11 +27,15 @@ public class Parser {
     // Categorised between empty, format and invalid
     private static final String LIST_FORMAT = "List format should be: list [-p]";
     private static final String PIN_FORMAT = "Pin format should be: pin/unpin <NOTE_ID>";
+    private static final String INIT_FORMAT = "Init format should be: init <REPO_NAME>";
     private static final String DELETE_FORMAT = "Delete format should be: delete [-f] <NOTE_ID>";
+    private static final String FIND_FORMAT = "Find format should be: find <SEARCH_TERM>";
     private static final String NOTE_FORMAT = "New note format should be: new -t <TITLE> [-b <BODY>]";
     private static final String TAG_FORMAT = "Tag command requires a subcommand: new/add";
     private static final String TAG_NOTE_FORMAT = "Tag note command format should be: tag <NOTE_ID> <TAG>";
     private static final String NEW_TAG_FORMAT = "Tag add command format should be: tag add <TAG>";
+    private static final String LINK_NOTES_FORMAT = "Link notes command format should be: link" 
+            + " <NOTE_ID_LINKED_TO> <NOTE_ID_LINKED_BY>";
     private static final String NOTE_EMPTY = "Note title cannot be empty!";
     private static final String TAG_EMPTY = "Tag cannot be empty!";
     private static final String ID_EMPTY = "Please specify a Note ID to ";
@@ -56,14 +63,15 @@ public class Parser {
         String command = inputs[0].toLowerCase(); //first word of user input
         return switch (command) {
         case "bye" -> new ExitCommand();
-        case "list" -> parseListNoteCommand(input);
-        case "new" -> parseNewNoteCommand(input);
+        case "list" -> parseListNoteCommand(inputs);
+        case "new" -> parseNewNoteCommand(inputs);
         case "delete" -> parseDeleteNoteCommand(inputs);
         case "pin" -> parsePinNoteCommand(inputs, true);
         case "unpin" -> parsePinNoteCommand(inputs, false);
-        case "init" -> parseInitCommand(input);
-        case "find" -> parseFindNoteCommand(input);
+        case "init" -> parseInitCommand(inputs);
+        case "find" -> parseFindNoteCommand(inputs);
         case "tag" -> parseTagCommand(inputs);
+        case "link" -> parseLinkNotesCommand(inputs);
         default -> throw new InvalidInputException(command);
         };
     }
@@ -76,11 +84,14 @@ public class Parser {
      * @return A ListNoteCommand object with the appropriate filter flag.
      * @throws ZettelException If the command format is invalid.
      */
-    private static Command parseListNoteCommand(String input) throws ZettelException {
-        String content = input.substring(4).trim();
-        if (content.isEmpty()) {
+    private static Command parseListNoteCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 1 && inputs.length != 2) {
+            throw new InvalidFormatException(LIST_FORMAT);
+        }
+        // command is for sure either "list" or "list <something>"
+        if (inputs.length == 1) {
             return new ListNoteCommand(false);
-        } else if (!content.equals("-p")) {
+        } else if (!inputs[1].equals("-p")) {
             throw new InvalidFormatException(LIST_FORMAT);
         }
         return new ListNoteCommand(true);
@@ -94,8 +105,16 @@ public class Parser {
      * @return An InitCommand object with the specified repository name.
      * @throws ZettelException If the repository name is empty or contains invalid characters.
      */
-    private static Command parseInitCommand(String input) throws ZettelException {
-        String content = input.substring(4).trim();
+    private static Command parseInitCommand(String[] inputs) throws ZettelException {
+        if (inputs.length < 2) {
+            throw new EmptyDescriptionException(INIT_EMPTY);
+        }
+        
+        if (inputs.length != 2) {
+            throw new InvalidFormatException(INIT_FORMAT);
+        }
+
+        String content = inputs[1].trim();
         if (content.isEmpty()) {
             throw new EmptyDescriptionException(INIT_EMPTY);
         }
@@ -115,9 +134,9 @@ public class Parser {
      * @return A NewNoteCommand object with the extracted title and body.
      * @throws ZettelException If the format is invalid, title flag is missing, or title is empty.
      */
-    private static Command parseNewNoteCommand(String input) throws ZettelException {
+    private static Command parseNewNoteCommand(String[] inputs) throws ZettelException {
         try {
-            String content = input.substring(3).trim();
+            String content = String.join(" ", Arrays.copyOfRange(inputs, 1, inputs.length)).trim();
 
             int titleIndex = content.indexOf("-t");
             int bodyIndex = content.indexOf("-b");
@@ -154,8 +173,12 @@ public class Parser {
      * @return A FindNoteCommand object with the search query.
      * @throws ZettelException If the search query is empty.
      */
-    private static Command parseFindNoteCommand(String input) throws ZettelException {
-        String content = input.substring(4).trim();
+    private static Command parseFindNoteCommand(String[] inputs) throws ZettelException {
+        if (inputs.length < 2) {
+            throw new EmptyDescriptionException("Search cannot be empty!");
+        }
+
+        String content = inputs[1].trim();
         if (content.isEmpty()) {
             throw new EmptyDescriptionException("Search cannot be empty!");
         }
@@ -291,5 +314,23 @@ public class Parser {
         }
 
         return new NewTagCommand(tag);
+    }
+
+    /**
+     * Parses a link notes command to create a unidirectional link between two notes.
+     * @param inputs The tokenized user input split by spaces.
+     * @return A LinkNotesCommand object with the note IDs to link.
+     * @throws ZettelException If the format is invalid or parameters are missing.
+     */
+
+    private static Command parseLinkNotesCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 3) {
+            throw new InvalidFormatException(LINK_NOTES_FORMAT);
+        }
+
+        String noteIdLinkedTo = inputs[1].trim();
+        String noteIdLinkedBy = inputs[2].trim();
+
+        return new LinkNotesCommand(noteIdLinkedTo, noteIdLinkedBy);
     }
 }
