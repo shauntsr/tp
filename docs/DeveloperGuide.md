@@ -636,84 +636,97 @@ A static `numberOfNotes` counter tracks total notes created during application r
 
 ### Storage Component
 
-The `Storage` class manages all file I/O operations and repository management.
+The `Storage` class is responsible for all file I/O and repository management in Zettel.
+It provides a persistent filesystem-based backend that stores note metadata, bodies, and repository configurations.
 
 **Key Responsibilities:**
-- Initialize and manage repository structure
-- Save and load notes from disk
-- Handle multiple repositories
-- Maintain configuration state
+
+- Initialize and validate repository structures
+- Create, load, and save individual note files
+- Maintain `.zettelConfig`
+- Support creating and switching repositories
+- Detect and repair missing or orphaned files
 
 **Repository Structure:**
 ```
-<root>/
-├── data/                 # Root data directory
-│   ├── main/             # Default repository
-│   │   ├── notes/        # Active notes folder
-│   │   ├── archive/      # Archived notes folder
-│   │   └── index.json    # Repository index
-│   └── .zettelConfig     # Active repository config
-├── commands/             # Command classes
-│   ├── Command           # Abstract base class
-│   ├── NewNoteCommand    # Create new note
-│   ├── ListNoteCommand   # List notes
-│   ├── DeleteNoteCommand # Delete note
-│   ├── PinNoteCommand    # Pin/unpin note
-│   ├── FindNoteCommand   # Search notes
-│   ├── TagNoteCommand    # Tag a note
-│   ├── NewTagCommand     # Add a new tag
-│   └── InitCommand       # Init repository
-├── exceptions/           # Custom exceptions
-├── Note                  # Note model
-├── Parser                # Input parser
-├── Storage               # File handling
-├── UI                    # User interface
-└── Zettel (main)         # Main entry point
+<root>/data/
+├── main/                    # Default repository
+│   ├── notes/               # Folder containing individual note .txt files
+│   ├── archive/             # Folder containing archived notes
+│   └── index.txt            # Metadata for all notes in this repository
+├── otherRepo/               # Additional repositories
+│   ├── notes/
+│   ├── archive/
+│   └── index.txt
+└── .zettelConfig            # Global config file
 ```
+
+**Configuration File:**
+
+Zettel tracks available repositories and the currently active one through `.zettelConfig`.
+
+Format:
+```
+main | repo2 | repo3
+main
+```
+- Line 1 — List of all repository names (pipe | separated)
+- Line 2 — Name of the currently active repository
+- The file is automatically created and updated as repositories are added or switched.
+- If malformed, Zettel gracefully defaults to main.
 
 **Class Diagram:**
 ```
-┌─────────────────────────┐
-│       Storage           │
-├─────────────────────────┤
-│ - rootPath: Path        │
-│ - repoName: String      │
-├─────────────────────────┤
-│ + init(): void          │
-│ + load(): ArrayList     │
-│ + save(List): void      │
-│ + createRepo(String)    │
-│ + changeRepo(String)    │
-│ + updateTags(String)    │
-└─────────────────────────┘
+┌─────────────────────────────────┐
+│             Storage             │
+├─────────────────────────────────┤
+│ - rootPath: Path                │
+│ - repoName: String              │
+│ - repoList: ArrayList<String>   │
+├─────────────────────────────────┤
+│ + init(): void                  │
+│ + load(): ArrayList<Note>       │
+│ + save(List<Note>): void        │
+│ + createRepo(String): void      │
+│ + changeRepo(String): void      │
+│ + createStorageFile(Note): void │
+│ + validateRepo(String): void    │
+└─────────────────────────────────┘
 ```
 
-**Save Format:**
+**Data Persistence Model:**
 
-Each note is stored as a single line with pipe-delimited fields:
+Each note’s data is split into metadata (stored in `index.txt`) and content (stored in its own .txt file).
+
+Each line in `index.txt` represents a note entry with pipe-delimited fields:
 ```
-id | title | filename | body | createdAt | modifiedAt | pinned | archived | archiveName | logs | tags
+id | title | filename | createdAt | modifiedAt | pinned | archived | archiveName | logs
+```
+Field Details:
+
+
+## Note Field Details
+
+| **Field**       | **Description** |
+|-----------------|-----------------|
+| `id`            | Unique note ID |
+| `title`         | Note title |
+| `filename`      | Corresponding `.txt` filename |
+| `createdAt` / `modifiedAt` | ISO-8601 timestamps |
+| `pinned`        | `1` if pinned, else `0` |
+| `archived`      | `1` if archived, else `0` |
+| `archiveName`   | Name of archive folder (empty if not archived) |
+| `logs`          | Concatenated note history entries, separated by `;;` |
+
+Each note’s text content is stored separately in:
+```
+data/<repoName>/notes/<filename>.txt
 ```
 
 Special handling:
-- Newlines in body are escaped as `\\n`
 - Multiple logs are separated by `;;`
 - Multiple tags are separated by `;;`
 - Empty archiveName stored as empty string
-
-**Sequence Diagram - Saving Notes:**
-```
-Zettel  →  Storage
-  |            |
-  |            |
-  |            |
-  |save(notes) |
-  |----------->|
-  |            | toSaveFormat()
-  |            | Files.write()
-  |<-----------|
-  |            |
-```
 
 ### Repository Management
 
@@ -730,39 +743,66 @@ Zettel  →  Storage
 
 **Code Snippet:**
 ```java
-public void changeRepo(String repoName) {
+public void changeRepo(String newRepo) {
+    if (!repoList.contains(newRepo)) {
+        System.out.println("Repo '" + newRepo + "' does not exist. Falling back to 'main'.");
+        newRepo = "main";
+    }
+
+    this.repoName = newRepo;
+
     try {
-        this.repoName = repoName;
-        Path configPath = rootPath.resolve(CONFIG_FILE);
-        Files.writeString(configPath, repoName);
-    } catch (IOException e) {
-        System.out.println("Unable to change repository to " + repoName);
+        updateConfig(newRepo);
+    } catch (ZettelException e) {
+        System.out.println("Error switching repo: " + e.getMessage());
     }
 }
 ```
 
 ### Error Handling Strategy
 
-The application follows a fail-safe approach:
-- IOExceptions are caught and logged with user-friendly messages
-- Corrupted note lines are skipped during parsing
-- Missing directories are created automatically during initialization
-- Returns empty collections rather than null on load failures
+Zettel follows a fail-safe approach:
+- All I/O operations wrapped in try–catch
+- On failure: print readable warning (no crash)
+- Missing folders/files are auto-created
+- Corrupted index entries are skipped (with console notice)
+- Repository validation runs after every save to maintain consistency
+- Fallbacks to default repository if `.zettelConfig` is missing or broken
 
 ### Data Persistence Flow
 
 **Loading Notes:**
-1. Resolve repository path from `repoName`
-2. Read `zettel.txt` line by line
-3. Parse each line with `parseSaveFile()`
-4. Filter out null entries (corrupted lines)
-5. Collect into ArrayList
+
+Purpose: Construct ArrayList<Note> from repository contents.
+1. Resolve repository path
+2. Validate repository layout
+3. Read each line from `index.txt`
+4. Parse metadata via `parseSaveFile()`
+5. Read corresponding .txt file in `/notes/`
+6. Combine metadata + body into Note object
+7. Skip corrupted or missing entries gracefully
+8. Collect into ArrayList
 
 **Saving Notes:**
+
+Purpose: Persist all notes to disk.
 1. Ensure repository directory exists
-2. Convert each Note to save format string
-3. Write all lines atomically to file
-4. Overwrite previous content completely
+2. Write metadata to index.txt (one line per note)
+3. Write note body to individual .txt file (createStorageFile())
+4. Validate repository structure post-save
+
+***Sequence Diagram - Saving Notes:***
+```
+Zettel → Storage
+  |         |
+  | save()  |
+  |-------->|
+  |         | toSaveFormat()
+  |         | write index.txt
+  |         | write note bodies
+  |         | validateRepo()
+  |<--------|
+```
 
 ### Tag Persistence Flow
 
