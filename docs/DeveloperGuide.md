@@ -222,12 +222,22 @@ The `Command` abstract class defines the interface for all executable commands u
    - Searches in note body content
    - Returns all matching notes
 
-6. **InitCommand** - Initializes a repository
+6. **AddTagCommand** - Adds a tag
+    - Validates that tag does not already exist in `.zettelConfig`
+    - Update `.zettelConfig` with added tag
+    - Displays tag added message
+   
+7. **TagNoteCommand** - Adds a tag
+    - Validates that the note does not already have the tag
+    - Update `.zettelConfig` with added tag if it does not exist
+    - Displays tag added message
+
+8. **InitCommand** - Initializes a repository
    - Validates repository name format
    - Creates repository structure
    - Displays confirmation message
 
-7. **ExitCommand** - Exits the application
+9. **ExitCommand** - Exits the application
    - Displays farewell message
    - Returns true for `isExit()` check
 
@@ -715,6 +725,7 @@ data/<repoName>/notes/<filename>.txt
 
 Special handling:
 - Multiple logs are separated by `;;`
+- Multiple tags are separated by `;;`
 - Empty archiveName stored as empty string
 
 ### Repository Management
@@ -792,6 +803,20 @@ Zettel → Storage
   |         | validateRepo()
   |<--------|
 ```
+
+### Tag Persistence Flow
+
+**Loading Tags:**
+1. Read `.zettelConfig` from root directory
+2. Extract third line (if it exists) as the line of tags
+3. Split the line using " | " as the delimiter
+4. Trim and collect non-empty tags into a `List<String>`
+
+**Saving Tags:**
+1. Ensure `.zettelConfig` exists
+2. Join all tags using " | "
+3. Insert or update the third line of `.zettelConfig`
+4. Overwrite the previous content completely
 
 ### Component Interaction Diagram
 ```
