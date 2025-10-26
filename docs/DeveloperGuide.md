@@ -650,6 +650,8 @@ The `Storage` class manages all file I/O operations and repository management.
 │   ├── DeleteNoteCommand # Delete note
 │   ├── PinNoteCommand    # Pin/unpin note
 │   ├── FindNoteCommand   # Search notes
+│   ├── TagNoteCommand    # Tag a note
+│   ├── NewTagCommand     # Add a new tag
 │   └── InitCommand       # Init repository
 ├── exceptions/           # Custom exceptions
 ├── Note                  # Note model
@@ -672,6 +674,7 @@ The `Storage` class manages all file I/O operations and repository management.
 │ + save(List): void      │
 │ + createRepo(String)    │
 │ + changeRepo(String)    │
+│ + updateTags(String)    │
 └─────────────────────────┘
 ```
 
@@ -679,12 +682,13 @@ The `Storage` class manages all file I/O operations and repository management.
 
 Each note is stored as a single line with pipe-delimited fields:
 ```
-id | title | filename | body | createdAt | modifiedAt | pinned | archived | archiveName | logs
+id | title | filename | body | createdAt | modifiedAt | pinned | archived | archiveName | logs | tags
 ```
 
 Special handling:
 - Newlines in body are escaped as `\\n`
 - Multiple logs are separated by `;;`
+- Multiple tags are separated by `;;`
 - Empty archiveName stored as empty string
 
 **Sequence Diagram - Saving Notes:**
@@ -749,6 +753,20 @@ The application follows a fail-safe approach:
 2. Convert each Note to save format string
 3. Write all lines atomically to file
 4. Overwrite previous content completely
+
+### Tag Persistence Flow
+
+**Loading Tags:**
+1. Read `.zettelConfig` from root directory
+2. Extract third line (if it exists) as the line of tags
+3. Split the line using " | " as the delimiter
+4. Trim and collect non-empty tags into a `List<String>`
+
+**Saving Tags:**
+1. Ensure `.zettelConfig` exists
+2. Join all tags using " | "
+3. Insert or update the third line of `.zettelConfig`
+4. Overwrite the previous content completely
 
 ### Component Interaction Diagram
 ```
