@@ -8,6 +8,7 @@ import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.FindNoteCommand;
 import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.LinkNotesCommand;
+import seedu.zettel.commands.ListLinkedNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.NewTagCommand;
@@ -49,6 +50,10 @@ public class Parser {
     private static final String VALID_NOTE_ID_REGEX = "^[a-f0-9]{" + VALID_NOTE_ID_LENGTH + "}$";
     private static final String INVALID_ID_LENGTH_FORMAT =
             "Note ID must be exactly " + VALID_NOTE_ID_LENGTH + " characters long.";
+    private static final String LIST_LINKED_TYPE_FORMAT = "Link type must be either" + 
+                    " 'incoming-links' or 'outgoing-links'.";
+    private static final String LIST_LINKED_FORMAT = "List linked notes format should be: list "
+                    + "<incoming-links/outgoing-links> <NOTE_ID>";
 
     /**
      * Parses a user command string and returns the corresponding Command object.
@@ -107,12 +112,19 @@ public class Parser {
     /**
      * Parses a list command to display notes.
      * Accepts an optional -p flag to show only pinned notes.
+     * Routes to parseListLinkedNotesCommand if the format matches listing linked notes.
      *
      * @param input The full user input string starting with "list".
-     * @return A ListNoteCommand object with the appropriate filter flag.
+     * @return A ListNoteCommand or ListLinkedNotesCommand object with the appropriate parameters.
      * @throws ZettelException If the command format is invalid.
      */
     private static Command parseListNoteCommand(String[] inputs) throws ZettelException {
+        // Check if this is a list linked notes command
+        if (inputs.length >= 3) {
+            return parseListLinkedNotesCommand(inputs);
+        }
+        
+        // Regular list command
         if (inputs.length != 1 && inputs.length != 2) {
             throw new InvalidFormatException(LIST_FORMAT);
         }
@@ -335,5 +347,25 @@ public class Parser {
         String targetNoteId = parseNoteId(inputs[2], "link");
 
         return new LinkNotesCommand(sourceNoteId, targetNoteId);
+    }
+
+    private static Command parseListLinkedNotesCommand(String[] inputs) throws ZettelException {
+        // Expected format: list <incoming-links/outgoing-links> <NOTE_ID>
+        if (inputs.length != 3) {
+            throw new InvalidFormatException(LIST_LINKED_FORMAT);
+        }
+
+        String linkType = inputs[1].toLowerCase();
+        String noteId = parseNoteId(inputs[2], "list linked notes");
+        
+        // Convert "incoming-links" to "incoming" and "outgoing-links" to "outgoing"
+        String listToShow;
+        switch (linkType) {
+        case "incoming-links" -> listToShow = "incoming";
+        case "outgoing-links" -> listToShow = "outgoing";
+        default -> throw new InvalidFormatException(LIST_LINKED_TYPE_FORMAT);
+        }
+
+        return new ListLinkedNotesCommand(listToShow, noteId);
     }
 }
