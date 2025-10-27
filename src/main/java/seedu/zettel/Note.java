@@ -38,8 +38,8 @@ public class Note {
     private String archiveName; // Name of the archive the note belongs to
     private List<String> logs; // History/log data of that individual note
     private List<String> tags; // Tags for the note
-    private HashSet<String> linkedTo; // note IDs that this note references
-    private HashSet<String> linkedBy; // note IDs of notes that reference this note
+    private HashSet<String> outgoingLinks; // note IDs that this note links to
+    private HashSet<String> incomingLinks; // note IDs of notes that is linked by this note
 
     /**
      * Constructor for creating a new note by the user.
@@ -65,8 +65,8 @@ public class Note {
         this.archiveName = null;
         this.logs = new ArrayList<>();
         this.tags = new ArrayList<>();
-        this.linkedTo = new HashSet<>();
-        this.linkedBy = new HashSet<>();
+        this.outgoingLinks = new HashSet<>();
+        this.incomingLinks = new HashSet<>();
         numberOfNotes++;
         logger.info("New note created: ID=" + id + ", title='" + title + "'");
     }
@@ -101,8 +101,8 @@ public class Note {
         this.archiveName = archiveName;
         this.logs = logs != null ? new ArrayList<>(logs) : new ArrayList<>();
         this.tags = tags != null ? new ArrayList<>(tags) : new ArrayList<>();
-        this.linkedTo = linkedTo != null ? new HashSet<>(linkedTo) : new HashSet<>();
-        this.linkedBy = linkedBy != null ? new HashSet<>(linkedBy) : new HashSet<>();
+        this.outgoingLinks = outgoingLinks != null ? new HashSet<>(outgoingLinks) : new HashSet<>();
+        this.incomingLinks = incomingLinks != null ? new HashSet<>(incomingLinks) : new HashSet<>();
         numberOfNotes++;
     }
 
@@ -187,7 +187,7 @@ public class Note {
      * @return true if the note is linked, false otherwise
      */
     public boolean isLinkedTo(String noteId) {
-        return linkedTo.contains(noteId);
+        return outgoingLinks.contains(noteId);
     }
 
     /** 
@@ -197,7 +197,7 @@ public class Note {
      * @return true if the note is linked, false otherwise
      */
     public boolean isLinkedBy(String noteId) {
-        return linkedBy.contains(noteId);
+        return incomingLinks.contains(noteId);
     }
 
     /**
@@ -231,21 +231,23 @@ public class Note {
     }
 
     /** 
-     * Gets the set of noteIds that this note references.
+     * Gets the set of noteIds that this note has outgoing
+     * links to.
      *
-     * @return a hash set of note IDs that this note references
+     * @return a hash set of note IDs that this note links to
      */
-    public HashSet<String> getLinkedTo() {
-        return new HashSet<>(linkedTo);
+    public HashSet<String> getOutgoingLinks() {
+        return new HashSet<>(outgoingLinks);
     }
 
     /** 
-     * Gets the set of noteIds that this note is referenced by.
+     * Gets the set of noteIds of the incoming links that is linking
+     * to this note.
      *
-     * @return a hash set of note IDs that reference this note
+     * @return a hash set of note IDs that link to this note
      */
-    public HashSet<String> getLinkedBy() {
-        return new HashSet<>(linkedBy);
+    public HashSet<String> getIncomingLinks() {
+        return new HashSet<>(incomingLinks);
     }
 
     // Setters
@@ -333,20 +335,20 @@ public class Note {
     }
 
     /**
-     * Adds a note ID to the "linkedTo" set.
+     * Adds a note ID to the "outgoingLinks" set.
      *
      * @param noteId The note ID to add
      */
-    public void addLinkedTo(String noteId) {
-        this.linkedTo.add(noteId);
+    public void addOutgoingLink(String noteId) {
+        this.outgoingLinks.add(noteId);
     }
     /**
-     * Adds a note ID to the "linkedBy" set.
+     * Adds a note ID to the "incomingLinks" set.
      *
      * @param noteId The note ID to add
      */
-    public void addLinkedBy(String noteId) {
-        this.linkedBy.add(noteId);
+    public void addIncomingLink(String noteId) {
+        this.incomingLinks.add(noteId);
     }
 
     /**

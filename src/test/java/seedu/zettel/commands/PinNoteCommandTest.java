@@ -13,73 +13,12 @@ import seedu.zettel.Note;
 import seedu.zettel.storage.Storage;
 import seedu.zettel.UI;
 import seedu.zettel.exceptions.AlreadyPinnedException;
-import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.InvalidNoteIdException;
 import seedu.zettel.exceptions.NoNotesException;
 
 public class PinNoteCommandTest {
 
     // ==================== Exception Tests ====================
-
-    @Test
-    public void testInvalidFormatTooShortException() {
-        ArrayList<Note> notes = new ArrayList<>();
-        List<String> tags = new ArrayList<>();
-        notes.add(new Note("abcd1234", "Title", "file.txt", "Body", Instant.now(), Instant.now()));
-        UI ui = new UI();
-        Storage storage = new Storage("build/testdata/pinnote-test.txt");
-
-        // Test with ID that's too short (only 1 character)
-        PinNoteCommand command = new PinNoteCommand("1", true);
-        assertThrows(InvalidFormatException.class, () -> {
-            command.execute(notes, tags, ui, storage);
-        });
-    }
-
-    @Test
-    public void testInvalidFormatTooLongException() {
-        ArrayList<Note> notes = new ArrayList<>();
-        List<String> tags = new ArrayList<>();
-        notes.add(new Note("abcd1234", "Title", "file.txt", "Body", Instant.now(), Instant.now()));
-        UI ui = new UI();
-        Storage storage = new Storage("build/testdata/pinnote-test.txt");
-
-        // Test with ID that's too long (more than 8 characters)
-        PinNoteCommand command = new PinNoteCommand("abcdef123", true);
-        assertThrows(InvalidFormatException.class, () -> {
-            command.execute(notes, tags, ui, storage);
-        });
-    }
-
-    @Test
-    public void testInvalidFormatSpecialCharactersException() {
-        ArrayList<Note> notes = new ArrayList<>();
-        List<String> tags = new ArrayList<>();
-        notes.add(new Note("abcd1234", "Title", "file.txt", "Body", Instant.now(), Instant.now()));
-        UI ui = new UI();
-        Storage storage = new Storage("build/testdata/pinnote-test.txt");
-
-        // Test with ID containing special characters
-        PinNoteCommand command = new PinNoteCommand("abcd-234", true);
-        assertThrows(InvalidFormatException.class, () -> {
-            command.execute(notes, tags, ui, storage);
-        });
-    }
-
-    @Test
-    public void testInvalidFormatNullThrowsException() {
-        ArrayList<Note> notes = new ArrayList<>();
-        List<String> tags = new ArrayList<>();
-        notes.add(new Note("abcd1234", "Title", "file.txt", "Body", Instant.now(), Instant.now()));
-        UI ui = new UI();
-        Storage storage = new Storage("build/testdata/pinnote-test.txt");
-
-        // Test with null ID
-        PinNoteCommand command = new PinNoteCommand(null, true);
-        assertThrows(InvalidFormatException.class, () -> {
-            command.execute(notes, tags, ui, storage);
-        });
-    }
 
     @Test
     public void testEmptyNotesListException() {

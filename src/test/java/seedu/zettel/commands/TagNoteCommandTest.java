@@ -89,16 +89,16 @@ public class TagNoteCommandTest {
         });
 
         assertEquals("Invalid Note ID! Note with ID 'deadbeef' does not exist.", e.getMessage());
-    }       
+    }
 
     @Test
-    void testInvalidNoteIdThrowsException() {
-        TagNoteCommand cmd = new TagNoteCommand("123", "tag");
+    void testTagContainingDelimiterThrowsException() {
+        TagNoteCommand cmd = new TagNoteCommand("abcd1234", "urgent;;critical");
 
         ZettelException e = assertThrows(InvalidFormatException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
         });
 
-        assertTrue(e.getMessage().contains("Note ID must be exactly 8 characters long"));
+        assertEquals("Tag should not contain ;;", e.getMessage());
     }
 }

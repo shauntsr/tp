@@ -16,8 +16,6 @@ import seedu.zettel.storage.Storage;
  * Command to tag a specific note with a new tag.
  */
 public class TagNoteCommand extends Command {
-    private static final int VALID_NOTE_ID_LENGTH = 8;
-    private static final String VALID_NOTE_ID_REGEX = "^[a-f0-9]{8}$";
     private static final String LIST_DELIM = ";;";
 
     private final String noteID;
@@ -48,7 +46,6 @@ public class TagNoteCommand extends Command {
     @Override
     public void execute(ArrayList<Note> notes, List<String> tags, UI ui, Storage storage) throws ZettelException {
         // Validate Inputs
-        validateNoteIdFormat(noteID);
         validateTag(tag);
 
         // Try to find the note
@@ -77,24 +74,6 @@ public class TagNoteCommand extends Command {
 
         note.addTag(tag);
         ui.showTaggedNote(noteID, tag);
-    }
-
-    /**
-     * Validates that the noteId has the correct format.
-     * Must be exactly 8 lowercase hexadecimal characters (0-9, a-f).
-     *
-     * @param noteId The noteId to validate
-     * @throws InvalidFormatException If the noteId format is invalid
-     */
-    private void validateNoteIdFormat(String noteId) throws InvalidFormatException {
-        if (noteId == null || noteId.length() != VALID_NOTE_ID_LENGTH) {
-            throw new InvalidFormatException(
-                    "Note ID must be exactly " + VALID_NOTE_ID_LENGTH + " characters long.");
-        }
-        if (!noteId.matches(VALID_NOTE_ID_REGEX)) {
-            throw new InvalidFormatException(
-                    "Note ID must contain only lowercase hexadecimal characters (0-9, a-f).");
-        }
     }
 
     private void validateTag(String tag) throws InvalidFormatException {

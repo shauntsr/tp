@@ -17,7 +17,6 @@ import org.junit.jupiter.api.io.TempDir;
 
 import seedu.zettel.Note;
 import seedu.zettel.UI;
-import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.InvalidNoteIdException;
 import seedu.zettel.exceptions.NoNotesException;
 import seedu.zettel.exceptions.NoteSelfLinkException;
@@ -57,118 +56,6 @@ public class LinkNotesCommandTest {
     @AfterEach
     void tearDown() {
         System.setOut(originalOutputStream);
-    }
-
-    // ==================== Format Validation Tests ====================
-
-    @Test
-    void testInvalidFormatTooShortFirstNoteIdThrowsException() {
-        LinkNotesCommand cmd = new LinkNotesCommand("abc", "ef567890");
-
-        ZettelException e = assertThrows(InvalidFormatException.class, () -> {
-            cmd.execute(notes, tags, ui, storage);
-        });
-
-        assertTrue(e.getMessage().contains("Note ID must be exactly 8 characters long"));
-    }
-
-    @Test
-    void testInvalidFormatTooShortSecondNoteIdThrowsException() {
-        LinkNotesCommand cmd = new LinkNotesCommand("abcd1234", "ef5");
-
-        ZettelException e = assertThrows(InvalidFormatException.class, () -> {
-            cmd.execute(notes, tags, ui, storage);
-        });
-
-        assertTrue(e.getMessage().contains("Note ID must be exactly 8 characters long"));
-    }
-
-    @Test
-    void testInvalidFormatTooLongFirstNoteIdThrowsException() {
-        LinkNotesCommand cmd = new LinkNotesCommand("abcd12345", "ef567890");
-
-        ZettelException e = assertThrows(InvalidFormatException.class, () -> {
-            cmd.execute(notes, tags, ui, storage);
-        });
-
-        assertTrue(e.getMessage().contains("Note ID must be exactly 8 characters long"));
-    }
-
-    @Test
-    void testInvalidFormatTooLongSecondNoteIdThrowsException() {
-        LinkNotesCommand cmd = new LinkNotesCommand("abcd1234", "ef567890123");
-
-        ZettelException e = assertThrows(InvalidFormatException.class, () -> {
-            cmd.execute(notes, tags, ui, storage);
-        });
-
-        assertTrue(e.getMessage().contains("Note ID must be exactly 8 characters long"));
-    }
-
-    @Test
-    void testInvalidFormatSpecialCharactersFirstNoteIdThrowsException() {
-        LinkNotesCommand cmd = new LinkNotesCommand("abcd-234", "ef567890");
-
-        ZettelException e = assertThrows(InvalidFormatException.class, () -> {
-            cmd.execute(notes, tags, ui, storage);
-        });
-
-        assertTrue(e.getMessage().contains("lowercase hexadecimal characters"));
-    }
-
-    @Test
-    void testInvalidFormatSpecialCharactersSecondNoteIdThrowsException() {
-        LinkNotesCommand cmd = new LinkNotesCommand("abcd1234", "ef56@890");
-
-        ZettelException e = assertThrows(InvalidFormatException.class, () -> {
-            cmd.execute(notes, tags, ui, storage);
-        });
-
-        assertTrue(e.getMessage().contains("lowercase hexadecimal characters"));
-    }
-
-    @Test
-    void testInvalidFormatUppercaseFirstNoteIdThrowsException() {
-        LinkNotesCommand cmd = new LinkNotesCommand("ABCD1234", "ef567890");
-
-        ZettelException e = assertThrows(InvalidFormatException.class, () -> {
-            cmd.execute(notes, tags, ui, storage);
-        });
-
-        assertTrue(e.getMessage().contains("lowercase hexadecimal characters"));
-    }
-
-    @Test
-    void testInvalidFormatUppercaseSecondNoteIdThrowsException() {
-        LinkNotesCommand cmd = new LinkNotesCommand("abcd1234", "EF567890");
-
-        ZettelException e = assertThrows(InvalidFormatException.class, () -> {
-            cmd.execute(notes, tags, ui, storage);
-        });
-
-        assertTrue(e.getMessage().contains("lowercase hexadecimal characters"));
-    }
-
-    @Test
-    void testInvalidFormatNullFirstNoteIdThrowsException() {
-        LinkNotesCommand cmd = new LinkNotesCommand(null, "ef567890");
-
-        ZettelException e = assertThrows(InvalidFormatException.class, () -> {
-            cmd.execute(notes, tags, ui, storage);
-        });
-
-        assertTrue(e.getMessage().contains("Note ID must be exactly 8 characters long"));
-    }
-
-    @Test
-    void testInvalidFormatNullSecondNoteIdThrowsException() {
-        LinkNotesCommand cmd = new LinkNotesCommand("abcd1234", null);
-
-        ZettelException e = assertThrows(InvalidFormatException.class, () -> {
-            cmd.execute(notes, tags, ui, storage);
-        });
-
-        assertTrue(e.getMessage().contains("Note ID must be exactly 8 characters long"));
     }
 
     // ==================== Self-Link Validation Test ====================
@@ -240,9 +127,9 @@ public class LinkNotesCommandTest {
     void testLinkAlreadyExistsThrowsException() throws ZettelException {
         // The command checks: noteLinkedTo.get().isLinkedTo(noteIdLinkedBy)
         // which checks if noteIdLinkedBy is in noteLinkedTo's linkedTo set
-        // So we need to add ef567890 to abcd1234's linkedTo set to simulate existing link
+        // So we need to add ef567890 to abcd1234's outgoingLinks set to simulate existing link
         Note note1 = notes.get(0);
-        note1.addLinkedTo("ef567890");  // Simulate the link already exists
+        note1.addOutgoingLink("ef567890");  // Simulate the link already exists
 
         // Try to link them again
         LinkNotesCommand cmd = new LinkNotesCommand("abcd1234", "ef567890");
@@ -266,12 +153,12 @@ public class LinkNotesCommandTest {
         Note note2 = notes.get(1); // ef567890
 
         // After linking abcd1234 → ef567890:
-        // - abcd1234's linkedBy set contains ef567890
-        // - ef567890's linkedTo set contains abcd1234
-        assertTrue(note1.getLinkedBy().contains("ef567890"), 
-                "First note should have second note in its linkedBy set");
-        assertTrue(note2.getLinkedTo().contains("abcd1234"), 
-                "Second note should have first note in its linkedTo set");
+        // - abcd1234's incomingLinks set contains ef567890
+        // - ef567890's outgoingLinks set contains abcd1234
+        assertTrue(note1.getIncomingLinks().contains("ef567890"), 
+                "First note should have second note in its incomingLinks set");
+        assertTrue(note2.getOutgoingLinks().contains("abcd1234"), 
+                "Second note should have first note in its outgoingLinks set");
     }
 
     @Test
@@ -285,12 +172,12 @@ public class LinkNotesCommandTest {
         Note note2 = notes.get(1); // ef567890
 
         // After linking ef567890 → abcd1234:
-        // - ef567890's linkedBy set contains abcd1234
-        // - abcd1234's linkedTo set contains ef567890
-        assertTrue(note2.getLinkedBy().contains("abcd1234"), 
-                "Second note should have first note in its linkedBy set");
-        assertTrue(note1.getLinkedTo().contains("ef567890"), 
-                "First note should have second note in its linkedTo set");
+        // - ef567890's incomingLinks set contains abcd1234
+        // - abcd1234's outgoingLinks set contains ef567890
+        assertTrue(note2.getIncomingLinks().contains("abcd1234"), 
+                "Second note should have first note in its incomingLinks set");
+        assertTrue(note1.getOutgoingLinks().contains("ef567890"), 
+                "First note should have second note in its outgoingLinks set");
     }
 
     @Test
@@ -313,17 +200,17 @@ public class LinkNotesCommandTest {
         Note note3Updated = notes.get(2); // 12345678
 
         // After linking abcd1234 → ef567890 and 12345678 → ef567890:
-        // - abcd1234's linkedBy set contains ef567890
-        // - 12345678's linkedBy set contains ef567890
-        // - ef567890's linkedTo set contains both abcd1234 and 12345678
-        assertTrue(note1.getLinkedBy().contains("ef567890"), 
-                "First note should have second note in linkedBy");
-        assertTrue(note3Updated.getLinkedBy().contains("ef567890"), 
-                "Third note should have second note in linkedBy");
-        assertTrue(note2.getLinkedTo().contains("abcd1234"), 
-                "Second note should have first note in linkedTo");
-        assertTrue(note2.getLinkedTo().contains("12345678"), 
-                "Second note should have third note in linkedTo");
+        // - abcd1234's incomingLinks set contains ef567890
+        // - 12345678's incomingLinks set contains ef567890
+        // - ef567890's outgoingLinks set contains both abcd1234 and 12345678
+        assertTrue(note1.getIncomingLinks().contains("ef567890"), 
+                "First note should have second note in incomingLinks");
+        assertTrue(note3Updated.getIncomingLinks().contains("ef567890"), 
+                "Third note should have second note in incomingLinks");
+        assertTrue(note2.getOutgoingLinks().contains("abcd1234"), 
+                "Second note should have first note in outgoingLinks");
+        assertTrue(note2.getOutgoingLinks().contains("12345678"), 
+                "Second note should have third note in outgoingLinks");
     }
 
     @Test
@@ -346,17 +233,17 @@ public class LinkNotesCommandTest {
         Note note3Updated = notes.get(2); // 12345678
 
         // After linking abcd1234 → ef567890 and abcd1234 → 12345678:
-        // - abcd1234's linkedBy set contains both ef567890 and 12345678
-        // - ef567890's linkedTo set contains abcd1234
-        // - 12345678's linkedTo set contains abcd1234
-        assertTrue(note1.getLinkedBy().contains("ef567890"), 
-                "First note should have second note in linkedBy");
-        assertTrue(note1.getLinkedBy().contains("12345678"), 
-                "First note should have third note in linkedBy");
-        assertTrue(note2.getLinkedTo().contains("abcd1234"), 
-                "Second note should have first note in linkedTo");
-        assertTrue(note3Updated.getLinkedTo().contains("abcd1234"), 
-                "Third note should have first note in linkedTo");
+        // - abcd1234's incomingLinks set contains both ef567890 and 12345678
+        // - ef567890's outgoingLinks set contains abcd1234
+        // - 12345678's outgoingLinks set contains abcd1234
+        assertTrue(note1.getIncomingLinks().contains("ef567890"), 
+                "First note should have second note in incomingLinks");
+        assertTrue(note1.getIncomingLinks().contains("12345678"), 
+                "First note should have third note in incomingLinks");
+        assertTrue(note2.getOutgoingLinks().contains("abcd1234"), 
+                "Second note should have first note in outgoingLinks");
+        assertTrue(note3Updated.getOutgoingLinks().contains("abcd1234"), 
+                "Third note should have first note in outgoingLinks");
     }
 }
 
