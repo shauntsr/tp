@@ -20,8 +20,8 @@ import seedu.zettel.UI;
 import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.InvalidNoteIdException;
 import seedu.zettel.exceptions.NoNotesException;
+import seedu.zettel.exceptions.NoteSelfLinkException;
 import seedu.zettel.exceptions.NotesAlreadyLinkedException;
-import seedu.zettel.exceptions.SelfLinkException;
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.storage.Storage;
 
@@ -174,10 +174,10 @@ public class LinkNotesCommandTest {
     // ==================== Self-Link Validation Test ====================
 
     @Test
-    void testSelfLinkThrowsException() {
+    void testNoteSelfLinkThrowsException() {
         LinkNotesCommand cmd = new LinkNotesCommand("abcd1234", "abcd1234");
 
-        ZettelException e = assertThrows(SelfLinkException.class, () -> {
+        ZettelException e = assertThrows(NoteSelfLinkException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
         });
 

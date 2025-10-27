@@ -9,8 +9,8 @@ import seedu.zettel.UI;
 import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.InvalidNoteIdException;
 import seedu.zettel.exceptions.NoNotesException;
+import seedu.zettel.exceptions.NoteSelfLinkException;
 import seedu.zettel.exceptions.NotesAlreadyLinkedException;
-import seedu.zettel.exceptions.SelfLinkException;
 import seedu.zettel.storage.Storage;
 
 
@@ -48,14 +48,14 @@ public class LinkNotesCommand extends Command {
     @Override
     public void execute(ArrayList<Note> notes, List<String> tags, UI ui, Storage storage) throws 
             InvalidFormatException, NoNotesException, InvalidNoteIdException, NotesAlreadyLinkedException,
-            SelfLinkException {
+            NoteSelfLinkException {
         // Validate Inputs
         validateNoteIdFormat(noteIdLinkedTo);
         validateNoteIdFormat(noteIdLinkedBy);
 
         // Check if attempting to link a note to itself
         if (noteIdLinkedTo.equals(noteIdLinkedBy)) {
-            throw new SelfLinkException("Cannot link a note to itself. Note ID: '" + noteIdLinkedTo + "'.");
+            throw new NoteSelfLinkException("Cannot link a note to itself. Note ID: '" + noteIdLinkedTo + "'.");
         }
 
         // If no notes at all in the list, throw an exception
