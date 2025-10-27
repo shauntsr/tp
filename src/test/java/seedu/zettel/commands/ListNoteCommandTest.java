@@ -3,6 +3,7 @@ package seedu.zettel.commands;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import seedu.zettel.exceptions.NoNotesException;
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
 import seedu.zettel.storage.Storage;
@@ -14,7 +15,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ListNoteCommandTest {
@@ -68,23 +71,27 @@ public class ListNoteCommandTest {
         assertTrue(lines[2].strip().contains("old.txt"), "Second note should be the older one");
     }
     @Test
-    void testPrintNoNotes() throws ZettelException {
+    void testNoNotesFoundThrowsException() {
         ListNoteCommand cmd = new ListNoteCommand(false);
-        cmd.execute(notes, tags, ui, storage);
 
-        String output = outputStream.toString();
-        assertTrue(output.contains("No notes found"),
-                "Should print message for no notes found");
+        NoNotesException ex = assertThrows(NoNotesException.class, () -> {
+            cmd.execute(notes, tags, ui, storage);
+        });
+
+        assertEquals("No notes found.", ex.getMessage(),
+                "Should throw exception with message for no notes found");
     }
 
     @Test
-    void testPrintNoPinnedNotes() throws ZettelException {
+    void testNoPinnedNotesFoundThrowsException() {
         ListNoteCommand cmd = new ListNoteCommand(true);
-        cmd.execute(notes, tags, ui, storage);
 
-        String output = outputStream.toString();
-        assertTrue(output.contains("No pinned notes found. Pin a note to add to this list."),
-                "Should print message for no pinned notes found");
+        NoNotesException ex = assertThrows(NoNotesException.class, () -> {
+            cmd.execute(notes, tags, ui, storage);
+        });
+
+        assertEquals("No pinned notes found. Pin a note to add to this list.", ex.getMessage(),
+                "Should throw exception with message for no pinned notes found");
     }
 
     @Test
