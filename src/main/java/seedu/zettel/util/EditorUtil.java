@@ -34,6 +34,13 @@ public final class EditorUtil {
     public static void openInEditor(Path filePath)
             throws EditorNotFoundException, InterruptedException, NoNoteFoundException {
 
+        if (System.console() == null) {
+            // No interactive console available (IDE Run, background process, etc.)
+            throw new EditorNotFoundException(
+                    "No interactive terminal available. " +
+                    "Run the program from a real terminal/console or supply the note body via -b.");
+        }
+
         File file = filePath.toFile();
         if (!file.exists()) {
             throw new NoNoteFoundException("Note does not exist at " + filePath);
