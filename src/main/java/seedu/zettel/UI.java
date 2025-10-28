@@ -11,6 +11,8 @@ import java.util.Scanner;
  */
 public class UI {
     private static final String LINE = "____________________________________________________________";
+    private static final String LIST_INCOMING = "incoming";
+    private static final String LIST_OUTGOING = "outgoing";
     private final Scanner scanner;
 
     /**
@@ -206,5 +208,17 @@ public class UI {
 
     public void showSuccessfulLinking(String referencingTitle, String linkedToTitle) {
         System.out.println(" Note '" + referencingTitle + "' now links to note '" + linkedToTitle + "'.");
+    }
+
+    public void showLinkedNotes(ArrayList<Note> linkedNotes, String noteId, String listToShow) {
+        if (listToShow.equals(LIST_INCOMING)) {
+            System.out.println(" Here are the notes that link to note #" + noteId + " (incoming):");
+        } else if (listToShow.equals(LIST_OUTGOING)) {
+            System.out.println(" Here are the notes that note #" + noteId + " links to (outgoing):");
+        }
+
+        for (int i = 0; i < linkedNotes.size(); i++) {
+            System.out.println(" " + (i + 1) + ". " + linkedNotes.get(i));
+        }
     }
 }
