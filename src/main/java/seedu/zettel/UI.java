@@ -211,4 +211,8 @@ public class UI {
     public void showNoteSavedFromEditor() {
         System.out.println("Note body saved from editor.");
     }
+
+    public void showNoteEdited(Note updatedNote) {
+        System.out.println("Successfully edited note: " + updatedNote.getFilename() + ", id: " + updatedNote.getId());
+    }
 }
