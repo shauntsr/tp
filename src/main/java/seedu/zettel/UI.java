@@ -203,4 +203,12 @@ public class UI {
     public void showTagAdded(String tag) {
         System.out.println(" Tag '"+ tag + "' has been added.");
     }
+
+    public void showOpeningEditor() {
+        System.out.println("Opening editor for note body...");
+    }
+
+    public void showNoteSavedFromEditor() {
+        System.out.println("Note body saved from editor.");
+    }
 }
