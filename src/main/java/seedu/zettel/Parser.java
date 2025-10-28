@@ -126,7 +126,7 @@ public class Parser {
                 throw new InvalidFormatException(NOTE_FORMAT);
             }
             String title;
-            String body = "";
+            String body = null; // newNoteCommand sees null as not provided, "" as user wants an empty body.
 
             if (bodyIndex != -1) {
                 title = content.substring(titleIndex + 2, bodyIndex).trim();
