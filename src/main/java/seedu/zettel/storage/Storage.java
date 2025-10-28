@@ -234,4 +234,8 @@ public class Storage {
             System.out.println("Error while validating repo: " + e.getMessage());
         }
     }
+
+    public Path getNotePath(String filename) {
+        return fileSystemManager.getNotesPath(repoName).resolve(filename);
+    }
 }
