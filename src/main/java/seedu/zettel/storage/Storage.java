@@ -34,6 +34,7 @@ public class Storage {
      * @param rootPath the root directory path where repositories will be stored
      */
     public Storage(String rootPath) {
+        assert rootPath != null : "Root path should not be null";
         this.fileSystemManager = new FileSystemManager(rootPath);
         this.noteSerializer = new NoteSerializer();
     }
