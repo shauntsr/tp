@@ -1,5 +1,6 @@
 package seedu.zettel;
 
+import seedu.zettel.commands.EditNoteCommand;
 import seedu.zettel.commands.NewTagCommand;
 import seedu.zettel.commands.Command;
 import seedu.zettel.commands.DeleteNoteCommand;
@@ -58,6 +59,7 @@ public class Parser {
         case "bye" -> new ExitCommand();
         case "list" -> parseListNoteCommand(input);
         case "new" -> parseNewNoteCommand(input);
+        case "edit" -> parseEditNoteCommand(inputs);
         case "delete" -> parseDeleteNoteCommand(inputs);
         case "pin" -> parsePinNoteCommand(inputs, true);
         case "unpin" -> parsePinNoteCommand(inputs, false);
@@ -144,6 +146,22 @@ public class Parser {
         } catch (StringIndexOutOfBoundsException e) {
             throw new InvalidFormatException(NOTE_FORMAT);
         }
+    }
+
+    /**
+     * Parses an edit note command to edit an existing note's body.
+     * Expected format: edit <NOTE_ID>
+     *
+     * @param inputs The tokenized user input split by spaces
+     * @return An EditNoteCommand object with the extracted note ID
+     * @throws ZettelException If the format is invalid or note ID is missing
+     */
+    private static Command parseEditNoteCommand(String[] inputs) throws ZettelException {
+        if (inputs.length > 2) {
+            throw new InvalidFormatException("Invalid format. Usage: edit <NOTE_ID>");
+        }
+        String noteId = parseNoteId(inputs, "edit");
+        return new EditNoteCommand(noteId);
     }
 
     /**

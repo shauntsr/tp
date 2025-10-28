@@ -45,6 +45,7 @@ public class UI {
         System.out.println(" Available Commands:");
         System.out.println("   init <repo-name>             - Initialize a new repository");
         System.out.println("   new -t <title> [-b <body>]   - Create a new note");
+        System.out.println("   edit <note-id>               - Edit an existing note");
         System.out.println("   list [-p]                    - List all notes (or pinned only)");
         System.out.println("   delete [-f] <note-id>        - Delete a note by ID");
         System.out.println("   pin <note-id>                - Pin a note");
