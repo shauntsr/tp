@@ -19,18 +19,18 @@ import seedu.zettel.storage.Storage;
  */
 public class LinkBothNotesCommand extends Command {
 
-    private final String sourceNoteId;
-    private final String targetNoteId;
+    private final String noteId1;
+    private final String noteId2;
 
     /**
      * Constructs a LinkBothNotesCommand for linking two notes by their IDs in both directions.
      *
-     * @param sourceNoteId The ID of the first note to link.
-     * @param targetNoteId The ID of the second note to link.
+     * @param noteId1 The ID of the first note to link.
+     * @param noteId2 The ID of the second note to link.
      */
-    public LinkBothNotesCommand(String sourceNoteId, String targetNoteId) {
-        this.sourceNoteId = sourceNoteId;
-        this.targetNoteId = targetNoteId;
+    public LinkBothNotesCommand(String noteId1, String noteId2) {
+        this.noteId1 = noteId1;
+        this.noteId2 = noteId2;
     }
 
     /**
@@ -63,53 +63,53 @@ public class LinkBothNotesCommand extends Command {
         }
 
         // Try to find both notes
-        Optional<Note> sourceNote = notes.stream()
-                .filter(n -> n.getId().equals(sourceNoteId))
+        Optional<Note> note1 = notes.stream()
+                .filter(n -> n.getId().equals(noteId1))
                 .findFirst();
-        if (sourceNote.isEmpty()) {
-            throw new InvalidNoteIdException("Note with ID '"+ sourceNoteId + "' does not exist.");
+        if (note1.isEmpty()) {
+            throw new InvalidNoteIdException("Note with ID '"+ noteId1 + "' does not exist.");
         }
 
-        Optional<Note> targetNote = notes.stream()
-                .filter(n -> n.getId().equals(targetNoteId))
+        Optional<Note> note2 = notes.stream()
+                .filter(n -> n.getId().equals(noteId2))
                 .findFirst();
-        if (targetNote.isEmpty()) {
-            throw new InvalidNoteIdException("Note with ID '"+ targetNoteId + "' does not exist.");
+        if (note2.isEmpty()) {
+            throw new InvalidNoteIdException("Note with ID '"+ noteId2 + "' does not exist.");
         }
 
         // Check if attempting to link a note to itself
-        if (sourceNoteId.equals(targetNoteId)) {
-            throw new NoteSelfLinkException("Cannot link a note to itself. Note ID: '" + sourceNoteId + "'.");
+        if (noteId1.equals(noteId2)) {
+            throw new NoteSelfLinkException("Cannot link a note to itself. Note ID: '" + noteId1 + "'.");
         }
         
         // Check if two-way link already exists
-        if (sourceNote.get().isLinkedTo(targetNoteId) && targetNote.get().isLinkedTo(sourceNoteId)) {
-            throw new NotesAlreadyLinkedException("Note with ID '" + sourceNoteId
-                    + "' already links in both directions to note with ID '" + targetNoteId + "'.");
+        if (note1.get().isLinkedTo(noteId2) && note2.get().isLinkedTo(noteId1)) {
+            throw new NotesAlreadyLinkedException("Note with ID '" + noteId1
+                    + "' already links in both directions to note with ID '" + noteId2 + "'.");
         }
         
 
         // Create the two-way link
         // If a partial link already exists, only add the missing direction(s)
         // to prevent duplicates
-        
-        // Add links from source to target if not already present
-        if (!sourceNote.get().isLinkedTo(targetNoteId)) {
-            sourceNote.get().addOutgoingLink(targetNoteId);
+
+        // Add links from note1 to note2 if not already present
+        if (!note1.get().isLinkedTo(noteId2)) {
+            note1.get().addOutgoingLink(noteId2);
         }
-        if (!sourceNote.get().isLinkedBy(targetNoteId)) {
-            sourceNote.get().addIncomingLink(targetNoteId);
+        if (!note1.get().isLinkedBy(noteId2)) {
+            note1.get().addIncomingLink(noteId2);
         }
 
-        // Add links from target to source if not already present
-        if (!targetNote.get().isLinkedTo(sourceNoteId)) {
-            targetNote.get().addOutgoingLink(sourceNoteId);
+        // Add links from note2 to note1 if not already present
+        if (!note2.get().isLinkedTo(noteId1)) {
+            note2.get().addOutgoingLink(noteId1);
         }
-        if (!targetNote.get().isLinkedBy(sourceNoteId)) {
-            targetNote.get().addIncomingLink(sourceNoteId);
+        if (!note2.get().isLinkedBy(noteId1)) {
+            note2.get().addIncomingLink(noteId1);
         }
 
-        ui.showSuccessfulDoubleLinking(sourceNote.get().getTitle(), targetNote.get().getTitle());
+        ui.showSuccessfullyDoubleLinkedNotes(note1.get().getTitle(), note2.get().getTitle());
     }
 
 }

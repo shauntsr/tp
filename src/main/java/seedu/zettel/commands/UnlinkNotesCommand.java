@@ -94,6 +94,6 @@ public class UnlinkNotesCommand extends Command {
         srcNote.removeOutgoingLink(targetNoteId);
         tgtNote.removeIncomingLink(sourceNoteId);
 
-        ui.showNotesUnlinked(sourceNoteId, targetNoteId);
+        ui.showSuccessfullyUnlinkedNotes(sourceNoteId, targetNoteId);
     }  
 }

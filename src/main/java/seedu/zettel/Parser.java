@@ -15,6 +15,7 @@ import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.NewTagCommand;
 import seedu.zettel.commands.PinNoteCommand;
 import seedu.zettel.commands.TagNoteCommand;
+import seedu.zettel.commands.UnlinkBothNotesCommand;
 import seedu.zettel.commands.UnlinkNotesCommand;
 import seedu.zettel.exceptions.EmptyDescriptionException;
 import seedu.zettel.exceptions.InvalidFormatException;
@@ -42,6 +43,8 @@ public class Parser {
     private static final String UNLINK_NOTES_FORMAT = "Unlink notes command format should be: unlink" 
             + " <SOURCE_NOTE_ID> <TARGET_NOTE_ID>";
     private static final String LINK_BOTH_NOTES_FORMAT = "Linking both notes command format should be: link-both" 
+            + " <NOTE_ID_1> <NOTE_ID_2>";
+    private static final String UNLINK_BOTH_NOTES_FORMAT = "Unlinking both notes command format should be: unlink-both" 
             + " <NOTE_ID_1> <NOTE_ID_2>";
     private static final String NOTE_EMPTY = "Note title cannot be empty!";
     private static final String TAG_EMPTY = "Tag cannot be empty!";
@@ -85,6 +88,7 @@ public class Parser {
         case "link" -> parseLinkNotesCommand(inputs);
         case "unlink" -> parseUnlinkNotesCommand(inputs);
         case "link-both" -> parseLinkBothNotesCommand(inputs);
+        case "unlink-both" -> parseUnlinkBothNotesCommand(inputs);
         default -> throw new InvalidInputException(command);
         };
     }
@@ -421,5 +425,23 @@ public class Parser {
         String targetNoteId = parseNoteId(inputs[2], "link in both directions");
 
         return new LinkBothNotesCommand(sourceNoteId, targetNoteId);
+    }
+
+    /**
+     * Parses an unlink-both notes command to remove a bidirectional link between two notes.
+     * @param inputs The tokenized user input split by spaces.
+     * @return An UnlinkBothNotesCommand object with the note IDs to unlink.
+     * @throws ZettelException If the format is invalid or parameters are missing.
+     */    
+    private static Command parseUnlinkBothNotesCommand(String[] inputs) throws ZettelException {
+        // Expected format: unlink-both <note_ID_1> <note_ID_2>
+        if (inputs.length != 3) {
+            throw new InvalidFormatException(UNLINK_BOTH_NOTES_FORMAT);
+        }
+
+        String noteId1 = parseNoteId(inputs[1], "unlink in both directions");
+        String noteId2 = parseNoteId(inputs[2], "unlink in both directions");
+
+        return new UnlinkBothNotesCommand(noteId1, noteId2);
     }
 }
