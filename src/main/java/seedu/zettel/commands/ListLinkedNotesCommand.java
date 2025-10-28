@@ -54,7 +54,9 @@ public class ListLinkedNotesCommand extends Command {
         // Validation 4: Check if the note has any links of the requested type
         if (listToShow.equals(LIST_INCOMING) && incomingLinks.isEmpty()) {
             throw new NoNotesException("Note with ID '" + noteId + "' has no incoming links.");
-        } else if (listToShow.equals(LIST_OUTGOING) && outgoingLinks.isEmpty()) {
+        }
+
+        if (listToShow.equals(LIST_OUTGOING) && outgoingLinks.isEmpty()) {
             throw new NoNotesException("Note with ID '" + noteId + "' has no outgoing links.");
         }
         
@@ -63,9 +65,8 @@ public class ListLinkedNotesCommand extends Command {
 
         ArrayList<Note> linkedNotes = new ArrayList<>();
         for (Note n : notes) {
-            if (listToShow.equals(LIST_OUTGOING) && outgoingLinks.contains(n.getId())) {
-                linkedNotes.add(n);
-            } else if (listToShow.equals(LIST_INCOMING) && incomingLinks.contains(n.getId())) {
+            if (listToShow.equals(LIST_OUTGOING) && outgoingLinks.contains(n.getId()) ||
+                    listToShow.equals(LIST_INCOMING) && incomingLinks.contains(n.getId())) {
                 linkedNotes.add(n);
             }
         }
