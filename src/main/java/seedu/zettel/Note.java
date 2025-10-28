@@ -352,6 +352,24 @@ public class Note {
     }
 
     /**
+     * Removes a note ID from the "outgoingLinks" set.
+     *
+     * @param noteId The note ID to remove
+     */
+    public void removeOutgoingLink(String noteId) {
+        this.outgoingLinks.remove(noteId);
+    }
+
+    /**
+     * Removes a note ID from the "incomingLinks" set.
+     *
+     * @param noteId The note ID to remove
+     */
+    public void removeIncomingLink(String noteId) {
+        this.incomingLinks.remove(noteId);
+    }
+
+    /**
      * Updates the modifiedAt timestamp to the current time.
      * Called automatically by setters that modify note content.
      */

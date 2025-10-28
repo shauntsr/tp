@@ -221,4 +221,8 @@ public class UI {
             System.out.println(" " + (i + 1) + ". " + linkedNotes.get(i));
         }
     }
+
+    public void showNotesUnlinked(String sourceNoteId, String targetNoteId) {
+        System.out.println(" The link from note #" + sourceNoteId + " to note #" + targetNoteId + " has been removed.");
+    }
 }
