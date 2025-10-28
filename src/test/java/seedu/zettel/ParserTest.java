@@ -9,9 +9,11 @@ import seedu.zettel.commands.DeleteNoteCommand;
 import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.FindNoteCommand;
 import seedu.zettel.commands.InitCommand;
+import seedu.zettel.commands.LinkNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.PinNoteCommand;
+import seedu.zettel.commands.TagNoteCommand;
 import seedu.zettel.exceptions.EmptyDescriptionException;
 import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.InvalidInputException;
@@ -175,6 +177,122 @@ class ParserTest {
     @Test
     void testParseFindWithoutSearchTermThrowsEmptyDescriptionException() {
         assertThrows(EmptyDescriptionException.class, () -> Parser.parse("find"));
+    }
+
+    // ==================== Link Command Tests ====================
+
+    @Test
+    void testParseLinkWithValidIdsReturnsLinkNotesCommand() throws ZettelException {
+        Command command = Parser.parse("link abcd1234 ef567890");
+        assertInstanceOf(LinkNotesCommand.class, command);
+    }
+
+    @Test
+    void testParseLinkWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link"));
+    }
+
+    @Test
+    void testParseLinkWithOnlyOneIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link abcd1234"));
+    }
+
+    @Test
+    void testParseLinkWithTooManyArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link abcd1234 ef567890 12345678"));
+    }
+
+    @Test
+    void testParseLinkWithTooShortFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link abc ef567890"));
+    }
+
+    @Test
+    void testParseLinkWithTooShortSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link abcd1234 ef5"));
+    }
+
+    @Test
+    void testParseLinkWithTooLongFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link abcd12345 ef567890"));
+    }
+
+    @Test
+    void testParseLinkWithTooLongSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link abcd1234 ef567890123"));
+    }
+
+    @Test
+    void testParseLinkWithSpecialCharactersFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link abcd-234 ef567890"));
+    }
+
+    @Test
+    void testParseLinkWithSpecialCharactersSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link abcd1234 ef56@890"));
+    }
+
+    @Test
+    void testParseLinkWithUppercaseFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link ABCD1234 ef567890"));
+    }
+
+    @Test
+    void testParseLinkWithUppercaseSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link abcd1234 EF567890"));
+    }
+
+    @Test
+    void testParseLinkWithInvalidHexCharactersFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link abcdefgh ef567890"));
+    }
+
+    @Test
+    void testParseLinkWithInvalidHexCharactersSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link abcd1234 ghijk890"));
+    }
+
+    // ==================== Tag Command Tests ====================
+
+    @Test
+    void testParseTagAddWithValidIdAndTagReturnsTagNoteCommand() throws ZettelException {
+        Command command = Parser.parse("tag add abcd1234 urgent");
+        assertInstanceOf(TagNoteCommand.class, command);
+    }
+
+    @Test
+    void testParseTagAddWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("tag add"));
+    }
+
+    @Test
+    void testParseTagAddWithOnlyNoteIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("tag add abcd1234"));
+    }
+
+    @Test
+    void testParseTagAddWithTooShortIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("tag add abc urgent"));
+    }
+
+    @Test
+    void testParseTagAddWithTooLongIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("tag add abcd12345 urgent"));
+    }
+
+    @Test
+    void testParseTagAddWithSpecialCharactersIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("tag add abcd-234 urgent"));
+    }
+
+    @Test
+    void testParseTagAddWithUppercaseIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("tag add ABCD1234 urgent"));
+    }
+
+    @Test
+    void testParseTagAddWithInvalidHexCharactersThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("tag add abcdefgh urgent"));
     }
 
     @Test

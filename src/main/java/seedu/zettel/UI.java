@@ -161,7 +161,7 @@ public class UI {
     /**
      * Displays a message when no notes match a search query.
      */
-    public void showNoNotesFoundMessage() {
+    public void showNoNotesFound() {
         System.out.println(" No notes found matching the search criteria.");
     }
 
@@ -170,7 +170,7 @@ public class UI {
      *
      * @param matchedNotes The list of notes matching the search.
      */
-    public void showFoundNotesMessage(ArrayList<Note> matchedNotes) {
+    public void showFoundNotes(ArrayList<Note> matchedNotes) {
         System.out.println(" Here are the matching notes in your list:");
         for (int i = 0; i < matchedNotes.size(); i++) {
             System.out.println(" " + (i + 1) + ". " + matchedNotes.get(i));
@@ -202,5 +202,9 @@ public class UI {
 
     public void showTagAdded(String tag) {
         System.out.println(" Tag '"+ tag + "' has been added.");
+    }
+
+    public void showSuccessfulLinking(String referencingTitle, String linkedToTitle) {
+        System.out.println(" Note '" + referencingTitle + "' now links to note '" + linkedToTitle + "'.");
     }
 }

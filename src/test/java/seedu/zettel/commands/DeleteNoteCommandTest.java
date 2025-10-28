@@ -14,11 +14,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import seedu.zettel.Note;
-import seedu.zettel.storage.Storage;
 import seedu.zettel.UI;
-import seedu.zettel.exceptions.NoNoteFoundException;
+import seedu.zettel.exceptions.InvalidNoteIdException;
 import seedu.zettel.exceptions.NoNotesException;
 import seedu.zettel.exceptions.ZettelException;
+import seedu.zettel.storage.Storage;
 
 public class DeleteNoteCommandTest {
 
@@ -101,8 +101,8 @@ public class DeleteNoteCommandTest {
         // Try to delete a note with a valid format ID (8 alphanumeric chars) that doesn't exist
         DeleteNoteCommand cmd = new DeleteNoteCommand("99999999", true);
 
-        // Should throw NoNoteFoundException because the noteId format is valid but the note doesn't exist
-        assertThrows(NoNoteFoundException.class, () -> {
+        // Should throw InvalidNoteIdException because the noteId format is valid but the note doesn't exist
+        assertThrows(InvalidNoteIdException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
         });
 

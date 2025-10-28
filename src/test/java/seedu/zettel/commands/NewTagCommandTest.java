@@ -1,25 +1,25 @@
 package seedu.zettel.commands;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import seedu.zettel.Note;
-import seedu.zettel.UI;
-import seedu.zettel.exceptions.InvalidFormatException;
-import seedu.zettel.exceptions.TagExistsException;
-import seedu.zettel.exceptions.ZettelException;
-import seedu.zettel.storage.Storage;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import seedu.zettel.Note;
+import seedu.zettel.UI;
+import seedu.zettel.exceptions.InvalidFormatException;
+import seedu.zettel.exceptions.TagAlreadyExistsException;
+import seedu.zettel.exceptions.ZettelException;
+import seedu.zettel.storage.Storage;
 
 public class NewTagCommandTest {
     @TempDir
@@ -67,7 +67,7 @@ public class NewTagCommandTest {
 
         NewTagCommand cmd = new NewTagCommand(newTag);
 
-        ZettelException e = assertThrows(TagExistsException.class, () -> {
+        ZettelException e = assertThrows(TagAlreadyExistsException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
         });
 

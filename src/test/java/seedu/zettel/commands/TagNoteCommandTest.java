@@ -1,17 +1,5 @@
 package seedu.zettel.commands;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import seedu.zettel.Note;
-import seedu.zettel.UI;
-import seedu.zettel.exceptions.InvalidFormatException;
-import seedu.zettel.exceptions.NoNoteFoundException;
-import seedu.zettel.exceptions.TagExistsException;
-import seedu.zettel.exceptions.ZettelException;
-import seedu.zettel.storage.Storage;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
@@ -19,9 +7,21 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import seedu.zettel.Note;
+import seedu.zettel.UI;
+import seedu.zettel.exceptions.InvalidFormatException;
+import seedu.zettel.exceptions.InvalidNoteIdException;
+import seedu.zettel.exceptions.TagAlreadyExistsException;
+import seedu.zettel.exceptions.ZettelException;
+import seedu.zettel.storage.Storage;
 
 public class TagNoteCommandTest {
     @TempDir
@@ -73,7 +73,7 @@ public class TagNoteCommandTest {
 
         TagNoteCommand cmd = new TagNoteCommand("abcd1234", "urgent");
 
-        ZettelException e = assertThrows(TagExistsException.class, () -> {
+        ZettelException e = assertThrows(TagAlreadyExistsException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
         });
 
@@ -84,21 +84,21 @@ public class TagNoteCommandTest {
     void testTaggingNonexistentNoteThrowsException() {
         TagNoteCommand cmd = new TagNoteCommand("deadbeef", "important");
 
-        ZettelException e = assertThrows(NoNoteFoundException.class, () -> {
+        ZettelException e = assertThrows(InvalidNoteIdException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
         });
 
-        assertEquals("Note with ID 'deadbeef' does not exist.", e.getMessage());
+        assertEquals("Invalid Note ID! Note with ID 'deadbeef' does not exist.", e.getMessage());
     }
 
     @Test
-    void testInvalidNoteIdThrowsException() {
-        TagNoteCommand cmd = new TagNoteCommand("123", "tag");
+    void testTagContainingDelimiterThrowsException() {
+        TagNoteCommand cmd = new TagNoteCommand("abcd1234", "urgent;;critical");
 
         ZettelException e = assertThrows(InvalidFormatException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
         });
 
-        assertTrue(e.getMessage().contains("Note ID must be exactly 8 characters long"));
+        assertEquals("Tag should not contain ;;", e.getMessage());
     }
 }
