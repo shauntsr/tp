@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import seedu.zettel.Note;
 import seedu.zettel.exceptions.ZettelException;
+import java.util.logging.Logger;
 
 /**
  * Orchestrates storage operations for Zettel repositories.
@@ -18,6 +19,8 @@ import seedu.zettel.exceptions.ZettelException;
 public class Storage {
     /** Default repository name used when no other repository is specified. */
     static final String DEFAULT_REPO = "main";
+
+    private static final Logger logger = Logger.getLogger(Storage.class.getName());
 
     private final FileSystemManager fileSystemManager;
     private final NoteSerializer noteSerializer;
@@ -141,6 +144,7 @@ public class Storage {
      * @throws ZettelException if there's an error writing to the config file
      */
     public void updateConfig(String newRepo) throws ZettelException {
+        logger.info("Updating config with current repository: " + newRepo);
         fileSystemManager.createConfigFile(DEFAULT_REPO);
         Path configFile = fileSystemManager.getConfigPath();
 
@@ -155,8 +159,10 @@ public class Storage {
                 lines.set(1, newRepo);
             }
             Files.write(configFile, lines);
+            logger.info("Config updated successfully");
         } catch (IOException e) {
-            System.out.println("Failed to update checked-out repo in .zettelConfig: " + e.getMessage());
+            logger.warning("Failed to update checked-out repo in .zettelConfig: " + e.getMessage());
+            throw new ZettelException("Failed to update checked-out repo in .zettelConfig: " + e.getMessage());
         }
     }
 
@@ -167,6 +173,7 @@ public class Storage {
      * @throws ZettelException if there's an error writing to the config file
      */
     public void updateTags(List<String> tags) throws ZettelException {
+        logger.info("Updating tags in config: " + tags);
         fileSystemManager.createConfigFile(DEFAULT_REPO);
         Path configFile = fileSystemManager.getConfigPath();
 
@@ -187,8 +194,10 @@ public class Storage {
                 lines.set(2, tagsLine);
             }
             Files.write(configFile, lines);
+            logger.info("Tags updated successfully");
         } catch (IOException e) {
-            System.out.println("Failed to update tags line in .zettelConfig: " + e.getMessage());
+            logger.warning("Failed to update tags line in .zettelConfig: " + e.getMessage());
+            throw new ZettelException("Failed to update tags line in .zettelConfig: " + e.getMessage());
         }
     }
 
@@ -229,10 +238,13 @@ public class Storage {
      * @param repoName the name of the repository to create
      */
     public void createRepo(String repoName) {
+        logger.info("Creating repository: " + repoName);
         boolean created = fileSystemManager.createRepoStructure(repoName);
         if (created) {
             addToConfig(repoName);
-            System.out.println("Repository " + repoName + " successfully created");
+            logger.info("Repository " + repoName + " successfully created");
+        } else {
+            logger.warning("Repository " + repoName + " already exists or creation failed");
         }
     }
 
