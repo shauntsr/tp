@@ -9,6 +9,7 @@ import seedu.zettel.commands.FindNoteCommand;
 import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.LinkNotesCommand;
 import seedu.zettel.commands.ListLinkedNotesCommand;
+import seedu.zettel.commands.UnlinkNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.NewTagCommand;
@@ -36,6 +37,8 @@ public class Parser {
     private static final String TAG_NOTE_FORMAT = "Tag note command format should be: tag <NOTE_ID> <TAG>";
     private static final String NEW_TAG_FORMAT = "Tag add command format should be: tag add <TAG>";
     private static final String LINK_NOTES_FORMAT = "Link notes command format should be: link" 
+            + " <SOURCE_NOTE_ID> <TARGET_NOTE_ID>";
+    private static final String UNLINK_NOTES_FORMAT = "Unlink notes command format should be: unlink" 
             + " <SOURCE_NOTE_ID> <TARGET_NOTE_ID>";
     private static final String NOTE_EMPTY = "Note title cannot be empty!";
     private static final String TAG_EMPTY = "Tag cannot be empty!";
@@ -77,6 +80,7 @@ public class Parser {
         case "find" -> parseFindNoteCommand(inputs);
         case "tag" -> parseTagCommand(inputs);
         case "link" -> parseLinkNotesCommand(inputs);
+        case "unlink" -> parseUnlinkNotesCommand(inputs);
         default -> throw new InvalidInputException(command);
         };
     }
@@ -349,6 +353,14 @@ public class Parser {
         return new LinkNotesCommand(sourceNoteId, targetNoteId);
     }
 
+    /**
+     * Parses a list linked notes command to display incoming or outgoing links for a specific note.
+     * Expected format: list incoming-links NOTE_ID or list outgoing-links NOTE_ID
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return A ListLinkedNotesCommand object with the link type and note ID.
+     * @throws ZettelException If the format is invalid, link type is invalid, or note ID is malformed.
+     */
     private static Command parseListLinkedNotesCommand(String[] inputs) throws ZettelException {
         // Expected format: list <incoming-links/outgoing-links> <NOTE_ID>
         if (inputs.length != 3) {
@@ -367,5 +379,25 @@ public class Parser {
         }
 
         return new ListLinkedNotesCommand(listToShow, noteId);
+    }
+
+    /**
+     * Parses an unlink notes command to remove a unidirectional link between two notes.
+     * Expected format: unlink SOURCE_NOTE_ID TARGET_NOTE_ID
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return An UnlinkNotesCommand object with the source and target note IDs.
+     * @throws ZettelException If the format is invalid or note IDs are malformed.
+     */
+    private static Command parseUnlinkNotesCommand(String[] inputs) throws ZettelException {
+        // Expected format: unlink <SOURCE_NOTE_ID> <TARGET_NOTE_ID>
+        if (inputs.length != 3) {
+            throw new InvalidFormatException(LINK_NOTES_FORMAT);
+        }
+
+        String sourceNoteId = parseNoteId(inputs[1], "unlink to");
+        String targetNoteId = parseNoteId(inputs[2], "unlink to");
+
+        return new UnlinkNotesCommand(sourceNoteId, targetNoteId);
     }
 }
