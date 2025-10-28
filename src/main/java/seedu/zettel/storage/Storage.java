@@ -6,18 +6,18 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import seedu.zettel.Note;
 import seedu.zettel.exceptions.ZettelException;
-
+import java.util.logging.Logger;
 
 /**
  * Orchestrates storage operations for Zettel repositories.
  * Manages repository state and coordinates file system and serialization operations.
  */
 public class Storage {
+    /** Default repository name used when no other repository is specified. */
     static final String DEFAULT_REPO = "main";
 
     private static final Logger logger = Logger.getLogger(Storage.class.getName());
@@ -28,11 +28,21 @@ public class Storage {
     private String repoName = DEFAULT_REPO;
     private ArrayList<String> repoList = new ArrayList<>();
 
+    /**
+     * Constructs a Storage instance with the specified root path.
+     *
+     * @param rootPath the root directory path where repositories will be stored
+     */
     public Storage(String rootPath) {
+        assert rootPath != null : "Root path should not be null";
         this.fileSystemManager = new FileSystemManager(rootPath);
         this.noteSerializer = new NoteSerializer();
     }
 
+    /**
+     * Initializes the storage system by creating necessary directories and files.
+     * Loads configuration and validates all repositories.
+     */
     public void init() {
         fileSystemManager.createRootFolder();
         fileSystemManager.createConfigFile(DEFAULT_REPO);
@@ -55,6 +65,11 @@ public class Storage {
         }
     }
 
+    /**
+     * Reads the currently checked-out repository from the configuration file.
+     *
+     * @return the name of the current repository, or DEFAULT_REPO if not found
+     */
     public String readCurrRepo() {
         Path configFile = fileSystemManager.getConfigPath();
         try {
@@ -70,6 +85,11 @@ public class Storage {
         return DEFAULT_REPO;
     }
 
+    /**
+     * Reads the tags line from the configuration file.
+     *
+     * @return a list of tags, or an empty list if no tags are configured
+     */
     public List<String> readTagsLine() {
         Path configFile = fileSystemManager.getConfigPath();
         try {
@@ -88,10 +108,19 @@ public class Storage {
         return new ArrayList<>();
     }
 
+    /**
+     * Creates a storage file for the specified note in the current repository.
+     *
+     * @param note the note to create a storage file for
+     */
     public void createStorageFile(Note note) {
         fileSystemManager.createNoteFile(note.getFilename(), note.getBody(), repoName);
     }
 
+    /**
+     * Loads the repository configuration from the config file.
+     * Populates the repoList with available repositories.
+     */
     public void loadConfig() {
         fileSystemManager.createConfigFile(DEFAULT_REPO);
         Path configFile = fileSystemManager.getConfigPath();
@@ -109,7 +138,14 @@ public class Storage {
         }
     }
 
+    /**
+     * Updates the configuration file with the specified repository as current.
+     *
+     * @param newRepo the repository to set as current
+     * @throws ZettelException if there's an error writing to the config file
+     */
     public void updateConfig(String newRepo) throws ZettelException {
+        logger.info("Updating config with current repository: " + newRepo);
         fileSystemManager.createConfigFile(DEFAULT_REPO);
         Path configFile = fileSystemManager.getConfigPath();
 
@@ -124,12 +160,21 @@ public class Storage {
                 lines.set(1, newRepo);
             }
             Files.write(configFile, lines);
+            logger.info("Config updated successfully");
         } catch (IOException e) {
+            logger.warning("Failed to update checked-out repo in .zettelConfig: " + e.getMessage());
             throw new ZettelException("Failed to update checked-out repo in .zettelConfig: " + e.getMessage());
         }
     }
 
+    /**
+     * Updates the tags configuration in the config file.
+     *
+     * @param tags the list of tags to write to the config file
+     * @throws ZettelException if there's an error writing to the config file
+     */
     public void updateTags(List<String> tags) throws ZettelException {
+        logger.info("Updating tags in config: " + tags);
         fileSystemManager.createConfigFile(DEFAULT_REPO);
         Path configFile = fileSystemManager.getConfigPath();
 
@@ -147,14 +192,21 @@ public class Storage {
                 lines.add(tagsLine);
             } else {
                 lines.set(1, repoName);
-                lines.set(2,tagsLine);
+                lines.set(2, tagsLine);
             }
             Files.write(configFile, lines);
+            logger.info("Tags updated successfully");
         } catch (IOException e) {
+            logger.warning("Failed to update tags line in .zettelConfig: " + e.getMessage());
             throw new ZettelException("Failed to update tags line in .zettelConfig: " + e.getMessage());
         }
     }
 
+    /**
+     * Loads all notes from the current repository.
+     *
+     * @return an ArrayList of notes loaded from the repository
+     */
     public ArrayList<Note> load() {
         Path indexPath = fileSystemManager.getIndexPath(repoName);
         Path notesDir = fileSystemManager.getNotesPath(repoName);
@@ -169,20 +221,39 @@ public class Storage {
         return noteSerializer.loadNotes(indexPath, notesDir);
     }
 
+    /**
+     * Validates the structure of the specified repository.
+     *
+     * @param repoName the name of the repository to validate
+     * @throws ZettelException if the repository structure is invalid
+     */
     private void validateRepo(String repoName) throws ZettelException {
         Path indexPath = fileSystemManager.getIndexPath(repoName);
         List<String> expectedFiles = noteSerializer.getExpectedFilenames(indexPath);
         fileSystemManager.validateRepoStructure(repoName, expectedFiles);
     }
 
+    /**
+     * Creates a new repository with the specified name.
+     *
+     * @param repoName the name of the repository to create
+     */
     public void createRepo(String repoName) {
+        logger.info("Creating repository: " + repoName);
         boolean created = fileSystemManager.createRepoStructure(repoName);
         if (created) {
             addToConfig(repoName);
             logger.info("Repository " + repoName + " successfully created");
+        } else {
+            logger.warning("Repository " + repoName + " already exists or creation failed");
         }
     }
 
+    /**
+     * Adds a repository to the configuration file.
+     *
+     * @param repoName the name of the repository to add
+     */
     private void addToConfig(String repoName) {
         fileSystemManager.createConfigFile(DEFAULT_REPO);
         Path configFile = fileSystemManager.getConfigPath();
@@ -206,6 +277,11 @@ public class Storage {
         }
     }
 
+    /**
+     * Changes the current repository to the specified repository.
+     *
+     * @param newRepo the name of the repository to switch to
+     */
     public void changeRepo(String newRepo) {
         if (!repoList.contains(newRepo)) {
             System.out.println("Repo '" + newRepo + "' does not exist. Falling back to 'main'.");
@@ -221,6 +297,11 @@ public class Storage {
         }
     }
 
+    /**
+     * Saves the list of notes to the current repository.
+     *
+     * @param notes the list of notes to save
+     */
     public void save(List<Note> notes) {
         Path indexPath = fileSystemManager.getIndexPath(repoName);
 
@@ -232,6 +313,25 @@ public class Storage {
             System.out.println("Error writing to index file: " + e.getMessage());
         } catch (ZettelException e) {
             System.out.println("Error while validating repo: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Deletes note's body text from the current repository.
+     *
+     * @param filename the name of the note of body text to delete
+     * @throws ZettelException if there's an error deleting the file
+     */
+    public void deleteStorageFile(String filename) throws ZettelException {
+        Path notesDir = fileSystemManager.getNotesPath(repoName);
+        Path noteFile = notesDir.resolve(filename);
+        try {
+            if (Files.exists(noteFile)) {
+                Files.delete(noteFile);
+            }
+
+        } catch (IOException e) {
+            throw new ZettelException("Error while deleting body file '" + filename + "': " + e.getMessage());
         }
     }
 }

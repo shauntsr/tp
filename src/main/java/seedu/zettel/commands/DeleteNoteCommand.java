@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
-import java.util.logging.Logger;
 
 import seedu.zettel.Note;
 import seedu.zettel.UI;
@@ -18,7 +17,6 @@ import seedu.zettel.storage.Storage;
  * Supports optional force deletion to skip confirmation prompt.
  */
 public class DeleteNoteCommand extends Command {
-    private static final Logger logger = Logger.getLogger(DeleteNoteCommand.class.getName());
 
     private final String noteId;
     private final boolean isForce;
@@ -74,9 +72,16 @@ public class DeleteNoteCommand extends Command {
         }
 
         if (shouldDelete) {
+            // Delete the physical body file from notes/ directory
+            storage.deleteStorageFile(note.getFilename());
+
+            // Remove note from ArrayList (this removes metadata)
             notes.remove(note);
+
+            // Save updated index (writes to index.txt)
             storage.save(notes);
-            logger.info("Note " + note.getTitle() + ", id " + noteId + " deleted.");
+
+            // Log and show confirmation
             ui.showNoteDeleted(noteId);
         } else {
             ui.showDeletionCancelled();
