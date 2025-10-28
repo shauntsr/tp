@@ -225,4 +225,8 @@ public class UI {
     public void showNotesUnlinked(String sourceNoteId, String targetNoteId) {
         System.out.println(" The link from note #" + sourceNoteId + " to note #" + targetNoteId + " has been removed.");
     }
+
+    public void showSuccessfulDoubleLinking(String sourceTitle, String targetTitle) {
+        System.out.println(" Notes '" + sourceTitle + "' and '" + targetTitle + "' are now linked in both directions.");
+    }
 }

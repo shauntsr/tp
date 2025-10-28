@@ -60,13 +60,7 @@ public class UnlinkNotesCommand extends Command {
             throw new NoNotesException("You have no notes to unlink.");
         }
 
-        // Validation 2: Check for self-unlink attempt (fail fast)
-        if (sourceNoteId.equals(targetNoteId)) {
-            throw new NoteSelfLinkException("Cannot unlink a note from itself. Note ID: '" 
-                    + sourceNoteId + "'.");
-        }
-
-        // Validation 3: Try to find both notes
+        // Validation 2: Try to find both notes
         Optional<Note> sourceNote = notes.stream()
                 .filter(n -> n.getId().equals(sourceNoteId))
                 .findFirst();
@@ -79,6 +73,12 @@ public class UnlinkNotesCommand extends Command {
                 .findFirst();
         if (targetNote.isEmpty()) {
             throw new InvalidNoteIdException("Note with ID '"+ targetNoteId + "' does not exist.");
+        }
+
+        // Validation 3: Check for self-unlink attempt (fail fast)
+        if (sourceNoteId.equals(targetNoteId)) {
+            throw new NoteSelfLinkException("Cannot unlink a note from itself. Note ID: '" 
+                    + sourceNoteId + "'.");
         }
 
         Note srcNote = sourceNote.get();
