@@ -9,11 +9,14 @@ import seedu.zettel.commands.DeleteNoteCommand;
 import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.FindNoteCommand;
 import seedu.zettel.commands.InitCommand;
+import seedu.zettel.commands.LinkBothNotesCommand;
 import seedu.zettel.commands.LinkNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.PinNoteCommand;
 import seedu.zettel.commands.TagNoteCommand;
+import seedu.zettel.commands.UnlinkBothNotesCommand;
+import seedu.zettel.commands.UnlinkNotesCommand;
 import seedu.zettel.exceptions.EmptyDescriptionException;
 import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.InvalidInputException;
@@ -298,5 +301,224 @@ class ParserTest {
     @Test
     void testParseUnknownCommandThrowsInvalidInputException() {
         assertThrows(InvalidInputException.class, () -> Parser.parse("unknown"));
+    }
+
+    // ==================== Unlink Command Tests ====================
+
+    @Test
+    void testParseUnlinkWithValidIdsReturnsUnlinkNotesCommand() throws ZettelException {
+        Command command = Parser.parse("unlink abcd1234 ef567890");
+        assertInstanceOf(UnlinkNotesCommand.class, command);
+    }
+
+    @Test
+    void testParseUnlinkWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink"));
+    }
+
+    @Test
+    void testParseUnlinkWithOnlyOneIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink abcd1234"));
+    }
+
+    @Test
+    void testParseUnlinkWithTooManyArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink abcd1234 ef567890 12345678"));
+    }
+
+    @Test
+    void testParseUnlinkWithTooShortFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink abc ef567890"));
+    }
+
+    @Test
+    void testParseUnlinkWithTooShortSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink abcd1234 ef5"));
+    }
+
+    @Test
+    void testParseUnlinkWithTooLongFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink abcd12345 ef567890"));
+    }
+
+    @Test
+    void testParseUnlinkWithTooLongSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink abcd1234 ef567890123"));
+    }
+
+    @Test
+    void testParseUnlinkWithSpecialCharactersFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink abcd-234 ef567890"));
+    }
+
+    @Test
+    void testParseUnlinkWithSpecialCharactersSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink abcd1234 ef56@890"));
+    }
+
+    @Test
+    void testParseUnlinkWithUppercaseFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink ABCD1234 ef567890"));
+    }
+
+    @Test
+    void testParseUnlinkWithUppercaseSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink abcd1234 EF567890"));
+    }
+
+    @Test
+    void testParseUnlinkWithInvalidHexCharactersFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink abcdefgh ef567890"));
+    }
+
+    @Test
+    void testParseUnlinkWithInvalidHexCharactersSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink abcd1234 ghijk890"));
+    }
+
+    // ==================== Link-Both Command Tests ====================
+
+    @Test
+    void testParseLinkBothWithValidIdsReturnsLinkBothNotesCommand() throws ZettelException {
+        Command command = Parser.parse("link-both abcd1234 ef567890");
+        assertInstanceOf(LinkBothNotesCommand.class, command);
+    }
+
+    @Test
+    void testParseLinkBothWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link-both"));
+    }
+
+    @Test
+    void testParseLinkBothWithOnlyOneIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link-both abcd1234"));
+    }
+
+    @Test
+    void testParseLinkBothWithTooManyArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link-both abcd1234 ef567890 12345678"));
+    }
+
+    @Test
+    void testParseLinkBothWithTooShortFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link-both abc ef567890"));
+    }
+
+    @Test
+    void testParseLinkBothWithTooShortSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link-both abcd1234 ef5"));
+    }
+
+    @Test
+    void testParseLinkBothWithTooLongFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link-both abcd12345 ef567890"));
+    }
+
+    @Test
+    void testParseLinkBothWithTooLongSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link-both abcd1234 ef567890123"));
+    }
+
+    @Test
+    void testParseLinkBothWithSpecialCharactersFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link-both abcd-234 ef567890"));
+    }
+
+    @Test
+    void testParseLinkBothWithSpecialCharactersSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link-both abcd1234 ef56@890"));
+    }
+
+    @Test
+    void testParseLinkBothWithUppercaseFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link-both ABCD1234 ef567890"));
+    }
+
+    @Test
+    void testParseLinkBothWithUppercaseSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link-both abcd1234 EF567890"));
+    }
+
+    @Test
+    void testParseLinkBothWithInvalidHexCharactersFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link-both abcdefgh ef567890"));
+    }
+
+    @Test
+    void testParseLinkBothWithInvalidHexCharactersSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("link-both abcd1234 ghijk890"));
+    }
+
+    // ==================== Unlink-Both Command Tests ====================
+
+    @Test
+    void testParseUnlinkBothWithValidIdsReturnsUnlinkBothNotesCommand() throws ZettelException {
+        Command command = Parser.parse("unlink-both abcd1234 ef567890");
+        assertInstanceOf(UnlinkBothNotesCommand.class, command);
+    }
+
+    @Test
+    void testParseUnlinkBothWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both"));
+    }
+
+    @Test
+    void testParseUnlinkBothWithOnlyOneIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both abcd1234"));
+    }
+
+    @Test
+    void testParseUnlinkBothWithTooManyArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both abcd1234 ef567890 12345678"));
+    }
+
+    @Test
+    void testParseUnlinkBothWithTooShortFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both abc ef567890"));
+    }
+
+    @Test
+    void testParseUnlinkBothWithTooShortSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both abcd1234 ef5"));
+    }
+
+    @Test
+    void testParseUnlinkBothWithTooLongFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both abcd12345 ef567890"));
+    }
+
+    @Test
+    void testParseUnlinkBothWithTooLongSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both abcd1234 ef567890123"));
+    }
+
+    @Test
+    void testParseUnlinkBothWithSpecialCharactersFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both abcd-234 ef567890"));
+    }
+
+    @Test
+    void testParseUnlinkBothWithSpecialCharactersSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both abcd1234 ef56@890"));
+    }
+
+    @Test
+    void testParseUnlinkBothWithUppercaseFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both ABCD1234 ef567890"));
+    }
+
+    @Test
+    void testParseUnlinkBothWithUppercaseSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both abcd1234 EF567890"));
+    }
+
+    @Test
+    void testParseUnlinkBothWithInvalidHexCharactersFirstIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both abcdefgh ef567890"));
+    }
+
+    @Test
+    void testParseUnlinkBothWithInvalidHexCharactersSecondIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both abcd1234 ghijk890"));
     }
 }

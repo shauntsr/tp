@@ -40,12 +40,6 @@ public class LinkNotesCommand extends Command {
             throw new NoNotesException("You have no notes to link.");
         }
 
-        // Check if attempting to link a note to itself
-        if (sourceNoteId.equals(targetNoteId)) {
-            throw new NoteSelfLinkException("Cannot link a note to itself. Note ID: '" + sourceNoteId + "'.");
-        }
-
-
         // Try to find both notes
         Optional<Note> sourceNote = notes.stream()
                 .filter(n -> n.getId().equals(sourceNoteId))
@@ -61,6 +55,11 @@ public class LinkNotesCommand extends Command {
             throw new InvalidNoteIdException("Note with ID '"+ targetNoteId + "' does not exist.");
         }
         
+        // Check if attempting to link a note to itself
+        if (sourceNoteId.equals(targetNoteId)) {
+            throw new NoteSelfLinkException("Cannot link a note to itself. Note ID: '" + sourceNoteId + "'.");
+        }
+
         // Check if link already exists
         if (sourceNote.get().isLinkedTo(targetNoteId)) {
             throw new NotesAlreadyLinkedException("Note with ID '" + sourceNoteId

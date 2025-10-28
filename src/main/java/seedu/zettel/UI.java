@@ -222,7 +222,15 @@ public class UI {
         }
     }
 
-    public void showNotesUnlinked(String sourceNoteId, String targetNoteId) {
+    public void showSuccessfullyUnlinkedNotes(String sourceNoteId, String targetNoteId) {
         System.out.println(" The link from note #" + sourceNoteId + " to note #" + targetNoteId + " has been removed.");
+    }
+
+    public void showSuccessfullyDoubleLinkedNotes(String noteTitle1, String noteTitle2) {
+        System.out.println(" Notes '" + noteTitle1 + "' and '" + noteTitle2 + "' are now linked in both directions.");
+    }
+
+    public void showSuccessfullyUnlinkedBothNotes(String noteId1, String noteId2) {
+        System.out.println(" All links between note #" + noteId1 + " and note #" + noteId2 + " have been removed.");
     }
 }
