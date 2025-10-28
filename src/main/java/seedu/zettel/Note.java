@@ -68,7 +68,7 @@ public class Note {
         this.outgoingLinks = new HashSet<>();
         this.incomingLinks = new HashSet<>();
         numberOfNotes++;
-        logger.info("New note created: ID=" + id + ", title='" + title + "'");
+        logger.info("Sucessful note creation!");
     }
 
     /**
@@ -375,6 +375,15 @@ public class Note {
      */
     public void updateModifiedAt() {
         this.modifiedAt = Instant.now();
+    }
+
+    /**
+     * Load new body content for this note after storage parsing
+     *
+     * @param body The new body content
+     */
+    public void loadBody(String body) {
+        this.body = body;
     }
 
     /**

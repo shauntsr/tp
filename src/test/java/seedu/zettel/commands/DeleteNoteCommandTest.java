@@ -1,209 +1,224 @@
-
 package seedu.zettel.commands;
 
-import java.io.ByteArrayInputStream;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.AfterEach;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import org.junit.jupiter.api.io.TempDir;
 import seedu.zettel.Note;
 import seedu.zettel.UI;
 import seedu.zettel.exceptions.InvalidNoteIdException;
 import seedu.zettel.exceptions.NoNotesException;
-import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.storage.Storage;
 
-public class DeleteNoteCommandTest {
+import java.io.ByteArrayInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
-    private static final String FILE_PATH = "./data/zettel.txt";
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-    // Simple UI test double that records calls
-    private static class TestUI extends UI {
-        private final ArrayList<String> events = new ArrayList<>();
+class DeleteNoteCommandTest {
 
-        public void showDeleteNotFound(String id) {
-            events.add("notFound:" + id);
-        }
-        
-        @Override
-        public void showDeleteConfirmation(String noteId, String title) {
-            events.add("confirm:" + noteId + ":" + title);
-        }
+    @TempDir
+    Path tempDir;
 
-        @Override
-        public void showNoteDeleted(String id) {
-            events.add("noteDeleted:" + id);
-        }
-
-        @Override
-        public void showDeletionCancelled() {
-            events.add("cancelled");
-        }
-
-        public boolean containsEvent(String e) {
-            return events.stream().anyMatch(s -> s.equals(e));
-        }
-    }
+    private Storage storage;
+    private UI ui;
+    private ArrayList<Note> notes;
+    private List<String> tags;
 
     @BeforeEach
-    public void setUp() {
-        // nothing to set up globally
+    void setUp() {
+        storage = new Storage(tempDir.toString());
+        storage.init();
+        ui = new UI();
+        notes = new ArrayList<>();
+        tags = new ArrayList<>();
     }
 
-    @AfterEach
-    public void tearDown() {
-        // restore System.in in case a test changed it
-        System.setIn(System.in);
-    }
-
-    
     @Test
-    public void testEmptyNotesListThrowsException() {
-        ArrayList<Note> notes = new ArrayList<>();
-        List<String> tags = new ArrayList<>();
-        TestUI ui = new TestUI();
-        Storage storage = new Storage(FILE_PATH) {
-            @Override
-            public void save(List<Note> notesToSave) {
-                // no-op for tests
-            }
-        };
+    void execute_successfulDelete_removesFileAndMetadata() throws Exception {
+        // Create a test note
+        Note testNote = new Note(
+                "12345678",
+                "Test Note",
+                "Test_Note.txt",
+                "Test body content",
+                Instant.now(),
+                Instant.now()
+        );
+        notes.add(testNote);
 
-        DeleteNoteCommand cmd = new DeleteNoteCommand("12345678", true);
-        assertThrows(NoNotesException.class, () -> {
-            cmd.execute(notes, tags, ui, storage);
-        });
+        // Create the physical file
+        storage.createStorageFile(testNote);
+        storage.save(notes);
+
+        // Verify file exists before deletion
+        Path notesDir = tempDir.resolve("main").resolve("notes");
+        Path noteFile = notesDir.resolve("Test_Note.txt");
+        assertTrue(Files.exists(noteFile), "Note file should exist before deletion");
+
+        // Execute delete with force flag (skip confirmation)
+        DeleteNoteCommand command = new DeleteNoteCommand("12345678", true);
+        command.execute(notes, tags, ui, storage);
+
+        // Verify note removed from list
+        assertEquals(0, notes.size(), "Note should be removed from ArrayList");
+
+        // Verify physical file deleted
+        assertFalse(Files.exists(noteFile), "Note file should be deleted");
+
+        // Verify metadata removed from index.txt
+        Path indexPath = tempDir.resolve("main").resolve("index.txt");
+        String indexContent = Files.readString(indexPath);
+        assertFalse(indexContent.contains("12345678"), "Note ID should not be in index.txt");
     }
-    
+
     @Test
-    public void testNoteIdNotFoundException() {
-        // Create a list with some notes
-        ArrayList<Note> notes = new ArrayList<>();
-        List<String> tags = new ArrayList<>();
-        notes.add(new Note("12345678", "Note One", "note1.txt", "Body 1", Instant.now(), Instant.now()));
-        notes.add(new Note("abcdefgh", "Note Two", "note2.txt", "Body 2", Instant.now(), Instant.now()));
+    void execute_missingBodyFile_stillRemovesMetadata() throws Exception {
+        // Create a note
+        Note testNote = new Note(
+                "abcdefgh",
+                "Orphan Note",
+                "Orphan_Note.txt",
+                "Body content",
+                Instant.now(),
+                Instant.now()
+        );
+        notes.add(testNote);
 
-        TestUI ui = new TestUI();
-        Storage storage = new Storage(FILE_PATH) {
-            @Override
-            public void save(List<Note> notesToSave) {
-                // no-op
-            }
-        };
+        // Manually write only metadata to index.txt (without body file)
+        Path indexPath = tempDir.resolve("main").resolve("index.txt");
+        Files.createDirectories(indexPath.getParent());
 
-        // Try to delete a note with a valid format ID (8 alphanumeric chars) that doesn't exist
-        DeleteNoteCommand cmd = new DeleteNoteCommand("99999999", true);
+        // Follow actual index format
+        String metadata = String.join(" | ",
+                testNote.getId(),
+                testNote.getTitle(),
+                testNote.getFilename(),
+                testNote.getCreatedAt().toString(),
+                testNote.getModifiedAt().toString(),
+                "0",  // pin flag
+                "0",  // archive flag
+                "",   // tags (empty)
+                "",   // tags (empty)
+                ""    // extra placeholder
+        );
 
-        // Should throw InvalidNoteIdException because the noteId format is valid but the note doesn't exist
+        Files.writeString(indexPath, metadata + System.lineSeparator());
+
+        // Verify body file is missing
+        Path notesDir = tempDir.resolve("main").resolve("notes");
+        Path noteFile = notesDir.resolve("Orphan_Note.txt");
+        assertFalse(Files.exists(noteFile), "Note file should not exist");
+
+        // Execute delete
+        DeleteNoteCommand command = new DeleteNoteCommand("abcdefgh", true);
+        command.execute(notes, tags, ui, storage);
+
+        // Verify note removed from list
+        assertEquals(0, notes.size(), "Note should be removed even if file is missing");
+
+        // Verify metadata removed
+        String indexContent = Files.readString(indexPath);
+        assertFalse(indexContent.contains("abcdefgh"), "Note ID should not be in index.txt");
+    }
+
+
+    @Test
+    void execute_nonExistentId_throwsException() {
+        // Add a different note
+        Note testNote = new Note(
+                "11111111",
+                "Existing Note",
+                "Existing_Note.txt",
+                "Content",
+                Instant.now(),
+                Instant.now()
+        );
+        notes.add(testNote);
+
+        // Try to delete non-existent note
+        DeleteNoteCommand command = new DeleteNoteCommand("99999999", true);
+
         assertThrows(InvalidNoteIdException.class, () -> {
-            cmd.execute(notes, tags, ui, storage);
-        });
+            command.execute(notes, tags, ui, storage);
+        }, "Should throw InvalidNoteIdException for non-existent ID");
 
-        // Verify that notes list is unchanged (nothing was deleted)
-        assertEquals(2, notes.size());
+        // Verify original note still exists
+        assertEquals(1, notes.size(), "Original note should remain");
     }
 
-    
-    @Test // test deleting an existing note with force
-    public void testDeleteNoteWithForce() throws ZettelException {
-        ArrayList<Note> notes = new ArrayList<>();
-        List<String> tags = new ArrayList<>();
-        notes.add(new Note("12345678", "Note One", "note1.txt", "Body 1", Instant.now(), Instant.now()));
-        notes.add(new Note("abcdefgh", "Note Two", "note2.txt", "Body 2", Instant.now(), Instant.now()));
+    @Test
+    void execute_emptyNotesList_throwsException() {
+        // Try to delete from empty list
+        DeleteNoteCommand command = new DeleteNoteCommand("12345678", true);
 
-        TestUI ui = new TestUI();
-        Storage storage = new Storage(FILE_PATH) {
-            @Override
-            public void save(List<Note> notesToSave) {
-                // no-op for tests
-            }
-        };
-
-        DeleteNoteCommand cmd = new DeleteNoteCommand("12345678", true);
-        cmd.execute(notes, tags, ui, storage);
-
-        assertTrue(ui.containsEvent("noteDeleted:12345678"), "expected UI to record noteDeleted:12345678");
-        assertEquals(1, notes.size());
+        assertThrows(NoNotesException.class, () -> {
+            command.execute(notes, tags, ui, storage);
+        }, "Should throw NoNotesException when notes list is empty");
     }
 
-    @Test // test deleting a note without force, user confirms
-    public void testDeleteNoteUserConfirms() throws ZettelException {
-        String userInput = "y\n";
-        System.setIn(new ByteArrayInputStream(userInput.getBytes()));
+    @Test
+    void execute_withConfirmation_deletesOnYes() throws Exception {
+        // Create test note
+        Note testNote = new Note(
+                "22222222",
+                "Confirm Delete",
+                "Confirm_Delete.txt",
+                "Test content",
+                Instant.now(),
+                Instant.now()
+        );
+        notes.add(testNote);
+        storage.createStorageFile(testNote);
+        storage.save(notes);
 
-        ArrayList<Note> notes = new ArrayList<>();
-        List<String> tags = new ArrayList<>();
-        notes.add(new Note("12345678", "Note One", "note1.txt", "Body 1", Instant.now(), Instant.now()));
-        notes.add(new Note("abcdefgh", "Note Two", "note2.txt", "Body 2", Instant.now(), Instant.now()));
-
-        TestUI ui = new TestUI();
-        Storage storage = new Storage(FILE_PATH) {
-            @Override
-            public void save(List<Note> notesToSave) {
-                // no-op for tests
-            }
-        };
-
-        DeleteNoteCommand cmd = new DeleteNoteCommand("abcdefgh", false);
-        cmd.execute(notes, tags, ui, storage);
-
-        assertTrue(ui.containsEvent("noteDeleted:abcdefgh"), "expected UI to record noteDeleted:abcdefgh");
-        assertEquals(1, notes.size());
-    }
-
-    @Test // test deleting a note without force, user cancels
-    public void testDeleteNoteUserCancels() throws ZettelException {
-        String userInput = "n\n";
-        System.setIn(new ByteArrayInputStream(userInput.getBytes()));
-
-        ArrayList<Note> notes = new ArrayList<>();
-        List<String> tags = new ArrayList<>();
-        notes.add(new Note("12345678", "Note One", "note1.txt", "Body 1", Instant.now(), Instant.now()));
-        notes.add(new Note("abcdefgh", "Note Two", "note2.txt", "Body 2", Instant.now(), Instant.now()));
-
-        TestUI ui = new TestUI();
-        Storage storage = new Storage(FILE_PATH) {
-            @Override
-            public void save(List<Note> notesToSave) {
-                // no-op for tests
-            }
-        };
-
-        DeleteNoteCommand cmd = new DeleteNoteCommand("12345678", false);
-        cmd.execute(notes, tags, ui, storage);
-
-        assertTrue(ui.containsEvent("cancelled"), "expected UI to record cancelled");
-        assertEquals(2, notes.size());
-    }
-    
-    @Test // test deleting a note without force, user types "yes"
-    public void testDeleteNoteUserTypesYesNoteIsDeleted() throws ZettelException {
+        // Simulate user typing "yes"
         String userInput = "yes\n";
         System.setIn(new ByteArrayInputStream(userInput.getBytes()));
 
-        ArrayList<Note> notes = new ArrayList<>();
-        List<String> tags = new ArrayList<>();
-        notes.add(new Note("12345678", "Note One", "note1.txt", "Body 1", Instant.now(), Instant.now()));
+        // Execute delete without force flag
+        DeleteNoteCommand command = new DeleteNoteCommand("22222222", false);
+        command.execute(notes, tags, ui, storage);
 
-        TestUI ui = new TestUI();
-        Storage storage = new Storage(FILE_PATH) {
-            @Override
-            public void save(List<Note> notesToSave) {
-                // no-op for tests
-            }
-        };
+        // Verify deletion occurred
+        assertEquals(0, notes.size(), "Note should be deleted after confirmation");
+    }
 
-        DeleteNoteCommand cmd = new DeleteNoteCommand("12345678", false);
-        cmd.execute(notes, tags, ui, storage);
+    @Test
+    void execute_withConfirmation_cancelsOnNo() throws Exception {
+        // Create test note
+        Note testNote = new Note(
+                "33333333",
+                "Cancel Delete",
+                "Cancel_Delete.txt",
+                "Test content",
+                Instant.now(),
+                Instant.now()
+        );
+        notes.add(testNote);
+        storage.createStorageFile(testNote);
+        storage.save(notes);
 
-        assertTrue(ui.containsEvent("noteDeleted:12345678"), "expected UI to record noteDeleted:12345678");
-        assertEquals(0, notes.size());
+        // Simulate user typing "no"
+        String userInput = "no\n";
+        System.setIn(new ByteArrayInputStream(userInput.getBytes()));
+
+        // Execute delete without force flag
+        DeleteNoteCommand command = new DeleteNoteCommand("33333333", false);
+        command.execute(notes, tags, ui, storage);
+
+        // Verify deletion was cancelled
+        assertEquals(1, notes.size(), "Note should not be deleted after cancellation");
+
+        // Verify file still exists
+        Path notesDir = tempDir.resolve("main").resolve("notes");
+        Path noteFile = notesDir.resolve("Cancel_Delete.txt");
+        assertTrue(Files.exists(noteFile), "Note file should still exist after cancellation");
     }
 }

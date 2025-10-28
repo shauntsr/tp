@@ -19,8 +19,16 @@ import seedu.zettel.Note;
  */
 public class NoteSerializer {
 
+    /** Delimiter used for separating items in lists during serialization. */
     static final String LIST_DELIM = ";;";
 
+    /**
+     * Loads notes from the index file and their corresponding body files.
+     *
+     * @param indexPath the path to the index file containing note metadata
+     * @param notesDir the directory containing note body files
+     * @return an ArrayList of loaded notes
+     */
     public ArrayList<Note> loadNotes(Path indexPath, Path notesDir) {
         try (Stream<String> lines = Files.lines(indexPath)) {
             return lines.map(this::parseIndex)
@@ -33,6 +41,13 @@ public class NoteSerializer {
         }
     }
 
+    /**
+     * Saves a list of notes to the index file.
+     *
+     * @param notes the list of notes to save
+     * @param indexPath the path where the index file should be written
+     * @throws IOException if there's an error writing to the file
+     */
     public void saveNotes(List<Note> notes, Path indexPath) throws IOException {
         List<String> lines = notes.stream()
                 .map(this::toIndexFormat)
@@ -41,6 +56,12 @@ public class NoteSerializer {
         Files.write(indexPath, lines);
     }
 
+    /**
+     * Reads the index file and extracts the expected filenames of note body files.
+     *
+     * @param indexPath the path to the index file
+     * @return a list of expected filenames
+     */
     public List<String> getExpectedFilenames(Path indexPath) {
         List<String> expectedFiles = new ArrayList<>();
 
@@ -55,19 +76,32 @@ public class NoteSerializer {
         return expectedFiles;
     }
 
+    /**
+     * Loads the body content for a note from its corresponding body file.
+     *
+     * @param note the note to load the body for
+     * @param notesDir the directory containing note body files
+     * @return the note with its body loaded
+     */
     private Note loadNoteBody(Note note, Path notesDir) {
         Path bodyFile = notesDir.resolve(note.getFilename());
         try {
             String body = Files.readString(bodyFile);
-            note.setBody(body);
+            note.loadBody(body);
         } catch (IOException e) {
             System.out.println("Warning: cannot read body file for '" +
                     note.getTitle() + "': " + e.getMessage());
-            note.setBody("");
+            note.loadBody("");
         }
         return note;
     }
 
+    /**
+     * Converts a note to its string representation for storage in the index file.
+     *
+     * @param note the note to convert
+     * @return the string representation of the note in index format
+     */
     private String toIndexFormat(Note note) {
         String logsStr = String.join(LIST_DELIM, note.getLogs());
         String tagsStr = String.join(LIST_DELIM, note.getTags());
@@ -88,6 +122,12 @@ public class NoteSerializer {
         );
     }
 
+    /**
+     * Parses a line from the index file and creates a Note object.
+     *
+     * @param line the line to parse from the index file
+     * @return a Note object, or null if the line is corrupted or invalid
+     */
     private Note parseIndex(String line) {
         if (line == null || line.isBlank()) {
             return null;
