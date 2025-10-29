@@ -12,10 +12,10 @@ import seedu.zettel.exceptions.NoNotesException;
 import seedu.zettel.exceptions.NoTagsException;
 import seedu.zettel.storage.Storage;
 
-public class ListTagsIndividualNoteCommand extends Command {
+public class ListTagsSingleNoteCommand extends Command {
     private String noteId;
 
-    public ListTagsIndividualNoteCommand(String noteId) {
+    public ListTagsSingleNoteCommand(String noteId) {
         this.noteId = noteId;
     }
 
@@ -34,12 +34,12 @@ public class ListTagsIndividualNoteCommand extends Command {
             throw new InvalidNoteIdException("Note with ID '" + noteId + "' does not exist.");
         }
 
-        // Validation 3: Check if tag list is empty for that individual note
+        // Validation 3: Check if tag list is empty for that single note
         if (maybe.get().getTags().isEmpty()) {
             throw new NoTagsException("No tags are tagged to note with ID '" + noteId + "'.");
         }
-        // Show the tags for the individual note
+        // Show the tags for the single note
 
-        ui.showTagsIndividualNote(maybe.get().getTags(), noteId);
+        ui.showTagsSingleNote(maybe.get().getTags(), noteId);
     }
 }

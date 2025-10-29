@@ -69,11 +69,11 @@ public class TagNoteCommand extends Command {
         if (!tags.contains(tag)) {
             tags.add(tag);
             storage.updateTags(tags);
-            ui.showTagAdded(tag);
+            ui.showSuccessfullyAddedTag(tag);
         }
 
         note.addTag(tag);
-        ui.showTaggedNote(noteID, tag);
+        ui.showSuccessfullyTaggedNote(noteID, tag);
     }
 
     private void validateTag(String tag) throws InvalidFormatException {

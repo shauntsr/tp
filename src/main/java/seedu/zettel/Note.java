@@ -311,6 +311,15 @@ public class Note {
     }
 
     /**
+     * Removes a tag from this note's tags list.
+     *
+     * @param tag The tag to remove
+     */
+    public void removeTag(String tag) {
+        this.tags.remove(tag);
+    }
+
+    /**
      * Adds a note ID to the "outgoingLinks" set.
      *
      * @param noteId The note ID to add
