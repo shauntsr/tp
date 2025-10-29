@@ -55,6 +55,8 @@ public class UI {
         System.out.println("   tag new <tag-name>           - Adds a tag");
         System.out.println("   tag add <note-id> <tag-name> - Tag a note");
         System.out.println("   find <text>                  - Search for notes");
+        System.out.println("   archive <note-id>            - Moves note to archive folder");
+        System.out.println("   unarchive <note-id           - Moves note out of archive folder");
         System.out.println("   bye                          - Exit the application");
         System.out.println();
         printLine();
@@ -129,18 +131,25 @@ public class UI {
     /**
      * Displays a list of notes.
      *
-     * @param notes The list of notes to display.
-     * @param isPinned True if displaying only pinned notes; false otherwise.
+     * @param notes       The list of notes to display.
+     * @param isPinned    True if displaying only pinned notes; false otherwise.
+     * @param isArchived  True if displaying only archived notes; false otherwise.
      */
-    public void showNoteList(List<Note> notes, boolean isPinned) {
-        // Show number of notes found.
-        if (isPinned) {
-            System.out.println("You have " + notes.size() + " pinned notes:");
+    public void showNoteList(List<Note> notes, boolean isPinned, boolean isArchived) {
+        // Determine label based on flags
+        String label;
+        if (isPinned && isArchived) {
+            label = "pinned and archived notes";
+        } else if (isPinned) {
+            label = "pinned notes";
+        } else if (isArchived) {
+            label = "archived notes";
         } else {
-            System.out.println("You have " + notes.size() + " notes:");
+            label = "notes";
         }
 
-        // Show the list of notes.
+        System.out.println("You have " + notes.size() + " " + label + ":");
+
         for (int idx = 0; idx < notes.size(); idx++) {
             System.out.println("    " + (idx + 1) + ". " + notes.get(idx));
         }
@@ -246,4 +255,13 @@ public class UI {
     public void showSuccessfullyUnlinkedBothNotes(String noteId1, String noteId2) {
         System.out.println(" All links between note #" + noteId1 + " and note #" + noteId2 + " have been removed.");
     }
+
+    public void showArchivedNote(Note note) {
+        System.out.println("Archived note: archive/" + note.getFilename());
+    }
+
+    public void showUnarchivedNote(Note note) {
+        System.out.println("Unarchived note: " + note.getFilename() + " (moved to notes/)");
+    }
+
 }
