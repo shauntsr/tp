@@ -58,7 +58,7 @@ public class UI {
         System.out.println("   unlink <source-id> <target-id> - Unlink two notes");
         System.out.println("   link-both <id1> <id2>        - Link two notes in both directions");
         System.out.println("   unlink-both <id1> <id2>      - Unlink two notes in both directions");
-        System.out.println("   list-tags-all                - Lists all tags that exist globally.");
+        System.out.println("   list-tags-all                - Lists all tags that exist globally");
         System.out.println("   list-tags <note-id>          - List tags for an individual note");
         System.out.println("   find <text>                  - Search for notes");
         System.out.println("   bye                          - Exit the application");
@@ -253,6 +253,14 @@ public class UI {
         System.out.println(" All links between note #" + noteId1 + " and note #" + noteId2 + " have been removed.");
     }
 
+
+    public void showTagsIndividualNote(List<String> tags, String noteId) {
+        System.out.println(" Tags for note #" + noteId + ":");
+        for (int i = 0; i < tags.size(); i++) {
+            System.out.println(" " + (i + 1) + ". " + tags.get(i));
+        }
+    }
+
     public void showTagsListGlobal(List<String> tags) {
         System.out.println("You have " + tags.size() + " tags:");
         // Show the list of tags.
@@ -260,5 +268,4 @@ public class UI {
             System.out.println("    " + (idx + 1) + ". " + tags.get(idx));
         }
     }
-
 }
