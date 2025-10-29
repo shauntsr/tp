@@ -1,7 +1,10 @@
 package seedu.zettel.commands;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -30,6 +33,7 @@ public class DeleteTagFromNoteCommandTest {
 
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     private final PrintStream originalOutputStream = System.out;
+    private final InputStream originalInputStream = System.in;
     private ArrayList<Note> notes;
     private UI ui;
     private Storage storage;
@@ -62,6 +66,12 @@ public class DeleteTagFromNoteCommandTest {
     @AfterEach
     void tearDown() {
         System.setOut(originalOutputStream);
+        System.setIn(originalInputStream);
+    }
+
+    private void setInput(String input) {
+        ByteArrayInputStream in = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
+        System.setIn(in);
     }
 
     // ==================== Empty Notes List Test ====================
@@ -69,7 +79,7 @@ public class DeleteTagFromNoteCommandTest {
     @Test
     void testEmptyNotesListThrowsNoNotesException() {
         notes.clear();
-        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("abcd1234", "java");
+        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("abcd1234", "java", true);
 
         ZettelException e = assertThrows(NoNotesException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
@@ -82,7 +92,7 @@ public class DeleteTagFromNoteCommandTest {
 
     @Test
     void testNoteIdNotFoundThrowsInvalidNoteIdException() {
-        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("deadbeef", "java");
+        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("deadbeef", "java", true);
 
         ZettelException e = assertThrows(InvalidNoteIdException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
@@ -94,7 +104,7 @@ public class DeleteTagFromNoteCommandTest {
     @Test
     void testNoteIdCaseSensitivity() {
         // Note IDs are lowercase hex, so uppercase should fail
-        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("ABCD1234", "java");
+        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("ABCD1234", "java", true);
 
         assertThrows(InvalidNoteIdException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
@@ -105,7 +115,7 @@ public class DeleteTagFromNoteCommandTest {
 
     @Test
     void testTagNotFoundThrowsTagNotFoundException() {
-        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("abcd1234", "nonexistent");
+        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("abcd1234", "nonexistent", true);
 
         ZettelException e = assertThrows(TagNotFoundException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
@@ -117,7 +127,7 @@ public class DeleteTagFromNoteCommandTest {
     @Test
     void testTagExistsInOtherNoteButNotThisOne() {
         // "python" exists in note2 but not in note1
-        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("abcd1234", "python");
+        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("abcd1234", "python", true);
 
         assertThrows(TagNotFoundException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
@@ -127,12 +137,12 @@ public class DeleteTagFromNoteCommandTest {
     // ==================== Successful Deletion Tests ====================
 
     @Test
-    void testSuccessfullyDeleteSingleTag() throws ZettelException {
+    void testSuccessfullyDeleteSingleTag_forceFlagSkipsConfirmation() throws ZettelException {
         Note note1 = notes.get(0);
         assertTrue(note1.getTags().contains("java"), "Note should have 'java' tag before deletion");
         assertEquals(3, note1.getTags().size(), "Note should have 3 tags before deletion");
 
-        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("abcd1234", "java");
+        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("abcd1234", "java", true);
         cmd.execute(notes, tags, ui, storage);
 
         assertFalse(note1.getTags().contains("java"), "Note should not have 'java' tag after deletion");
@@ -142,10 +152,10 @@ public class DeleteTagFromNoteCommandTest {
     }
 
     @Test
-    void testDeleteTagFromNoteWithMultipleTags() throws ZettelException {
+    void testDeleteTagFromNoteWithMultipleTags_forceFlag() throws ZettelException {
         Note note1 = notes.get(0);
         
-        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("abcd1234", "programming");
+        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("abcd1234", "programming", true);
         cmd.execute(notes, tags, ui, storage);
 
         assertFalse(note1.getTags().contains("programming"));
@@ -159,7 +169,7 @@ public class DeleteTagFromNoteCommandTest {
         Note note2 = notes.get(1); // Has only "python" tag
         assertEquals(1, note2.getTags().size(), "Note should have 1 tag before deletion");
 
-        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("ef567890", "python");
+        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("ef567890", "python", true);
         cmd.execute(notes, tags, ui, storage);
 
         assertTrue(note2.getTags().isEmpty(), "Note should have no tags after deleting the only tag");
@@ -170,28 +180,28 @@ public class DeleteTagFromNoteCommandTest {
         Note note1 = notes.get(0);
 
         // Delete first tag
-        DeleteTagFromNoteCommand cmd1 = new DeleteTagFromNoteCommand("abcd1234", "java");
+        DeleteTagFromNoteCommand cmd1 = new DeleteTagFromNoteCommand("abcd1234", "java", true);
         cmd1.execute(notes, tags, ui, storage);
         assertEquals(2, note1.getTags().size());
 
         // Delete second tag
-        DeleteTagFromNoteCommand cmd2 = new DeleteTagFromNoteCommand("abcd1234", "programming");
+        DeleteTagFromNoteCommand cmd2 = new DeleteTagFromNoteCommand("abcd1234", "programming", true);
         cmd2.execute(notes, tags, ui, storage);
         assertEquals(1, note1.getTags().size());
 
         // Delete third tag
-        DeleteTagFromNoteCommand cmd3 = new DeleteTagFromNoteCommand("abcd1234", "tutorial");
+        DeleteTagFromNoteCommand cmd3 = new DeleteTagFromNoteCommand("abcd1234", "tutorial", true);
         cmd3.execute(notes, tags, ui, storage);
         assertTrue(note1.getTags().isEmpty());
     }
 
     @Test
     void testCannotDeleteSameTagTwice() throws ZettelException {
-        DeleteTagFromNoteCommand cmd1 = new DeleteTagFromNoteCommand("abcd1234", "java");
+        DeleteTagFromNoteCommand cmd1 = new DeleteTagFromNoteCommand("abcd1234", "java", true);
         cmd1.execute(notes, tags, ui, storage);
 
         // Try to delete the same tag again
-        DeleteTagFromNoteCommand cmd2 = new DeleteTagFromNoteCommand("abcd1234", "java");
+        DeleteTagFromNoteCommand cmd2 = new DeleteTagFromNoteCommand("abcd1234", "java", true);
         assertThrows(TagNotFoundException.class, () -> {
             cmd2.execute(notes, tags, ui, storage);
         });
@@ -202,7 +212,7 @@ public class DeleteTagFromNoteCommandTest {
         Note note2 = notes.get(1);
         assertTrue(note2.getTags().contains("python"));
 
-        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("ef567890", "python");
+        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("ef567890", "python", true);
         cmd.execute(notes, tags, ui, storage);
 
         assertFalse(note2.getTags().contains("python"));
@@ -214,7 +224,7 @@ public class DeleteTagFromNoteCommandTest {
         Note note2 = notes.get(1);
         int note2TagsBefore = note2.getTags().size();
 
-        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("abcd1234", "java");
+        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("abcd1234", "java", true);
         cmd.execute(notes, tags, ui, storage);
 
         // Note2 should be unaffected
@@ -222,6 +232,38 @@ public class DeleteTagFromNoteCommandTest {
                 "Deleting tag from note1 should not affect note2");
         assertTrue(note2.getTags().contains("python"), 
                 "Note2's tags should remain unchanged");
+    }
+
+    // ==================== Confirmation Flow Tests ====================
+
+    @Test
+    void testDeleteWithConfirmationYes_removesTagAndPrintsMessages() throws ZettelException {
+        Note note1 = notes.get(0);
+        assertTrue(note1.getTags().contains("java"));
+
+        setInput("y\n");
+        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("abcd1234", "java", false);
+        cmd.execute(notes, tags, ui, storage);
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("Confirm deletion of tag 'java' on note # 'abcd1234'? (y/n)"));
+        assertTrue(output.contains(" Tag 'java' has been deleted from note #abcd1234."));
+        assertFalse(note1.getTags().contains("java"));
+    }
+
+    @Test
+    void testDeleteWithConfirmationNo_doesNotRemoveTagAndShowsCancelled() throws ZettelException {
+        Note note1 = notes.get(0);
+        assertTrue(note1.getTags().contains("java"));
+
+        setInput("n\n");
+        DeleteTagFromNoteCommand cmd = new DeleteTagFromNoteCommand("abcd1234", "java", false);
+        cmd.execute(notes, tags, ui, storage);
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("Confirm deletion of tag 'java' on note # 'abcd1234'? (y/n)"));
+        assertTrue(output.contains("Deletion cancelled"));
+        assertTrue(note1.getTags().contains("java"));
     }
 }
 

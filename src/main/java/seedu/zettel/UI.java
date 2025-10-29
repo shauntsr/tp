@@ -52,15 +52,16 @@ public class UI {
         System.out.println("   delete [-f] <note-id>        - Delete a note by ID");
         System.out.println("   pin <note-id>                - Pin a note");
         System.out.println("   unpin <note-id>              - Unpin a note");
-        System.out.println("   tag new <tag-name>           - Adds a tag");
-        System.out.println("   tag add <note-id> <tag-name> - Tag a note");
+        System.out.println("   new-tag <tag-name>           - Adds a tag");
+        System.out.println("   add-tag <note-id> <tag-name> - Tag a note");
         System.out.println("   link <source-id> <target-id> - Link two notes");
         System.out.println("   unlink <source-id> <target-id> - Unlink two notes");
         System.out.println("   link-both <id1> <id2>        - Link two notes in both directions");
         System.out.println("   unlink-both <id1> <id2>      - Unlink two notes in both directions");
         System.out.println("   list-tags-all                - Lists all tags that exist globally");
         System.out.println("   list-tags <note-id>          - List tags for an single note");
-        System.out.println("   delete-tag <note-id> <tag>   - Delete a tag from a note");
+        System.out.println("   delete-tag [-f] <note-id> <tag> - Delete a tag from a note");
+        System.out.println("   delete-tag-globally [-f] <tag> - Delete a tag from all notes");
         System.out.println("   find <text>                  - Search for notes");
         System.out.println("   bye                          - Exit the application");
         System.out.println();
@@ -90,9 +91,29 @@ public class UI {
      * @param id The ID of the note to delete.
      * @param noteTitle The title of the note to delete.
      */
-    public void showDeleteConfirmation(String id, String noteTitle) {
+    public void showDeleteNoteConfirmation(String id, String noteTitle) {
         System.out.println("Confirm deletion on '" + noteTitle + "', noteID " + id + "? (y/n)");
     }
+
+    /**
+     * Displays a confirmation prompt before deleting a tag.
+     *
+     * @param tag The tag to delete.
+     */
+    public void showDeleteTagConfirmation(String tag) {
+        System.out.println("Confirm deletion of tag '" + tag + "'? (y/n)");
+    }
+
+    /**
+     * Displays a confirmation prompt before deleting a tag from a note.
+     *
+     * @param tag The tag to delete
+     * @param noteId The ID of the note to delete.
+     */
+    public void showDeleteTagFromNoteConfirmation(String tag, String noteId) {
+        System.out.println("Confirm deletion of tag '" + tag + "' on note # '" + noteId + "'? (y/n)");
+    }
+    
 
     /**
      * Displays a generic error message.
@@ -272,5 +293,9 @@ public class UI {
 
     public void showSuccessfullyDeletedTagFromNote(String noteId, String tag) {
         System.out.println(" Tag '" + tag + "' has been deleted from note #" + noteId + ".");
+    }
+
+    public void showSuccessfullyDeletedTag(String tag) {
+        System.out.println(" Tag '" + tag + "' has been deleted across all notes, globally.");
     }
 }
