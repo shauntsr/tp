@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import seedu.zettel.exceptions.EditorNotFoundException;
 import seedu.zettel.exceptions.InvalidInputException;
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
@@ -20,6 +21,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -155,4 +157,103 @@ public class NewNoteCommandTest {
         assertTrue(Files.exists(noteFile), "Note file should be created");
         assertEquals(body, Files.readString(noteFile), "Note file should contain the body");
     }
+
+    @Test
+    void testWithBodyProvided_createsNoteWithoutOpeningEditor() throws ZettelException {
+        String title = "Note With Body";
+        String body = "This is the body content";
+
+        NewNoteCommand cmd = new NewNoteCommand(title, body);
+        cmd.execute(notes, tags, ui, storage);
+
+        assertEquals(1, notes.size(), "Note should be added to list");
+        Note note = notes.get(0);
+        assertEquals(title, note.getTitle(), "Note has correct title");
+        assertEquals(body, note.getBody(), "Note has correct body");
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("Note created:"), "Should show note created message");
+        // Should not contain "Opening editor" message
+        assertFalse(output.contains("Opening editor"), "Should not open editor when body provided");
+    }
+
+    @Test
+    void testWithoutBodyProvided_attemptsToOpenEditor() {
+        String title = "Note Without Body";
+        NewNoteCommand cmd = new NewNoteCommand(title, null);
+
+        // Editor opening will throw EditorNotFoundException in test environment
+        assertThrows(EditorNotFoundException.class,
+                () -> cmd.execute(notes, tags, ui, storage));
+
+        // Note should still be created before the exception
+        assertEquals(1, notes.size(), "Note should be created before editor fails");
+    }
+
+    @Test
+    void testWithExplicitEmptyBody_createsNoteWithoutEditor() throws ZettelException {
+        String title = "Note With Empty Body";
+        String body = ""; // Explicit empty string (from "-b" flag with no content)
+
+        NewNoteCommand cmd = new NewNoteCommand(title, body);
+        cmd.execute(notes, tags, ui, storage);
+
+        assertEquals(1, notes.size(), "Note should be added to list");
+        Note note = notes.get(0);
+        assertEquals(title, note.getTitle(), "Note has correct title");
+        assertEquals("", note.getBody(), "Note has empty body");
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("Note created:"), "Should show note created message");
+        // Should not attempt to open editor for explicit empty body
+        assertFalse(output.contains("Opening editor"), "Should not open editor for explicit empty body");
+    }
+
+    @Test
+    void testBodyNull_setsBodyToEmptyString() {
+        String title = "Null Body Test";
+        NewNoteCommand cmd = new NewNoteCommand(title, null);
+
+        assertThrows(EditorNotFoundException.class,
+                () -> cmd.execute(notes, tags, ui, storage));
+
+        assertEquals(1, notes.size());
+        Note note = notes.get(0);
+        assertEquals("", note.getBody(), "Null body should be converted to empty string");
+    }
+
+    @Test
+    void testEditorFailure_noteCreatedWithEmptyBody() throws IOException {
+        String title = "Editor Fail Test";
+        NewNoteCommand cmd = new NewNoteCommand(title, null);
+
+        assertThrows(EditorNotFoundException.class,
+                () -> cmd.execute(notes, tags, ui, storage));
+
+        assertEquals(1, notes.size(), "Note should be created despite editor failure");
+        Note note = notes.get(0);
+        assertEquals("", note.getBody(), "Note should have empty body when editor fails");
+
+        Path noteFile = tempDir.resolve("main").resolve("notes").resolve("Editor_Fail_Test.txt");
+        assertTrue(Files.exists(noteFile), "Note file should exist");
+        assertEquals("", Files.readString(noteFile), "Note file should be empty");
+    }
+
+    @Test
+    void testMultipleNotesWithAndWithoutBody() throws ZettelException {
+        NewNoteCommand cmd1 = new NewNoteCommand("First", "Has body");
+        cmd1.execute(notes, tags, ui, storage);
+
+        NewNoteCommand cmd2 = new NewNoteCommand("Second", "Also has body");
+        cmd2.execute(notes, tags, ui, storage);
+
+        assertEquals(2, notes.size(), "Both notes should be created");
+        assertEquals("Has body", notes.get(0).getBody());
+        assertEquals("Also has body", notes.get(1).getBody());
+
+        // Both should have valid IDs
+        assertTrue(notes.get(0).getId().matches("[a-f0-9]{8}"));
+        assertTrue(notes.get(1).getId().matches("[a-f0-9]{8}"));
+    }
+
 }

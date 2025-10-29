@@ -47,6 +47,7 @@ public class UI {
         System.out.println(" Available Commands:");
         System.out.println("   init <repo-name>             - Initialize a new repository");
         System.out.println("   new -t <title> [-b <body>]   - Create a new note");
+        System.out.println("   edit <note-id>               - Edit an existing note");
         System.out.println("   list [-p]                    - List all notes (or pinned only)");
         System.out.println("   delete [-f] <note-id>        - Delete a note by ID");
         System.out.println("   pin <note-id>                - Pin a note");
@@ -204,6 +205,18 @@ public class UI {
 
     public void showTagAdded(String tag) {
         System.out.println(" Tag '"+ tag + "' has been added.");
+    }
+
+    public void showOpeningEditor() {
+        System.out.println("Opening editor for note body...");
+    }
+
+    public void showNoteSavedFromEditor() {
+        System.out.println("Note body saved from editor.");
+    }
+
+    public void showNoteEdited(Note updatedNote) {
+        System.out.println("Successfully edited note: " + updatedNote.getFilename() + ", id: " + updatedNote.getId());
     }
 
     public void showSuccessfulLinking(String referencingTitle, String linkedToTitle) {

@@ -316,6 +316,10 @@ public class Storage {
         }
     }
 
+    public Path getNotePath(String filename) {
+        return fileSystemManager.getNotesPath(repoName).resolve(filename);
+    }
+
     /**
      * Deletes note's body text from the current repository.
      *
