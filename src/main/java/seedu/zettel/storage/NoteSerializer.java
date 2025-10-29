@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -19,16 +20,8 @@ import seedu.zettel.Note;
  */
 public class NoteSerializer {
 
-    /** Delimiter used for separating items in lists during serialization. */
     static final String LIST_DELIM = ";;";
 
-    /**
-     * Loads notes from the index file and their corresponding body files.
-     *
-     * @param indexPath the path to the index file containing note metadata
-     * @param notesDir the directory containing note body files
-     * @return an ArrayList of loaded notes
-     */
     public ArrayList<Note> loadNotes(Path indexPath, Path notesDir) {
         try (Stream<String> lines = Files.lines(indexPath)) {
             return lines.map(this::parseIndex)
@@ -41,13 +34,6 @@ public class NoteSerializer {
         }
     }
 
-    /**
-     * Saves a list of notes to the index file.
-     *
-     * @param notes the list of notes to save
-     * @param indexPath the path where the index file should be written
-     * @throws IOException if there's an error writing to the file
-     */
     public void saveNotes(List<Note> notes, Path indexPath) throws IOException {
         List<String> lines = notes.stream()
                 .map(this::toIndexFormat)
@@ -56,12 +42,6 @@ public class NoteSerializer {
         Files.write(indexPath, lines);
     }
 
-    /**
-     * Reads the index file and extracts the expected filenames of note body files.
-     *
-     * @param indexPath the path to the index file
-     * @return a list of expected filenames
-     */
     public List<String> getExpectedFilenames(Path indexPath) {
         List<String> expectedFiles = new ArrayList<>();
 
@@ -76,13 +56,6 @@ public class NoteSerializer {
         return expectedFiles;
     }
 
-    /**
-     * Loads the body content for a note from its corresponding body file.
-     *
-     * @param note the note to load the body for
-     * @param notesDir the directory containing note body files
-     * @return the note with its body loaded
-     */
     private Note loadNoteBody(Note note, Path notesDir) {
         Path bodyFile = notesDir.resolve(note.getFilename());
         try {
@@ -96,19 +69,37 @@ public class NoteSerializer {
         return note;
     }
 
-    /**
-     * Converts a note to its string representation for storage in the index file.
-     *
-     * @param note the note to convert
-     * @return the string representation of the note in index format
-     */
     private String toIndexFormat(Note note) {
-        String logsStr = String.join(LIST_DELIM, note.getLogs());
-        String tagsStr = String.join(LIST_DELIM, note.getTags());
+        // Filter and clean tags - remove null/empty entries
+        String tagsStr = note.getTags().stream()
+                .filter(Objects::nonNull)
+                .filter(s -> !s.trim().isEmpty())
+                .collect(Collectors.joining(LIST_DELIM));
+
         String filename = note.getFilename() != null ? note.getFilename() : "";
         String archiveName = note.getArchiveName() != null ? note.getArchiveName() : "";
 
-        return String.format("%s | %s | %s | %s | %s | %s | %s | %s | %s | %s",
+        HashSet<String> outgoingLinks = note.getOutgoingLinks();
+        String outgoingLinksStr = "";
+        if (outgoingLinks != null && !outgoingLinks.isEmpty()) {
+            outgoingLinksStr = outgoingLinks.stream()
+                    .filter(Objects::nonNull)
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.joining(LIST_DELIM));
+        }
+
+        HashSet<String> incomingLinks = note.getIncomingLinks();
+        String incomingLinksStr = "";
+        if (incomingLinks != null && !incomingLinks.isEmpty()) {
+            incomingLinksStr = incomingLinks.stream()
+                    .filter(Objects::nonNull)
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.joining(LIST_DELIM));
+        }
+
+        return String.format("%s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s",
                 note.getId(),
                 note.getTitle(),
                 filename,
@@ -117,25 +108,28 @@ public class NoteSerializer {
                 note.isPinned() ? "1" : "0",
                 note.isArchived() ? "1" : "0",
                 archiveName,
-                logsStr,
-                tagsStr
+                tagsStr,
+                outgoingLinksStr,
+                incomingLinksStr
         );
     }
 
-    /**
-     * Parses a line from the index file and creates a Note object.
-     *
-     * @param line the line to parse from the index file
-     * @return a Note object, or null if the line is corrupted or invalid
-     */
     private Note parseIndex(String line) {
         if (line == null || line.isBlank()) {
             return null;
         }
 
-        String[] fields = line.split(" \\| ", -1);
+        // Split by " | " but limit to 11 fields to handle any extra pipes in content
+        String[] fields = line.split(" \\| ", 11);
+
+        // Ensure we have exactly 11 fields
+        if (fields.length < 11) {
+            System.out.println("Skipping malformed line (expected 11 fields, got " + fields.length + "): " + line);
+            return null;
+        }
+
         try {
-            String id = fields[0];
+            String id = fields[0].trim();
             String title = fields[1];
             String filename = fields[2];
             String body = "";
@@ -145,21 +139,44 @@ public class NoteSerializer {
             boolean archived = fields[6].equals("1");
             String archiveName = fields[7].isEmpty() ? null : fields[7];
 
-            List<String> logs = new ArrayList<>();
-            if (fields.length > 8 && !fields[8].isEmpty()) {
-                logs = Arrays.asList(fields[8].split(LIST_DELIM));
-            }
-
-            String tagsStr = fields[9];
             List<String> tags = new ArrayList<>();
-            if (!tagsStr.isEmpty()) {
-                tags = Arrays.asList(tagsStr.split(LIST_DELIM));
+            if (!fields[8].trim().isEmpty()) {
+                tags = Arrays.stream(fields[8].split(LIST_DELIM))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .collect(Collectors.toList());
             }
 
-            return new Note(id, title, filename, body, createdAt, modifiedAt,
-                    pinned, archived, archiveName, logs, tags);
+            HashSet<String> outgoingLinks = new HashSet<>();
+            if (!fields[9].trim().isEmpty()) {
+                outgoingLinks = Arrays.stream(fields[9].split(LIST_DELIM))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .collect(Collectors.toCollection(HashSet::new));
+            }
+
+            HashSet<String> incomingLinks = new HashSet<>();
+            if (!fields[10].trim().isEmpty()) {
+                incomingLinks = Arrays.stream(fields[10].split(LIST_DELIM))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .collect(Collectors.toCollection(HashSet::new));
+            }
+
+            Note note = new Note(id, title, filename, body, createdAt, modifiedAt,
+                    pinned, archived, archiveName, tags);
+
+            for (String linkId : outgoingLinks) {
+                note.addOutgoingLink(linkId);
+            }
+            for (String linkId : incomingLinks) {
+                note.addIncomingLink(linkId);
+            }
+
+            return note;
         } catch (Exception e) {
-            System.out.println("Skipping corrupted line: " + line);
+            System.out.println("Skipping corrupted line: " + line + " (Error: " + e.getMessage() + ")");
+            e.printStackTrace();
             return null;
         }
     }

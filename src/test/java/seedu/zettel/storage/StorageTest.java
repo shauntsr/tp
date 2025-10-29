@@ -85,7 +85,6 @@ public class StorageTest {
                 false,
                 false,
                 null,
-                new ArrayList<>(),
                 new ArrayList<>()
         );
 
@@ -102,9 +101,9 @@ public class StorageTest {
         storage.init();
 
         Note note1 = new Note("88888889", "Title1", "Title1.txt", "Body1",
-                Instant.now(), Instant.now(), false, false, null, new ArrayList<>(), new ArrayList<>());
+                Instant.now(), Instant.now(), false, false, null,  new ArrayList<>());
         Note note2 = new Note("99999999", "Title2", "Title2.txt", "Body2",
-                Instant.now(), Instant.now(), true, false, null, new ArrayList<>(), new ArrayList<>());
+                Instant.now(), Instant.now(), true, false, null,  new ArrayList<>());
 
         List<Note> notes = List.of(note1, note2);
 

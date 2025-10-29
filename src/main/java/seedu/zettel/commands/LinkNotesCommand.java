@@ -30,6 +30,7 @@ public class LinkNotesCommand extends Command {
         this.targetNoteId = targetNoteId;
     }
 
+
     @Override
     public void execute(ArrayList<Note> notes, List<String> tags, UI ui, Storage storage) throws 
             NoNotesException, InvalidNoteIdException, NotesAlreadyLinkedException,
@@ -67,8 +68,8 @@ public class LinkNotesCommand extends Command {
         }
 
         // Create unidirectional link
-        sourceNote.get().addIncomingLink(targetNoteId);
-        targetNote.get().addOutgoingLink(sourceNoteId);
+        sourceNote.get().addOutgoingLink(targetNoteId);
+        targetNote.get().addIncomingLink(sourceNoteId);
         ui.showSuccessfulLinking(sourceNote.get().getTitle(), targetNote.get().getTitle());
     }
 

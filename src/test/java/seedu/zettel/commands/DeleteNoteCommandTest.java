@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -220,5 +221,33 @@ class DeleteNoteCommandTest {
         Path notesDir = tempDir.resolve("main").resolve("notes");
         Path noteFile = notesDir.resolve("Cancel_Delete.txt");
         assertTrue(Files.exists(noteFile), "Note file should still exist after cancellation");
+    }
+
+    @Test
+    void execute_cleanupLinks_removesAllReferencesInMemory() throws Exception {
+        Instant now = Instant.now();
+
+        Note noteA = new Note("11111111", "Note A (Target)", "Note_A.txt", "Content A", now, now);
+        Note noteB = new Note("22222222", "Note B (Source)", "Note_B.txt", "Content B", now, now);
+        Note noteC = new Note("33333333", "Note C (Target)", "Note_C.txt", "Content C", now, now);
+
+        noteB.addOutgoingLink(noteA.getId());
+        noteA.addIncomingLink(noteB.getId());
+        noteA.addOutgoingLink(noteC.getId());
+        noteC.addIncomingLink(noteA.getId());
+
+        assertTrue(noteB.getOutgoingLinks().contains(noteA.getId()), "Pre-check: B must link out to A");
+        assertTrue(noteC.getIncomingLinks().contains(noteA.getId()), "Pre-check: C must be linked by A");
+
+        // Assume DeleteNoteCommand takes a note ID and cleans up links in a provided list
+        ArrayList<Note> notes = new ArrayList<>(Arrays.asList(noteA, noteB, noteC));
+        DeleteNoteCommand command = new DeleteNoteCommand(noteA.getId(), true);
+
+        command.execute(notes, tags, ui, storage);
+
+        assertFalse(noteB.getOutgoingLinks().contains(noteA.getId()),
+                "Note B's outgoing link to A must be removed.");
+        assertFalse(noteC.getIncomingLinks().contains(noteA.getId()),
+                "Note C's incoming link from A must be removed.");
     }
 }
