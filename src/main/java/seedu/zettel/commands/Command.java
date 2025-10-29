@@ -3,10 +3,10 @@ package seedu.zettel.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
-import seedu.zettel.storage.Storage;
 import seedu.zettel.UI;
+import seedu.zettel.exceptions.ZettelException;
+import seedu.zettel.storage.Storage;
 
 /**
  * Represents an abstract command that can be executed in Zettel.
