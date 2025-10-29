@@ -1,14 +1,14 @@
 package seedu.zettel.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import seedu.zettel.Note;
 import seedu.zettel.UI;
 import seedu.zettel.exceptions.InvalidFormatException;
-import seedu.zettel.exceptions.TagExistsException;
+import seedu.zettel.exceptions.TagAlreadyExistsException;
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.storage.Storage;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Command to add a new tag to the global list of tags.
@@ -43,12 +43,11 @@ public class NewTagCommand extends Command {
         }
 
         if (tags.contains(tag)) {
-            throw new TagExistsException(tag + " already exists.");
+            throw new TagAlreadyExistsException(tag + " already exists.");
         }
 
         tags.add(tag);
         storage.updateTags(tags);
-
         ui.showTagAdded(tag);
     }
 }

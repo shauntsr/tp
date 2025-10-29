@@ -11,6 +11,8 @@ import java.util.Scanner;
  */
 public class UI {
     private static final String LINE = "____________________________________________________________";
+    private static final String LIST_INCOMING = "incoming";
+    private static final String LIST_OUTGOING = "outgoing";
     private final Scanner scanner;
 
     /**
@@ -162,7 +164,7 @@ public class UI {
     /**
      * Displays a message when no notes match a search query.
      */
-    public void showNoNotesFoundMessage() {
+    public void showNoNotesFound() {
         System.out.println(" No notes found matching the search criteria.");
     }
 
@@ -171,7 +173,7 @@ public class UI {
      *
      * @param matchedNotes The list of notes matching the search.
      */
-    public void showFoundNotesMessage(ArrayList<Note> matchedNotes) {
+    public void showFoundNotes(ArrayList<Note> matchedNotes) {
         System.out.println(" Here are the matching notes in your list:");
         for (int i = 0; i < matchedNotes.size(); i++) {
             System.out.println(" " + (i + 1) + ". " + matchedNotes.get(i));
@@ -215,5 +217,33 @@ public class UI {
 
     public void showNoteEdited(Note updatedNote) {
         System.out.println("Successfully edited note: " + updatedNote.getFilename() + ", id: " + updatedNote.getId());
+    }
+
+    public void showSuccessfulLinking(String referencingTitle, String linkedToTitle) {
+        System.out.println(" Note '" + referencingTitle + "' now links to note '" + linkedToTitle + "'.");
+    }
+
+    public void showLinkedNotes(ArrayList<Note> linkedNotes, String noteId, String listToShow) {
+        if (listToShow.equals(LIST_INCOMING)) {
+            System.out.println(" Here are the notes that link to note #" + noteId + " (incoming):");
+        } else if (listToShow.equals(LIST_OUTGOING)) {
+            System.out.println(" Here are the notes that note #" + noteId + " links to (outgoing):");
+        }
+
+        for (int i = 0; i < linkedNotes.size(); i++) {
+            System.out.println(" " + (i + 1) + ". " + linkedNotes.get(i));
+        }
+    }
+
+    public void showSuccessfullyUnlinkedNotes(String sourceNoteId, String targetNoteId) {
+        System.out.println(" The link from note #" + sourceNoteId + " to note #" + targetNoteId + " has been removed.");
+    }
+
+    public void showSuccessfullyDoubleLinkedNotes(String noteTitle1, String noteTitle2) {
+        System.out.println(" Notes '" + noteTitle1 + "' and '" + noteTitle2 + "' are now linked in both directions.");
+    }
+
+    public void showSuccessfullyUnlinkedBothNotes(String noteId1, String noteId2) {
+        System.out.println(" All links between note #" + noteId1 + " and note #" + noteId2 + " have been removed.");
     }
 }

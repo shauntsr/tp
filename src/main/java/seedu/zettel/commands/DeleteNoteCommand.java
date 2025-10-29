@@ -4,21 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
-import java.util.logging.Logger;
 
 import seedu.zettel.Note;
-import seedu.zettel.storage.Storage;
 import seedu.zettel.UI;
-import seedu.zettel.exceptions.NoNoteFoundException;
+import seedu.zettel.exceptions.InvalidNoteIdException;
 import seedu.zettel.exceptions.NoNotesException;
 import seedu.zettel.exceptions.ZettelException;
+import seedu.zettel.storage.Storage;
 
 /**
  * Command to delete a note by its ID.
  * Supports optional force deletion to skip confirmation prompt.
  */
 public class DeleteNoteCommand extends Command {
-    private static final Logger logger = Logger.getLogger(DeleteNoteCommand.class.getName());
 
     private final String noteId;
     private final boolean isForce;
@@ -56,7 +54,7 @@ public class DeleteNoteCommand extends Command {
         Optional<Note> maybe = notes.stream().filter(n -> n.getId().equals(noteId)).findFirst();
 
         if (maybe.isEmpty()) {
-            throw new NoNoteFoundException("Note with ID '" + noteId + "' does not exist.");
+            throw new InvalidNoteIdException("Note with ID '" + noteId + "' does not exist.");
         }
 
         // Happy path: Execute the delete operation
@@ -74,9 +72,16 @@ public class DeleteNoteCommand extends Command {
         }
 
         if (shouldDelete) {
+            // Delete the physical body file from notes/ directory
+            storage.deleteStorageFile(note.getFilename());
+
+            // Remove note from ArrayList (this removes metadata)
             notes.remove(note);
+
+            // Save updated index (writes to index.txt)
             storage.save(notes);
-            logger.info("Note " + note.getTitle() + ", id " + noteId + " deleted.");
+
+            // Log and show confirmation
             ui.showNoteDeleted(noteId);
         } else {
             ui.showDeletionCancelled();
