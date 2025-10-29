@@ -14,6 +14,7 @@ ____________________________________________________________
    tag new <tag-name>           - Adds a tag
    tag add <note-id> <tag-name> - Tag a note
    list-tags <note-id>          - List tags for an individual note
+   delete-tag <note-id> <tag>   - Delete a tag from a note
    find <text>                  - Search for notes
    bye                          - Exit the application
 

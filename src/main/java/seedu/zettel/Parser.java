@@ -1,25 +1,24 @@
 package seedu.zettel;
 
-import java.util.Arrays;
-
-import seedu.zettel.commands.Command;
-import seedu.zettel.commands.DeleteNoteCommand;
-import seedu.zettel.commands.EditNoteCommand;
+nds.DeleteNoteCommand;
 import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.FindNoteCommand;
-import seedu.zettel.commands.InitCommand;
+imimport seedu.zettel.commands.EditNoteCommand;
+port seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.LinkBothNotesCommand;
 import seedu.zettel.commands.LinkNotesCommand;
 import seedu.zettel.commands.ListLinkedNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
-import seedu.zettel.commands.ListTagsIndividualNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.NewTagCommand;
-import seedu.zettel.commands.PinNoteCommand;
-import seedu.zettel.commands.TagNoteCommand;
+iimport seedu.zettel.commands.ListTagsIndividualNoteCommand;
+mport seedu.zettel.commands.PinNoteCommand;
+iimport seedu.zettel.commands.NewTagCommand;
+mport seedu.zettel.commands.TagNoteCommand;
 import seedu.zettel.commands.UnlinkBothNotesCommand;
 import seedu.zettel.commands.UnlinkNotesCommand;
-import seedu.zettel.exceptions.EmptyDescriptionException;
+import seedu.zettel.exceptions.EmptyDescripti
+Exception;
 import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.InvalidInputException;
 import seedu.zettel.exceptions.ZettelException;
@@ -38,7 +37,7 @@ public class Parser {
     private static final String FIND_FORMAT = "Find format should be: find <SEARCH_TERM>";
     private static final String NOTE_FORMAT = "New note format should be: new -t <TITLE> [-b <BODY>]";
     private static final String TAG_FORMAT = "Tag command requires a subcommand: new/add";
-    private static final String TAG_NOTE_FORMAT = "Tag note command format should be: tag new <NOTE_ID> <TAG>";
+    private static final String TAG_NOTE_FORMAT = "Tag note command format should be: tag <NOTE_ID> <TAG>";
     private static final String NEW_TAG_FORMAT = "Tag add command format should be: tag add <TAG>";
     private static final String LINK_NOTES_FORMAT = "Link notes command format should be: link" 
             + " <SOURCE_NOTE_ID> <TARGET_NOTE_ID>";
@@ -48,9 +47,9 @@ public class Parser {
             + " <NOTE_ID_1> <NOTE_ID_2>";
     private static final String UNLINK_BOTH_NOTES_FORMAT = "Unlinking both notes command format should be: unlink-both" 
             + " <NOTE_ID_1> <NOTE_ID_2>";
+    private static final String NOTE_EMPTY = "Not
     private static final String LIST_TAGS_INDIVIDUAL_NOTE_FORMAT = "List tags for individual note command format "
-            + "should be: list-tags <NOTE_ID>";
-    private static final String NOTE_EMPTY = "Note title cannot be empty!";
+            + "should be: list-tags <NOTE_ID>";e title cannot be empty!";
     private static final String TAG_EMPTY = "Tag cannot be empty!";
     private static final String ID_EMPTY = "Please specify a Note ID to ";
     private static final String ID_INVALID = "Note ID must be exactly 8 hexadecimal characters (0-9, a-f)";
@@ -83,7 +82,6 @@ public class Parser {
         case "bye" -> new ExitCommand();
         case "list" -> parseListNoteCommand(inputs);
         case "new" -> parseNewNoteCommand(inputs);
-        case "edit" -> parseEditNoteCommand(inputs);
         case "delete" -> parseDeleteNoteCommand(inputs);
         case "pin" -> parsePinNoteCommand(inputs, true);
         case "unpin" -> parsePinNoteCommand(inputs, false);
@@ -94,17 +92,17 @@ public class Parser {
         case "unlink" -> parseUnlinkNotesCommand(inputs);
         case "link-both" -> parseLinkBothNotesCommand(inputs);
         case "unlink-both" -> parseUnlinkBothNotesCommand(inputs);
-        case "list-tags" -> parseListTagsIndividualNoteCommand(inputs);
         default -> throw new InvalidInputException(command);
         };
     }
 
     /**
-     * Extracts and validates a note ID from the input array.
+     * Extr
+        case "list-tags" -> parseListTagsIndividualNoteCommand(inputs);acts and validates a note ID from the input array.
      * The note ID must be exactly 8 alphanumeric characters.
      * Helper function used to validate NoteId during parsing
      *
-     * @param noteId ID of note
+     * @param inputs The tokenized user input split by spaces.
      * @param actionName The name of the action requesting the ID (for error messages).
      * @return The validated note ID string.
      * @throws ZettelException If the ID is missing, has incorrect length, or contains invalid characters.
@@ -132,7 +130,7 @@ public class Parser {
      * Accepts an optional -p flag to show only pinned notes.
      * Routes to parseListLinkedNotesCommand if the format matches listing linked notes.
      *
-     * @param inputs The tokenized user input split by spaces
+     * @param input The full user input string starting with "list".
      * @return A ListNoteCommand or ListLinkedNotesCommand object with the appropriate parameters.
      * @throws ZettelException If the command format is invalid.
      */
@@ -159,7 +157,7 @@ public class Parser {
      * Parses an init command to initialize a new repository.
      * The repository name must contain only alphanumeric characters, hyphens, and underscores.
      *
-     * @param inputs The tokenized user input split by spaces
+     * @param input The full user input string starting with "init".
      * @return An InitCommand object with the specified repository name.
      * @throws ZettelException If the repository name is empty or contains invalid characters.
      */
@@ -188,7 +186,7 @@ public class Parser {
      * Parses a new note command to create a new note with a title and optional body.
      * Expected format: new -t TITLE [-b BODY]
      *
-     * @param inputs The tokenized user input split by spaces
+     * @param input The full user input string starting with "new".
      * @return A NewNoteCommand object with the extracted title and body.
      * @throws ZettelException If the format is invalid, title flag is missing, or title is empty.
      */
@@ -203,7 +201,7 @@ public class Parser {
                 throw new InvalidFormatException(NOTE_FORMAT);
             }
             String title;
-            String body = null; // newNoteCommand sees null as not provided, "" as user wants an empty body.
+            String body = "";
 
             if (bodyIndex != -1) {
                 title = content.substring(titleIndex + 2, bodyIndex).trim();
@@ -224,26 +222,10 @@ public class Parser {
     }
 
     /**
-     * Parses an edit note command to edit an existing note's body.
-     * Expected format: edit NOTE_ID
-     *
-     * @param inputs The tokenized user input split by spaces
-     * @return An EditNoteCommand object with the extracted note ID
-     * @throws ZettelException If the format is invalid or note ID is missing
-     */
-    private static Command parseEditNoteCommand(String[] inputs) throws ZettelException {
-        if (inputs.length != 2) {
-            throw new InvalidFormatException("Invalid format. Usage: edit <NOTE_ID>");
-        }
-        String noteId = parseNoteId(inputs[1], "edit");
-        return new EditNoteCommand(noteId);
-    }
-
-    /**
      * Parses a find command to search for notes.
      * Expected format: find SEARCH_TERM
      *
-     * @param inputs The tokenized user input split by spaces
+     * @param input The full user input string starting with "find".
      * @return A FindNoteCommand object with the search query.
      * @throws ZettelException If the search query is empty.
      */
@@ -309,18 +291,6 @@ public class Parser {
         return new DeleteNoteCommand(noteId, forceDelete);
     }
 
-    /**
-     * Parses a tag command and delegates to the appropriate subcommand parser.
-     * Supported formats:
-     * <ul>
-     *     <li>tag new TAG_NAME</li>
-     *     <li>tag add NOTE_ID TAG_NAME</li>
-     * </ul>
-     *
-     * @param inputs The tokenized user input split by spaces.
-     * @return A TagNoteCommand or an AddTagCommand
-     * @throws ZettelException If the format is invalid or parameters are missing.
-     */
     private static Command parseTagCommand(String[] inputs) throws ZettelException {
         if (inputs.length < 2) {
             throw new InvalidFormatException(TAG_FORMAT);
@@ -337,7 +307,6 @@ public class Parser {
 
     /**
      * Parses a tag command to add a tag to a note.
-     * Expected Format: tag add NOTE_ID TAG_NAME
      *
      * @param inputs The tokenized user input split by spaces.
      * @return A TagNoteCommand object with the note ID and tag.
@@ -360,7 +329,6 @@ public class Parser {
 
     /**
      * Parses a new tag command to add a new tag to the config file.
-     * Expected Format: tag new TAG_NAME
      *
      * @param inputs The tokenized user input split by spaces.
      * @return An AddTagCommand object with the tag to add.
@@ -480,21 +448,27 @@ public class Parser {
 
         return new UnlinkBothNotesCommand(noteId1, noteId2);
     }
+}
 
-    /**
-     * Parses a list-tags command to display all tags associated with a specific note.
+    
+    private stat        /**
+     * Parses a list-tags command to list all tags associated with a specific note.
+     * Expected format: list-tags NOTE_ID
+     *
      * @param inputs The tokenized user input split by spaces.
      * @return A ListTagsIndividualNoteCommand object with the note ID.
      * @throws ZettelException If the format is invalid or note ID is malformed.
      */
-    private static Command parseListTagsIndividualNoteCommand(String[] inputs) throws ZettelException {
-        // expected format: list-tags <NOTE_ID>
+        private static Command parseListTagsIndividualNoteCommand(String[] inputs) throws ZettelException {
         if (inputs.length != 2) {
             throw new InvalidFormatException(LIST_TAGS_INDIVIDUAL_NOTE_FORMAT);
         }
 
         String noteId = parseNoteId(inputs[1], "list tags for");
- 
-        return new ListTagsIndividualNoteCommand(noteId);
-    }
-}
+
+        return new ListTagsIndividualNoteCommand(noteId);><> 
+            }51
+    /**
+         /**    /**
+     * Parses a list-tags command to display all tags associated with a specific note.
+        // expected format: list-tags <NOTE+_DIID>

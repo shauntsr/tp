@@ -55,6 +55,7 @@ public class UI {
         System.out.println("   tag new <tag-name>           - Adds a tag");
         System.out.println("   tag add <note-id> <tag-name> - Tag a note");
         System.out.println("   list-tags <note-id>          - List tags for an individual note");
+        System.out.println("   delete-tag <note-id> <tag>   - Delete a tag from a note");
         System.out.println("   find <text>                  - Search for notes");
         System.out.println("   bye                          - Exit the application");
         System.out.println();
@@ -253,5 +254,9 @@ public class UI {
         for (int i = 0; i < tags.size(); i++) {
             System.out.println(" " + (i + 1) + ". " + tags.get(i));
         }
+    }
+
+    public void showSuccessfullyDeletedTagSingleNote(String noteId, String tag) {
+        System.out.println(" Tag '" + tag + "' has been deleted from note #" + noteId + ".");
     }
 }
