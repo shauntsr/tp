@@ -77,9 +77,9 @@ public class ListTagsGlobalCommandTest {
         assertTrue(lines[0].contains("You have 3 tags:"), "Header should show total tag count");
 
         // Check numbering and tag names
-        assertEquals("1. work", lines[1].strip(), "First tag should be numbered 1 and be 'work'");
-        assertEquals("2. urgent", lines[2].strip(), "Second tag should be numbered 2 and be 'urgent'");
-        assertEquals("3. ideas", lines[3].strip(), "Third tag should be numbered 3 and be 'ideas'");
+        assertEquals("1. 'work'", lines[1].strip(), "First tag should be numbered 1 and be 'work'");
+        assertEquals("2. 'urgent'", lines[2].strip(), "Second tag should be numbered 2 and be 'urgent'");
+        assertEquals("3. 'ideas'", lines[3].strip(), "Third tag should be numbered 3 and be 'ideas'");
     }
 
     @Test
@@ -93,7 +93,7 @@ public class ListTagsGlobalCommandTest {
         String[] lines = output.split("\\r?\\n");
 
         assertEquals("You have 1 tags:", lines[0].strip(), "Header should show count 1");
-        assertEquals("1. todo", lines[1].strip(), "Should display numbered tag correctly");
+        assertEquals("1. 'todo'", lines[1].strip(), "Should display numbered tag correctly");
     }
 
     @Test
