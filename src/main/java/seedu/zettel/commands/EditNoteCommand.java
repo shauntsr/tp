@@ -71,7 +71,6 @@ public class EditNoteCommand extends Command {
             ui.showNoteEdited(updatedNote);
 
         } catch (EditorNotFoundException e) {
-            ui.showError("Could not open text editor: " + e.getMessage());
             throw new ZettelException("Failed to open editor: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

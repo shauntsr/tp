@@ -101,12 +101,12 @@ public class NewNoteCommand extends Command {
 
                 ui.showNoteSavedFromEditor();
             } catch (EditorNotFoundException e) {
-                ui.showError("Could not open text editor, empty body will be used: " + e.getMessage());
+                throw new EditorNotFoundException("Could not open text editor, empty body will be used: " + e.getMessage());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt(); // preserves interrupted state
                 throw new ZettelException("Editor was interrupted: " + e.getMessage());
             } catch (NoNoteFoundException e) {
-                throw new ZettelException("Failed to open note file: " + e.getMessage());
+                throw new NoNoteFoundException("Failed to open note file: " + e.getMessage());
             } catch (IOException e) {
                 throw new ZettelException("Failed to read edited content: " + e.getMessage());
             }
