@@ -30,6 +30,7 @@ public class LinkNotesCommand extends Command {
         this.targetNoteId = targetNoteId;
     }
 
+
     @Override
     public void execute(ArrayList<Note> notes, List<String> tags, UI ui, Storage storage) throws 
             NoNotesException, InvalidNoteIdException, NotesAlreadyLinkedException,

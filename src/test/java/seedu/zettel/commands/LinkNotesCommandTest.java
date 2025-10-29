@@ -155,9 +155,9 @@ public class LinkNotesCommandTest {
         // After linking abcd1234 → ef567890:
         // - abcd1234's outgoingLinks set contains ef567890
         // - ef567890's incomingLinks set contains abcd1234
-        assertTrue(note1.getOutgoingLinks().contains("ef567890"), 
+        assertTrue(note1.getOutgoingLinks().contains("ef567890"),
                 "First note should have second note in its outgoingLinks set");
-        assertTrue(note2.getIncomingLinks().contains("abcd1234"), 
+        assertTrue(note2.getIncomingLinks().contains("abcd1234"),
                 "Second note should have first note in its incomingLinks set");
     }
 
@@ -174,9 +174,9 @@ public class LinkNotesCommandTest {
         // After linking ef567890 → abcd1234:
         // - ef567890's outgoingLinks set contains abcd1234
         // - abcd1234's incomingLinks set contains ef567890
-        assertTrue(note2.getOutgoingLinks().contains("abcd1234"), 
+        assertTrue(note2.getOutgoingLinks().contains("abcd1234"),
                 "Second note should have first note in its outgoingLinks set");
-        assertTrue(note1.getIncomingLinks().contains("ef567890"), 
+        assertTrue(note1.getIncomingLinks().contains("ef567890"),
                 "First note should have second note in its incomingLinks set");
     }
 
@@ -203,13 +203,13 @@ public class LinkNotesCommandTest {
         // - abcd1234's outgoingLinks set contains ef567890
         // - 12345678's outgoingLinks set contains ef567890
         // - ef567890's incomingLinks set contains both abcd1234 and 12345678
-        assertTrue(note1.getOutgoingLinks().contains("ef567890"), 
+        assertTrue(note1.getOutgoingLinks().contains("ef567890"),
                 "First note should have second note in outgoingLinks");
-        assertTrue(note3Updated.getOutgoingLinks().contains("ef567890"), 
+        assertTrue(note3Updated.getOutgoingLinks().contains("ef567890"),
                 "Third note should have second note in outgoingLinks");
-        assertTrue(note2.getIncomingLinks().contains("abcd1234"), 
+        assertTrue(note2.getIncomingLinks().contains("abcd1234"),
                 "Second note should have first note in incomingLinks");
-        assertTrue(note2.getIncomingLinks().contains("12345678"), 
+        assertTrue(note2.getIncomingLinks().contains("12345678"),
                 "Second note should have third note in incomingLinks");
     }
 
@@ -236,14 +236,13 @@ public class LinkNotesCommandTest {
         // - abcd1234's outgoingLinks set contains both ef567890 and 12345678
         // - ef567890's incomingLinks set contains abcd1234
         // - 12345678's incomingLinks set contains abcd1234
-        assertTrue(note1.getOutgoingLinks().contains("ef567890"), 
+        assertTrue(note1.getOutgoingLinks().contains("ef567890"),
                 "First note should have second note in outgoingLinks");
-        assertTrue(note1.getOutgoingLinks().contains("12345678"), 
+        assertTrue(note1.getOutgoingLinks().contains("12345678"),
                 "First note should have third note in outgoingLinks");
-        assertTrue(note2.getIncomingLinks().contains("abcd1234"), 
+        assertTrue(note2.getIncomingLinks().contains("abcd1234"),
                 "Second note should have first note in incomingLinks");
-        assertTrue(note3Updated.getIncomingLinks().contains("abcd1234"), 
+        assertTrue(note3Updated.getIncomingLinks().contains("abcd1234"),
                 "Third note should have first note in incomingLinks");
     }
 }
-

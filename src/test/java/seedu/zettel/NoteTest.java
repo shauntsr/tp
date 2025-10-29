@@ -6,7 +6,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +47,6 @@ public class NoteTest {
         assertFalse(note.isPinned(), "New note should not be pinned by default.");
         assertFalse(note.isArchived(), "New note should not be archived by default.");
         assertNull(note.getArchiveName(), "Archive name should be null for a new note.");
-        assertTrue(note.getLogs().isEmpty(), "Logs should be empty for a new note.");
     }
 
     @Test
@@ -57,27 +55,17 @@ public class NoteTest {
         List<String> logs = List.of("Log entry 1", "Log entry 2");
         List<String> tags = List.of("Homework");
         Note loadedNote = new Note(id, title, filename, body, createdAt, modifiedAt,
-                true, true, "my-archive", logs, tags);
+                true, true, "my-archive", tags);
 
         assertEquals(id, loadedNote.getId());
         assertEquals(title, loadedNote.getTitle());
         assertTrue(loadedNote.isPinned(), "Pinned status should be loaded correctly.");
         assertTrue(loadedNote.isArchived(), "Archived status should be loaded correctly.");
         assertEquals("my-archive", loadedNote.getArchiveName());
-        assertEquals(2, loadedNote.getLogs().size());
-        assertEquals("Log entry 1", loadedNote.getLogs().get(0));
         assertEquals(1, loadedNote.getTags().size());
         assertEquals("Homework", loadedNote.getTags().get(0));
     }
 
-    @Test
-    @DisplayName("Test full constructor with null logs list")
-    void testFullConstructorWithNullLogs() {
-        Note loadedNote = new Note(id, title, filename, body, createdAt, modifiedAt,
-                false, false, null, null,null);
-        assertNotNull(loadedNote.getLogs(), "Logs list should be initialized to an empty list, not null.");
-        assertTrue(loadedNote.getLogs().isEmpty(), "Logs list should be empty when loaded with null.");
-    }
 
     @Test
     @DisplayName("Getters should return correct values")
@@ -130,28 +118,6 @@ public class NoteTest {
         assertTrue(note.getModifiedAt().isAfter(initialModifiedAt), "setPinned should update modifiedAt.");
     }
 
-    @Test
-    @DisplayName("addLog should add an entry to the logs")
-    void testAddLog() {
-        assertTrue(note.getLogs().isEmpty());
-        String logEntry = "Note created.";
-        note.addLog(logEntry);
-        assertEquals(1, note.getLogs().size());
-        assertEquals(logEntry, note.getLogs().get(0));
-    }
-
-    @Test
-    @DisplayName("getLogs should return a defensive copy")
-    void testGetLogsReturnsDefensiveCopy() {
-        note.addLog("Original log");
-        List<String> logsCopy = note.getLogs();
-
-        // Modify the returned copy
-        logsCopy.add("This should not affect the original");
-
-        assertEquals(1, note.getLogs().size(), "Modifying the copy should not affect the original list.");
-        assertEquals("Original log", note.getLogs().get(0));
-    }
 
     @Test
     @DisplayName("updateModifiedAt should update the modifiedAt timestamp")
