@@ -17,18 +17,20 @@ ____________________________________________________________
    unlink <source-id> <target-id> - Unlink two notes
    link-both <id1> <id2>        - Link two notes in both directions
    unlink-both <id1> <id2>      - Unlink two notes in both directions
+   list-tags-all                - Lists all tags that exist globally.
+   list-tags <note-id>          - List tags for an individual note
    find <text>                  - Search for notes
    bye                          - Exit the application
 
 ____________________________________________________________
-Note created: test1.txt #b6a4d234
-Note created: test2.txt #24054908
-Note created: test3.txt #7934031f
+Note created: test1.txt #a0287f24
+Note created: test2.txt #3a782a6f
+Note created: test3.txt #c7a257e1
 You have 3 notes:
-    1. test3.txt 2025-10-29 7934031f
-    2. test2.txt 2025-10-29 24054908
-    3. test1.txt 2025-10-29 b6a4d234
+    1. test3.txt 2025-10-29 c7a257e1
+    2. test2.txt 2025-10-29 3a782a6f
+    3. test1.txt 2025-10-29 a0287f24
  Here are the matching notes in your list:
- 1. test3.txt 2025-10-29 7934031f
- 2. test2.txt 2025-10-29 24054908
- 3. test1.txt 2025-10-29 b6a4d234
+ 1. test3.txt 2025-10-29 c7a257e1
+ 2. test2.txt 2025-10-29 3a782a6f
+ 3. test1.txt 2025-10-29 a0287f24
