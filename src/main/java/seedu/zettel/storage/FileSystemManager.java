@@ -177,11 +177,15 @@ public class FileSystemManager {
      *
      * @throws ZettelException if creating the tags file fails
      */
-    public void validateTagsFile() throws ZettelException{
+    public void validateTagsFile() throws ZettelException {
         Path tagsFile = rootPath.resolve(TAGS_FILE);
-        if (Files.exists(tagsFile)) {
+        try {
+            if (Files.notExists(tagsFile)) {
+                Files.createFile(tagsFile);
+            }
+        } catch (IOException e) {
+            throw new ZettelException("Error creating tags file: " + e.getMessage());
         }
-        createIfMissing(tagsFile, "tags.txt for storing tags", false);
     }
 
     /**
