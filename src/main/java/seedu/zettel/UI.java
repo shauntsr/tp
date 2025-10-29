@@ -53,6 +53,7 @@ public class UI {
         System.out.println("   unpin <note-id>              - Unpin a note");
         System.out.println("   tag new <tag-name>           - Adds a tag");
         System.out.println("   tag add <note-id> <tag-name> - Tag a note");
+        System.out.println("   list-tags-all                - Lists all tags that exist globally.");
         System.out.println("   find <text>                  - Search for notes");
         System.out.println("   bye                          - Exit the application");
         System.out.println();
@@ -233,4 +234,13 @@ public class UI {
     public void showSuccessfullyUnlinkedBothNotes(String noteId1, String noteId2) {
         System.out.println(" All links between note #" + noteId1 + " and note #" + noteId2 + " have been removed.");
     }
+
+    public void showTagsListGlobal(List<String> tags) {
+        System.out.println("You have " + tags.size() + " tags:");
+        // Show the list of tags.
+        for (int idx = 0; idx < tags.size(); idx++) {
+            System.out.println("    " + (idx + 1) + ". " + tags.get(idx));
+        }
+    }
+
 }
