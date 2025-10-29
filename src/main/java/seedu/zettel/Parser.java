@@ -150,7 +150,7 @@ public class Parser {
 
     /**
      * Parses an edit note command to edit an existing note's body.
-     * Expected format: edit <NOTE_ID>
+     * Expected format: edit NOTE_ID
      *
      * @param inputs The tokenized user input split by spaces
      * @return An EditNoteCommand object with the extracted note ID

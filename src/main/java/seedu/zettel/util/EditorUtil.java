@@ -3,9 +3,6 @@ package seedu.zettel.util;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import seedu.zettel.exceptions.EditorNotFoundException;
 import seedu.zettel.exceptions.NoNoteFoundException;
@@ -17,7 +14,6 @@ import seedu.zettel.exceptions.NoNoteFoundException;
  *  1) $VISUAL
  *  2) $EDITOR
  *  3) fallback editors: vim, nano, vi
- * <p>
  */
 public final class EditorUtil {
 

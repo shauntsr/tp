@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import seedu.zettel.commands.Command;
 import seedu.zettel.commands.DeleteNoteCommand;
+import seedu.zettel.commands.EditNoteCommand;
 import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.FindNoteCommand;
 import seedu.zettel.commands.InitCommand;
@@ -180,5 +181,63 @@ class ParserTest {
     @Test
     void testParseUnknownCommandThrowsInvalidInputException() {
         assertThrows(InvalidInputException.class, () -> Parser.parse("unknown"));
+    }
+
+    @Test
+    void testParseEditWithValidHexIdReturnsEditNoteCommand() throws ZettelException {
+        Command command = Parser.parse("edit abcd1234");
+        assertInstanceOf(EditNoteCommand.class, command);
+    }
+
+    @Test
+    void testParseEditWithoutIdThrowsEmptyDescriptionException() {
+        assertThrows(EmptyDescriptionException.class, () -> Parser.parse("edit"));
+    }
+
+    @Test
+    void testParseEditWithTooShortIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("edit abc"));
+    }
+
+    @Test
+    void testParseEditWithTooLongIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("edit abcdef123"));
+    }
+
+    @Test
+    void testParseEditWithUppercaseHexThrowsInvalidFormatException() {
+        // IDs must be lowercase hex only
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("edit ABCD1234"));
+    }
+
+    @Test
+    void testParseEditWithSpecialCharactersThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("edit abcd-234"));
+    }
+
+    @Test
+    void testParseEditWithInvalidCharactersThrowsInvalidFormatException() {
+        // 'g' is not a valid hex character
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("edit abcdefgh"));
+    }
+
+    @Test
+    void testParseEditWithTooManyArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("edit abcd1234 extra"));
+    }
+
+    @Test
+    void testParseNewNoteWithEmptyBodyFlagReturnsNewNoteCommand() throws ZettelException {
+        // "new -t Title -b" should parse successfully with empty body string
+        Command command = Parser.parse("new -t Title -b");
+        assertInstanceOf(NewNoteCommand.class, command);
+    }
+
+    @Test
+    void testParseNewNoteWithTitleOnlyCreatesCommandWithNullBody() throws ZettelException {
+        // "new -t Title" (no -b flag) should create command with null body
+        // This triggers editor opening behavior
+        Command command = Parser.parse("new -t Title");
+        assertInstanceOf(NewNoteCommand.class, command);
     }
 }

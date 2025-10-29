@@ -153,5 +153,4 @@ class EditNoteCommandTest {
 
         assertTrue(exception.getMessage().contains("not found"));
     }
-
 }

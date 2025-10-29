@@ -115,3 +115,4 @@ public class NewNoteCommand extends Command {
         ui.showAddedNote(newNote);
     }
 }
+
