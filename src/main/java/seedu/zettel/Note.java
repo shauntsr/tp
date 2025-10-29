@@ -85,6 +85,9 @@ public class Note {
      * @param archived Whether the note is archived
      * @param archiveName The archive name if archived, null otherwise
      * @param logs The list of log entries for this note
+     * @param tags The list of tags for this note
+     * @param outgoingLinks The set of note IDs that this note links to
+     * @param incomingLinks The set of note IDs that link to this note
      */
     public Note(String id, String title, String filename, String body,
                 Instant createdAt, Instant modifiedAt, boolean pinned,
@@ -332,6 +335,15 @@ public class Note {
 
     public void addTag(String tag) {
         this.tags.add(tag);
+    }
+
+    /**
+     * Removes a tag from this note's tags list.
+     *
+     * @param tag The tag to remove
+     */
+    public void removeTag(String tag) {
+        this.tags.remove(tag);
     }
 
     /**

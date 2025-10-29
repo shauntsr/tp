@@ -2,10 +2,12 @@ package seedu.zettel;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import seedu.zettel.commands.Command;
 import seedu.zettel.commands.DeleteNoteCommand;
+import seedu.zettel.commands.DeleteTagFromNoteCommand;
 import seedu.zettel.commands.EditNoteCommand;
 import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.FindNoteCommand;
@@ -13,6 +15,7 @@ import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.LinkBothNotesCommand;
 import seedu.zettel.commands.LinkNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
+import seedu.zettel.commands.ListTagsSingleNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.PinNoteCommand;
 import seedu.zettel.commands.TagNoteCommand;
@@ -579,4 +582,166 @@ class ParserTest {
     void testParseUnlinkBothWithInvalidHexCharactersSecondIdThrowsInvalidFormatException() {
         assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both abcd1234 ghijk890"));
     }
+
+    //@@author danielkwan2004-reused
+    //Reused from testParseUnlinkBoth tests above with modifications
+    //list-tags command parser tests
+    @Test
+    void testParseListTagsSingleNoteWithValidIdReturnsListTagsSingleNoteCommand() throws ZettelException {
+        Command command = Parser.parse("list-tags abcd1234");
+        assertTrue(command instanceof ListTagsSingleNoteCommand);
+    }
+
+    @Test
+    void testParseListTagsSingleNoteWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags"));
+    }
+
+    @Test
+    void testParseListTagsSingleNoteWithTooManyArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags abcd1234 ef567890"));
+    }
+
+    @Test
+    void testParseListTagsSingleNoteWithTooShortIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags abc123"));
+    }
+
+    @Test
+    void testParseListTagsSingleNoteWithTooLongIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags abcd12345"));
+    }
+
+    @Test
+    void testParseListTagsSingleNoteWithSpecialCharactersIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags abcd@234"));
+    }
+
+    @Test
+    void testParseListTagsSingleNoteWithUppercaseIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags ABCD1234"));
+    }
+
+    @Test
+    void testParseListTagsSingleNoteWithInvalidHexCharactersIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags abcdefgh"));
+    }
+
+    @Test
+    void testParseListTagsSingleNoteWithWhitespaceInIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags abc 1234"));
+    }
+
+    @Test
+    void testParseListTagsSingleNoteWithEmptyStringIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags "));
+    }
+
+    @Test
+    void testParseListTagsSingleNoteWithMixedCaseIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags AbCd1234"));
+    }
+
+    @Test
+    void testParseListTagsSingleNoteWithSymbolsIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags abcd#234"));
+    }
+
+    @Test
+    void testParseListTagsSingleNoteWithNumbersOnlyIdReturnsListTagsSingleNoteCommand() throws ZettelException {
+        Command command = Parser.parse("list-tags 12345678");
+        assertTrue(command instanceof ListTagsSingleNoteCommand);
+    }
+
+    @Test
+    void testParseListTagsSingleNoteWithLettersOnlyIdReturnsListTagsSingleNoteCommand() throws ZettelException {
+        Command command = Parser.parse("list-tags abcdefab");
+        assertTrue(command instanceof ListTagsSingleNoteCommand);
+    }
+    //@@author
+
+    //@@author danielkwan2004-reused
+    //Reused from testParseListTagsSingleNote tests above with modifications
+    //delete-tag command parser tests
+    @Test
+    void testParseDeleteTagFromNoteWithValidIdAndTagReturnsDeleteTagFromNoteCommand() 
+            throws ZettelException {
+        Command command = Parser.parse("delete-tag abcd1234 java");
+        assertTrue(command instanceof DeleteTagFromNoteCommand);
+    }
+
+    @Test
+    void testParseDeleteTagFromNoteWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag"));
+    }
+
+    @Test
+    void testParseDeleteTagFromNoteWithOnlyNoteIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag abcd1234"));
+    }
+
+    @Test
+    void testParseDeleteTagFromNoteWithTooManyArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag abcd1234 java extra"));
+    }
+
+    @Test
+    void testParseDeleteTagFromNoteWithTooShortIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag abc1234 java"));
+    }
+
+    @Test
+    void testParseDeleteTagFromNoteWithTooLongIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag abcd12345 java"));
+    }
+
+    @Test
+    void testParseDeleteTagFromNoteWithSpecialCharactersIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag abcd@234 java"));
+    }
+
+    @Test
+    void testParseDeleteTagFromNoteWithUppercaseIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag ABCD1234 java"));
+    }
+
+    @Test
+    void testParseDeleteTagFromNoteWithInvalidHexCharactersIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag abcdxyz1 java"));
+    }
+
+    @Test
+    void testParseDeleteTagFromNoteWithMixedCaseIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag AbCd1234 java"));
+    }
+
+    @Test
+    void testParseDeleteTagFromNoteWithWhitespaceInIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag abcd 1234 java"));
+    }
+
+    @Test
+    void testParseDeleteTagFromNoteWithEmptyStringIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag \"\" java"));
+    }
+
+    @Test
+    void testParseDeleteTagFromNoteWithSymbolsIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag #abcd123 java"));
+    }
+
+    @Test
+    void testParseDeleteTagFromNoteWithNumbersOnlyIdReturnsDeleteTagFromNoteCommand() 
+            throws ZettelException {
+        Command command = Parser.parse("delete-tag 12345678 java");
+        assertTrue(command instanceof DeleteTagFromNoteCommand);
+    }
+
+    @Test
+    void testParseDeleteTagFromNoteWithLettersOnlyIdReturnsDeleteTagFromNoteCommand() 
+            throws ZettelException {
+        Command command = Parser.parse("delete-tag abcdefab java");
+        assertTrue(command instanceof DeleteTagFromNoteCommand);
+    }
+    //@@author
 }

@@ -1,11 +1,11 @@
 package seedu.zettel;
 
-import seedu.zettel.commands.EditNoteCommand;
-import seedu.zettel.commands.NewTagCommand;
 import java.util.Arrays;
 
 import seedu.zettel.commands.Command;
 import seedu.zettel.commands.DeleteNoteCommand;
+import seedu.zettel.commands.DeleteTagFromNoteCommand;
+import seedu.zettel.commands.EditNoteCommand;
 import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.FindNoteCommand;
 import seedu.zettel.commands.InitCommand;
@@ -14,7 +14,9 @@ import seedu.zettel.commands.LinkNotesCommand;
 import seedu.zettel.commands.ListLinkedNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
 import seedu.zettel.commands.ListTagsGlobalCommand;
+import seedu.zettel.commands.ListTagsSingleNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
+import seedu.zettel.commands.NewTagCommand;
 import seedu.zettel.commands.PinNoteCommand;
 import seedu.zettel.commands.TagNoteCommand;
 import seedu.zettel.commands.UnlinkBothNotesCommand;
@@ -50,6 +52,9 @@ public class Parser {
             + " <NOTE_ID_1> <NOTE_ID_2>";
     private static final String UNLINK_BOTH_NOTES_FORMAT = "Unlinking both notes command format should be: unlink-both" 
             + " <NOTE_ID_1> <NOTE_ID_2>";
+    private static final String LIST_TAGS_SINGLE_NOTE_FORMAT = "List tags for single note command format "
+            + "should be: list-tags <NOTE_ID>";
+    private static final String DELETE_TAG_FORMAT = "Delete tag command format should be: delete-tag <NOTE_ID> <TAG>";
     private static final String NOTE_EMPTY = "Note title cannot be empty!";
     private static final String TAG_EMPTY = "Tag cannot be empty!";
     private static final String ID_EMPTY = "Please specify a Note ID to ";
@@ -95,6 +100,8 @@ public class Parser {
         case "link-both" -> parseLinkBothNotesCommand(inputs);
         case "unlink-both" -> parseUnlinkBothNotesCommand(inputs);
         case "list-tags-all" -> parseListTagsGlobalCommand(inputs);
+        case "list-tags" -> parseListTagsSingleNoteCommand(inputs);
+        case "delete-tag" -> parseDeleteTagFromNoteCommand(inputs);
         default -> throw new InvalidInputException(command);
         };
     }
@@ -494,5 +501,44 @@ public class Parser {
         String noteId2 = parseNoteId(inputs[2], "unlink in both directions");
 
         return new UnlinkBothNotesCommand(noteId1, noteId2);
+    }
+
+    /**
+     * Parses a list-tags command to display all tags associated with a specific note.
+     * @param inputs The tokenized user input split by spaces.
+     * @return A ListTagsSingleNoteCommand object with the note ID.
+     * @throws ZettelException If the format is invalid or note ID is malformed.
+     */
+    private static Command parseListTagsSingleNoteCommand(String[] inputs) throws ZettelException {
+        // expected format: list-tags <NOTE_ID>
+        if (inputs.length != 2) {
+            throw new InvalidFormatException(LIST_TAGS_SINGLE_NOTE_FORMAT);
+        }
+
+        String noteId = parseNoteId(inputs[1], "list tags for");
+ 
+        return new ListTagsSingleNoteCommand(noteId);
+    }
+
+    /**
+     * Parses a delete-tag command to remove a tag from a specific note.
+     * @param inputs The tokenized user input split by spaces.
+     * @return A DeleteTagFromNoteCommand object with the note ID and tag.
+     * @throws ZettelException If the format is invalid or parameters are missing.
+     */
+    private static Command parseDeleteTagFromNoteCommand(String[] inputs) throws ZettelException {
+        // Expected format: delete-tag NOTE_ID TAG_NAME
+        if (inputs.length != 3) {
+            throw new InvalidFormatException(DELETE_TAG_FORMAT);
+        }
+
+        String noteId = parseNoteId(inputs[1], "delete tag from");
+        String tag = inputs[2].trim();
+
+        if (tag.isEmpty()) {
+            throw new EmptyDescriptionException("Tag cannot be empty!");
+        }
+
+        return new DeleteTagFromNoteCommand(noteId, tag);
     }
 }
