@@ -36,7 +36,7 @@ public class Parser {
     private static final String FIND_FORMAT = "Find format should be: find <SEARCH_TERM>";
     private static final String NOTE_FORMAT = "New note format should be: new -t <TITLE> [-b <BODY>]";
     private static final String TAG_FORMAT = "Tag command requires a subcommand: new/add";
-    private static final String TAG_NOTE_FORMAT = "Tag note command format should be: tag <NOTE_ID> <TAG>";
+    private static final String TAG_NOTE_FORMAT = "Tag note command format should be: tag new <NOTE_ID> <TAG>";
     private static final String NEW_TAG_FORMAT = "Tag add command format should be: tag add <TAG>";
     private static final String LINK_NOTES_FORMAT = "Link notes command format should be: link" 
             + " <SOURCE_NOTE_ID> <TARGET_NOTE_ID>";
