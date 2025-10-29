@@ -1,6 +1,7 @@
 package seedu.zettel.storage;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -96,7 +97,7 @@ public class Storage {
         Path tagsFile = fileSystemManager.getRootPath().resolve(FileSystemManager.TAGS_FILE);
         try {
             if (Files.exists(tagsFile)) {
-                return Files.readAllLines(tagsFile)
+                return Files.readAllLines(tagsFile, StandardCharsets.UTF_8)
                         .stream()
                         .map(String::trim)
                         .filter(s -> !s.isEmpty())
@@ -105,6 +106,7 @@ public class Storage {
         } catch (IOException e) {
             System.out.println("Warning: failed to read tags.txt: " + e.getMessage());
         }
+
         return new ArrayList<>();
     }
 
@@ -174,14 +176,14 @@ public class Storage {
      * @throws ZettelException if there's an error writing to the config file
      */
     public void updateTags(List<String> tags) throws ZettelException {
-        logger.info("Updating tags in config: " + tags);
+        logger.info("Updating tags in tags.txt: " + tags);
 
         fileSystemManager.validateTagsFile(); // Ensure tags file exists
         Path rootPath= fileSystemManager.getRootPath();
         Path tagsFile = rootPath.resolve(FileSystemManager.TAGS_FILE);
 
         try {
-            Files.write(tagsFile, tags);
+            Files.write(tagsFile, tags, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new ZettelException("Failed to update tags line in .tags.txt: " + e.getMessage());
         }
@@ -207,7 +209,7 @@ public class Storage {
         // Read existing tags
         Set<String> tags = new HashSet<>();
         try {
-            List<String> lines = Files.readAllLines(tagsFile);
+            List<String> lines = Files.readAllLines(tagsFile, StandardCharsets.UTF_8);
             for (String line: lines) {
                 String tag = line.trim();
                 tags.add(tag);
@@ -228,7 +230,7 @@ public class Storage {
 
         List<String> tagsList = new ArrayList<String>(tags);
         try {
-            Files.write(tagsFile, tagsList);
+            Files.write(tagsFile, tagsList, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new ZettelException("Failed to update existing tags: " + e.getMessage());
         }

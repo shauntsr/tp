@@ -266,7 +266,7 @@ public class UI {
         System.out.println("You have " + tags.size() + " tags:");
         // Show the list of tags.
         for (int idx = 0; idx < tags.size(); idx++) {
-            System.out.println("    " + (idx + 1) + ". " + tags.get(idx));
+            System.out.println("    " + (idx + 1) + ". '" + tags.get(idx) + "'");
         }
     }
 
