@@ -13,7 +13,12 @@ ____________________________________________________________
    unpin <note-id>              - Unpin a note
    tag new <tag-name>           - Adds a tag
    tag add <note-id> <tag-name> - Tag a note
+   link <source-id> <target-id> - Link two notes
+   unlink <source-id> <target-id> - Unlink two notes
+   link-both <id1> <id2>        - Link two notes in both directions
+   unlink-both <id1> <id2>      - Unlink two notes in both directions
    list-tags-all                - Lists all tags that exist globally.
+   list-tags <note-id>          - List tags for an individual note
    find <text>                  - Search for notes
    bye                          - Exit the application
 

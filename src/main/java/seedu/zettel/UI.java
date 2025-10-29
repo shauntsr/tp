@@ -54,7 +54,12 @@ public class UI {
         System.out.println("   unpin <note-id>              - Unpin a note");
         System.out.println("   tag new <tag-name>           - Adds a tag");
         System.out.println("   tag add <note-id> <tag-name> - Tag a note");
+        System.out.println("   link <source-id> <target-id> - Link two notes");
+        System.out.println("   unlink <source-id> <target-id> - Unlink two notes");
+        System.out.println("   link-both <id1> <id2>        - Link two notes in both directions");
+        System.out.println("   unlink-both <id1> <id2>      - Unlink two notes in both directions");
         System.out.println("   list-tags-all                - Lists all tags that exist globally.");
+        System.out.println("   list-tags <note-id>          - List tags for an individual note");
         System.out.println("   find <text>                  - Search for notes");
         System.out.println("   bye                          - Exit the application");
         System.out.println();
