@@ -39,7 +39,8 @@ public class Parser {
     private static final String TAG_FORMAT = "Tag command requires a subcommand: new/add";
     private static final String TAG_NOTE_FORMAT = "Tag note command format should be: tag <NOTE_ID> <TAG>";
     private static final String NEW_TAG_FORMAT = "Tag add command format should be: tag add <TAG>";
-    private static final String LIST_TAGS_GLOBAL_FORMAT = "List all tags globally command format should be: list-tags-all";
+    private static final String LIST_TAGS_GLOBAL_FORMAT = "List all tags globally command format should be: "
+            + "list-tags-all";
     private static final String LINK_NOTES_FORMAT = "Link notes command format should be: link"
             + " <SOURCE_NOTE_ID> <TARGET_NOTE_ID>";
     private static final String UNLINK_NOTES_FORMAT = "Unlink notes command format should be: unlink" 
