@@ -36,7 +36,7 @@ public class Parser {
     private static final String FIND_FORMAT = "Find format should be: find <SEARCH_TERM>";
     private static final String NOTE_FORMAT = "New note format should be: new -t <TITLE> [-b <BODY>]";
     private static final String TAG_FORMAT = "Tag command requires a subcommand: new/add";
-    private static final String TAG_NOTE_FORMAT = "Tag note command format should be: tag <NOTE_ID> <TAG>";
+    private static final String TAG_NOTE_FORMAT = "Tag note command format should be: tag new <NOTE_ID> <TAG>";
     private static final String NEW_TAG_FORMAT = "Tag add command format should be: tag add <TAG>";
     private static final String LINK_NOTES_FORMAT = "Link notes command format should be: link" 
             + " <SOURCE_NOTE_ID> <TARGET_NOTE_ID>";
@@ -287,6 +287,18 @@ public class Parser {
         return new DeleteNoteCommand(noteId, forceDelete);
     }
 
+    /**
+     * Parses a tag command and delegates to the appropriate subcommand parser.
+     * Supported formats:
+     * <ul>
+     *     <li>tag new TAG_NAME</li>
+     *     <li>tag add NOTE_ID TAG_NAME</li>
+     * </ul>
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return A TagNoteCommand or an AddTagCommand
+     * @throws ZettelException If the format is invalid or parameters are missing.
+     */
     private static Command parseTagCommand(String[] inputs) throws ZettelException {
         if (inputs.length < 2) {
             throw new InvalidFormatException(TAG_FORMAT);
@@ -303,6 +315,7 @@ public class Parser {
 
     /**
      * Parses a tag command to add a tag to a note.
+     * Expected Format: tag add NOTE_ID TAG_NAME
      *
      * @param inputs The tokenized user input split by spaces.
      * @return A TagNoteCommand object with the note ID and tag.
@@ -325,6 +338,7 @@ public class Parser {
 
     /**
      * Parses a new tag command to add a new tag to the config file.
+     * Expected Format: tag new TAG_NAME
      *
      * @param inputs The tokenized user input split by spaces.
      * @return An AddTagCommand object with the tag to add.
