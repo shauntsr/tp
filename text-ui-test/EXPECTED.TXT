@@ -18,7 +18,7 @@ ____________________________________________________________
    link-both <id1> <id2>        - Link two notes in both directions
    unlink-both <id1> <id2>      - Unlink two notes in both directions
    list-tags-all                - Lists all tags that exist globally
-   list-tags <note-id>          - List tags for an individual note
+   list-tags <note-id>          - List tags for an single note
    delete-tag <note-id> <tag>   - Delete a tag from a note
    find <text>                  - Search for notes
    bye                          - Exit the application

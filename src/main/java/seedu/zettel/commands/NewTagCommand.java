@@ -48,6 +48,6 @@ public class NewTagCommand extends Command {
 
         tags.add(tag);
         storage.updateTags(tags);
-        ui.showTagAdded(tag);
+        ui.showSuccessfullyAddedTag(tag);
     }
 }

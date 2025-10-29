@@ -13,21 +13,20 @@ import seedu.zettel.exceptions.TagNotFoundException;
 import seedu.zettel.storage.Storage;
 
 /**
- * Represents a command to remove a bidirectional link between two notes.
- * This command removes all links between the first and the second note,
- * updating both the first and second note's outgoing links and incoming links.
+ * Represents a command to delete a tag from a specific note.
+ * This command removes a tag from the note's tag list.
  */
-public class DeleteTagSingleNoteCommand extends Command {
+public class DeleteTagFromNoteCommand extends Command {
     private String noteId;
     private String tag;
 
     /**
-     * Constructs a DeleteTagSingleNoteCommand with the specified note ID and tag.
+     * Constructs a DeleteTagFromNoteCommand with the specified note ID and tag.
      *
      * @param noteId The ID of the note.
      * @param tag The tag to be deleted.
      */
-    public DeleteTagSingleNoteCommand(String noteId, String tag) {
+    public DeleteTagFromNoteCommand(String noteId, String tag) {
         this.noteId = noteId;
         this.tag = tag;
     }
@@ -54,6 +53,8 @@ public class DeleteTagSingleNoteCommand extends Command {
             throw new TagNotFoundException("Tag '" + tag + "' does not exist for note with ID '" + noteId + "'.");
         }
 
-        ui.showSuccessfullyDeletedTagSingleNote(noteId, tag);
+        // Remove the tag from the note
+        note.get().removeTag(tag);  
+        ui.showSuccessfullyDeletedTagFromNote(noteId, tag);
     }
 }

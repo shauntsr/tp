@@ -25,10 +25,10 @@ import seedu.zettel.storage.Storage;
 
 //
 /**
- * JUnit test class for {@link ListTagsIndividualNoteCommand}.
+ * JUnit test class for {@link ListTagsSingleNoteCommand}.
  * Tests all execution paths including exception cases and successful tag listing.
  */
-public class ListTagsIndividualNoteCommandTest {
+public class ListTagsSingleNoteCommandTest {
     @TempDir
     Path tempDir;
 
@@ -77,7 +77,7 @@ public class ListTagsIndividualNoteCommandTest {
     @Test
     void testEmptyNotesListThrowsNoNotesException() {
         ArrayList<Note> emptyNotes = new ArrayList<>();
-        ListTagsIndividualNoteCommand cmd = new ListTagsIndividualNoteCommand("abcd1234");
+        ListTagsSingleNoteCommand cmd = new ListTagsSingleNoteCommand("abcd1234");
 
         NoNotesException ex = assertThrows(NoNotesException.class, () -> {
             cmd.execute(emptyNotes, tags, ui, storage);
@@ -88,7 +88,7 @@ public class ListTagsIndividualNoteCommandTest {
 
     @Test
     void testNoteIdNotFoundThrowsInvalidNoteIdException() {
-        ListTagsIndividualNoteCommand cmd = new ListTagsIndividualNoteCommand("deadbeef");
+        ListTagsSingleNoteCommand cmd = new ListTagsSingleNoteCommand("deadbeef");
 
         InvalidNoteIdException ex = assertThrows(InvalidNoteIdException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
@@ -100,7 +100,7 @@ public class ListTagsIndividualNoteCommandTest {
     @Test
     void testNoteWithNoTagsThrowsNoTagsException() {
         // Note with ID "12345678" has no tags
-        ListTagsIndividualNoteCommand cmd = new ListTagsIndividualNoteCommand("12345678");
+        ListTagsSingleNoteCommand cmd = new ListTagsSingleNoteCommand("12345678");
 
         NoTagsException ex = assertThrows(NoTagsException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
@@ -114,7 +114,7 @@ public class ListTagsIndividualNoteCommandTest {
     @Test
     void testSuccessfullyListSingleTag() throws ZettelException {
         // Note with ID "ef567890" has one tag: "testing"
-        ListTagsIndividualNoteCommand cmd = new ListTagsIndividualNoteCommand("ef567890");
+        ListTagsSingleNoteCommand cmd = new ListTagsSingleNoteCommand("ef567890");
         cmd.execute(notes, tags, ui, storage);
 
         String output = outputStream.toString();
@@ -125,7 +125,7 @@ public class ListTagsIndividualNoteCommandTest {
     @Test
     void testSuccessfullyListMultipleTags() throws ZettelException {
         // Note with ID "abcd1234" has two tags: "java" and "programming"
-        ListTagsIndividualNoteCommand cmd = new ListTagsIndividualNoteCommand("abcd1234");
+        ListTagsSingleNoteCommand cmd = new ListTagsSingleNoteCommand("abcd1234");
         cmd.execute(notes, tags, ui, storage);
 
         String output = outputStream.toString();
@@ -141,7 +141,7 @@ public class ListTagsIndividualNoteCommandTest {
         tags.add("global-tag-2");
         
         // Note with ID "ef567890" has only "testing" tag
-        ListTagsIndividualNoteCommand cmd = new ListTagsIndividualNoteCommand("ef567890");
+        ListTagsSingleNoteCommand cmd = new ListTagsSingleNoteCommand("ef567890");
         cmd.execute(notes, tags, ui, storage);
 
         String output = outputStream.toString();
@@ -154,7 +154,7 @@ public class ListTagsIndividualNoteCommandTest {
     @Test
     void testListTagsFromFirstNoteInList() throws ZettelException {
         // Test with the first note in the list
-        ListTagsIndividualNoteCommand cmd = new ListTagsIndividualNoteCommand("abcd1234");
+        ListTagsSingleNoteCommand cmd = new ListTagsSingleNoteCommand("abcd1234");
         cmd.execute(notes, tags, ui, storage);
 
         String output = outputStream.toString();
@@ -166,7 +166,7 @@ public class ListTagsIndividualNoteCommandTest {
     @Test
     void testListTagsFromMiddleNoteInList() throws ZettelException {
         // Test with a note in the middle of the list
-        ListTagsIndividualNoteCommand cmd = new ListTagsIndividualNoteCommand("ef567890");
+        ListTagsSingleNoteCommand cmd = new ListTagsSingleNoteCommand("ef567890");
         cmd.execute(notes, tags, ui, storage);
 
         String output = outputStream.toString();
@@ -178,7 +178,7 @@ public class ListTagsIndividualNoteCommandTest {
     void testNoteIdCaseSensitivity() {
         // Note IDs should be case-sensitive (lowercase only valid)
         // This test verifies that "ABCD1234" doesn't match "abcd1234"
-        ListTagsIndividualNoteCommand cmd = new ListTagsIndividualNoteCommand("ABCD1234");
+        ListTagsSingleNoteCommand cmd = new ListTagsSingleNoteCommand("ABCD1234");
 
         InvalidNoteIdException ex = assertThrows(InvalidNoteIdException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
