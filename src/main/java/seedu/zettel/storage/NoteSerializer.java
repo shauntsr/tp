@@ -6,7 +6,9 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -26,14 +28,15 @@ public class NoteSerializer {
      * Loads notes from the index file and their corresponding body files.
      *
      * @param indexPath the path to the index file containing note metadata
-     * @param notesDir the directory containing note body files
+     * @param notesDir the directory containing note body files (notes/)
+     * @param archiveDir the directory containing archived note body files (archive/)
      * @return an ArrayList of loaded notes
      */
-    public ArrayList<Note> loadNotes(Path indexPath, Path notesDir) {
+    public ArrayList<Note> loadNotes(Path indexPath, Path notesDir, Path archiveDir) {
         try (Stream<String> lines = Files.lines(indexPath)) {
             return lines.map(this::parseIndex)
                     .filter(Objects::nonNull)
-                    .map(note -> loadNoteBody(note, notesDir))
+                    .map(note -> loadNoteBody(note, notesDir, archiveDir))
                     .collect(Collectors.toCollection(ArrayList::new));
         } catch (IOException e) {
             System.out.println("Error loading file: " + indexPath);
@@ -77,14 +80,34 @@ public class NoteSerializer {
     }
 
     /**
-     * Loads the body content for a note from its corresponding body file.
+     * Returns a map of expected body filenames to a boolean indicating whether
+     * the note is archived (true => expected in archive/, false => expected in notes/).
+     *
+     * @param indexPath path to the index file
+     * @return Map filename -> isArchived
+     */
+    public Map<String, Boolean> getExpectedFilenamesWithArchiveFlag(Path indexPath) {
+        Map<String, Boolean> map = new HashMap<>();
+        try (Stream<String> lines = Files.lines(indexPath)) {
+            lines.map(this::parseIndex)
+                    .filter(Objects::nonNull)
+                    .forEach(note -> map.put(note.getFilename(), note.isArchived()));
+        } catch (IOException e) {
+            System.out.println("Warning: Could not read index file for validation: " + e.getMessage());
+        }
+        return map;
+    }
+
+    /**
+     * Loads the body content for a note from its corresponding body file in notes/ or archive/.
      *
      * @param note the note to load the body for
-     * @param notesDir the directory containing note body files
+     * @param notesDir the notes directory
+     * @param archiveDir the archive directory
      * @return the note with its body loaded
      */
-    private Note loadNoteBody(Note note, Path notesDir) {
-        Path bodyFile = notesDir.resolve(note.getFilename());
+    private Note loadNoteBody(Note note, Path notesDir, Path archiveDir) {
+        Path bodyFile = (note.isArchived() ? archiveDir : notesDir).resolve(note.getFilename());
         try {
             String body = Files.readString(bodyFile);
             note.loadBody(body);
