@@ -14,9 +14,9 @@ ____________________________________________________________
    tag new <tag-name>           - Adds a tag
    tag add <note-id> <tag-name> - Tag a note
    link <source-id> <target-id> - Link two notes
-   unlink <source_id> <target_id> - Unlink two notes
+   unlink <source-id> <target-id> - Unlink two notes
    link-both <id1> <id2>        - Link two notes in both directions
-   unlink-both <id1> <id2>      - Unlink two notes in both directions"
+   unlink-both <id1> <id2>      - Unlink two notes in both directions
    find <text>                  - Search for notes
    bye                          - Exit the application
 
