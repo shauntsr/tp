@@ -321,6 +321,16 @@ public class Storage {
     }
 
     /**
+     * Gets the path to a note file in the archive folder.
+     *
+     * @param filename the name of the note file
+     * @return the path to the note in the archive folder
+     */
+    public Path getArchivePath(String filename) {
+        return fileSystemManager.getArchivePath(repoName).resolve(filename);
+    }
+
+    /**
      * Deletes note's body text from the current repository.
      *
      * @param filename the name of the note of body text to delete

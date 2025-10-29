@@ -234,6 +234,16 @@ public class FileSystemManager {
     }
 
     /**
+     * Gets the path to the archive directory for the specified repository.
+     *
+     * @param repoName the repository name
+     * @return the path to the repository's archive directory
+     */
+    public Path getArchivePath(String repoName) {
+        return rootPath.resolve(repoName).resolve(REPO_ARCHIVE);
+    }
+
+    /**
      * Gets the path to the configuration file.
      *
      * @return the path to the configuration file
