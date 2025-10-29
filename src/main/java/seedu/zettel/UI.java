@@ -54,6 +54,11 @@ public class UI {
         System.out.println("   unpin <note-id>              - Unpin a note");
         System.out.println("   tag new <tag-name>           - Adds a tag");
         System.out.println("   tag add <note-id> <tag-name> - Tag a note");
+        System.out.println("   link <source-id> <target-id> - Link two notes");
+        System.out.println("   unlink <source-id> <target-id> - Unlink two notes");
+        System.out.println("   link-both <id1> <id2>        - Link two notes in both directions");
+        System.out.println("   unlink-both <id1> <id2>      - Unlink two notes in both directions");
+        System.out.println("   list-tags-all                - Lists all tags that exist globally");
         System.out.println("   list-tags <note-id>          - List tags for an individual note");
         System.out.println("   delete-tag <note-id> <tag>   - Delete a tag from a note");
         System.out.println("   find <text>                  - Search for notes");
@@ -249,10 +254,19 @@ public class UI {
         System.out.println(" All links between note #" + noteId1 + " and note #" + noteId2 + " have been removed.");
     }
 
+
     public void showTagsIndividualNote(List<String> tags, String noteId) {
         System.out.println(" Tags for note #" + noteId + ":");
         for (int i = 0; i < tags.size(); i++) {
             System.out.println(" " + (i + 1) + ". " + tags.get(i));
+        }
+    }
+
+    public void showTagsListGlobal(List<String> tags) {
+        System.out.println("You have " + tags.size() + " tags:");
+        // Show the list of tags.
+        for (int idx = 0; idx < tags.size(); idx++) {
+            System.out.println("    " + (idx + 1) + ". " + tags.get(idx));
         }
     }
 
