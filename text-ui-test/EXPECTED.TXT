@@ -12,18 +12,19 @@ ____________________________________________________________
    unpin <note-id>              - Unpin a note
    tag new <tag-name>           - Adds a tag
    tag add <note-id> <tag-name> - Tag a note
+   list-tags-all                - Lists all tags that exist globally.
    find <text>                  - Search for notes
    bye                          - Exit the application
 
 ____________________________________________________________
-Note created: test1.txt #bbaede33
-Note created: test2.txt #93a6c4fb
-Note created: test3.txt #af06c9e6
+Note created: test1.txt #a0287f24
+Note created: test2.txt #3a782a6f
+Note created: test3.txt #c7a257e1
 You have 3 notes:
-    1. test3.txt 2025-10-29 af06c9e6
-    2. test2.txt 2025-10-29 93a6c4fb
-    3. test1.txt 2025-10-29 bbaede33
+    1. test3.txt 2025-10-29 c7a257e1
+    2. test2.txt 2025-10-29 3a782a6f
+    3. test1.txt 2025-10-29 a0287f24
  Here are the matching notes in your list:
- 1. test3.txt 2025-10-29 af06c9e6
- 2. test2.txt 2025-10-29 93a6c4fb
- 3. test1.txt 2025-10-29 bbaede33
+ 1. test3.txt 2025-10-29 c7a257e1
+ 2. test2.txt 2025-10-29 3a782a6f
+ 3. test1.txt 2025-10-29 a0287f24
