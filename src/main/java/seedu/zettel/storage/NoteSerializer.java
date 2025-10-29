@@ -119,10 +119,7 @@ public class NoteSerializer {
             return null;
         }
 
-        // Split by " | " but limit to 11 fields to handle any extra pipes in content
         String[] fields = line.split(" \\| ", 11);
-
-        // Ensure we have exactly 11 fields
         if (fields.length < 11) {
             System.out.println("Skipping malformed line (expected 11 fields, got " + fields.length + "): " + line);
             return null;
