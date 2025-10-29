@@ -54,6 +54,7 @@ public class UI {
         System.out.println("   unpin <note-id>              - Unpin a note");
         System.out.println("   tag new <tag-name>           - Adds a tag");
         System.out.println("   tag add <note-id> <tag-name> - Tag a note");
+        System.out.println("   list-tags <note-id>          - List tags for an individual note");
         System.out.println("   find <text>                  - Search for notes");
         System.out.println("   bye                          - Exit the application");
         System.out.println();
@@ -245,5 +246,12 @@ public class UI {
 
     public void showSuccessfullyUnlinkedBothNotes(String noteId1, String noteId2) {
         System.out.println(" All links between note #" + noteId1 + " and note #" + noteId2 + " have been removed.");
+    }
+
+    public void showTagsIndividualNote(List<String> tags, String noteId) {
+        System.out.println(" Tags for note #" + noteId + ":");
+        for (int i = 0; i < tags.size(); i++) {
+            System.out.println(" " + (i + 1) + ". " + tags.get(i));
+        }
     }
 }

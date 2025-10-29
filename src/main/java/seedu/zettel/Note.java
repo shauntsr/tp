@@ -85,6 +85,9 @@ public class Note {
      * @param archived Whether the note is archived
      * @param archiveName The archive name if archived, null otherwise
      * @param logs The list of log entries for this note
+     * @param tags The list of tags for this note
+     * @param outgoingLinks The set of note IDs that this note links to
+     * @param incomingLinks The set of note IDs that link to this note
      */
     public Note(String id, String title, String filename, String body,
                 Instant createdAt, Instant modifiedAt, boolean pinned,
