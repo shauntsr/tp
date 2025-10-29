@@ -1,5 +1,6 @@
 package seedu.zettel.storage;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -83,21 +84,6 @@ public class FileSystemManager {
         }
     }
 
-    /**
-     * Creates the global tags file in the root directory if it doesn't exist.
-     * This file stores all tags used across repositories.
-     */
-    public void createTagsFile() {
-        Path tagsPath = rootPath.resolve(TAGS_FILE);
-        try {
-            if (Files.notExists(tagsPath)) {
-                Files.createFile(tagsPath);
-                System.out.println("Created " + TAGS_FILE);
-            }
-        } catch (IOException e) {
-            System.out.println("Error creating " + TAGS_FILE + ": " + e.getMessage());
-        }
-    }
 
     /**
      * Creates the directory structure for a new repository.
@@ -181,6 +167,22 @@ public class FileSystemManager {
         }
 
         detectOrphans(notesDir, expectedFiles, repoName);
+    }
+
+    /**
+     * Ensures that the global tags file exists in the root directory.
+     * <p>
+     * If the file already exists, the method returns {@code true}.
+     * If the file does not exist, it will be created and the method returns {@code false}.
+     * </p>
+     *
+     * @throws ZettelException if creating the tags file fails
+     */
+    public void validateTagsFile() throws ZettelException{
+        Path tagsFile = rootPath.resolve(TAGS_FILE);
+        if (Files.exists(tagsFile)) {
+        }
+        createIfMissing(tagsFile, "tags.txt for storing tags", false);
     }
 
     /**
