@@ -1,11 +1,10 @@
 package seedu.zettel;
 
-import seedu.zettel.commands.EditNoteCommand;
-import seedu.zettel.commands.NewTagCommand;
 import java.util.Arrays;
 
 import seedu.zettel.commands.Command;
 import seedu.zettel.commands.DeleteNoteCommand;
+import seedu.zettel.commands.EditNoteCommand;
 import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.FindNoteCommand;
 import seedu.zettel.commands.InitCommand;
@@ -13,7 +12,10 @@ import seedu.zettel.commands.LinkBothNotesCommand;
 import seedu.zettel.commands.LinkNotesCommand;
 import seedu.zettel.commands.ListLinkedNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
+import seedu.zettel.commands.ListTagsIndividualNoteCommand;
+import seedu.zettel.commands.ListTagsGlobalCommand;
 import seedu.zettel.commands.NewNoteCommand;
+import seedu.zettel.commands.NewTagCommand;
 import seedu.zettel.commands.PinNoteCommand;
 import seedu.zettel.commands.TagNoteCommand;
 import seedu.zettel.commands.UnlinkBothNotesCommand;
@@ -39,7 +41,9 @@ public class Parser {
     private static final String TAG_FORMAT = "Tag command requires a subcommand: new/add";
     private static final String TAG_NOTE_FORMAT = "Tag note command format should be: tag new <NOTE_ID> <TAG>";
     private static final String NEW_TAG_FORMAT = "Tag add command format should be: tag add <TAG>";
-    private static final String LINK_NOTES_FORMAT = "Link notes command format should be: link" 
+    private static final String LIST_TAGS_GLOBAL_FORMAT = "List all tags globally command format should be: "
+            + "list-tags-all";
+    private static final String LINK_NOTES_FORMAT = "Link notes command format should be: link"
             + " <SOURCE_NOTE_ID> <TARGET_NOTE_ID>";
     private static final String UNLINK_NOTES_FORMAT = "Unlink notes command format should be: unlink" 
             + " <SOURCE_NOTE_ID> <TARGET_NOTE_ID>";
@@ -47,6 +51,8 @@ public class Parser {
             + " <NOTE_ID_1> <NOTE_ID_2>";
     private static final String UNLINK_BOTH_NOTES_FORMAT = "Unlinking both notes command format should be: unlink-both" 
             + " <NOTE_ID_1> <NOTE_ID_2>";
+    private static final String LIST_TAGS_INDIVIDUAL_NOTE_FORMAT = "List tags for individual note command format "
+            + "should be: list-tags <NOTE_ID>";
     private static final String NOTE_EMPTY = "Note title cannot be empty!";
     private static final String TAG_EMPTY = "Tag cannot be empty!";
     private static final String ID_EMPTY = "Please specify a Note ID to ";
@@ -91,6 +97,8 @@ public class Parser {
         case "unlink" -> parseUnlinkNotesCommand(inputs);
         case "link-both" -> parseLinkBothNotesCommand(inputs);
         case "unlink-both" -> parseUnlinkBothNotesCommand(inputs);
+        case "list-tags-all" -> parseListTagsGlobalCommand(inputs);
+        case "list-tags" -> parseListTagsIndividualNoteCommand(inputs);
         default -> throw new InvalidInputException(command);
         };
     }
@@ -376,6 +384,21 @@ public class Parser {
     }
 
     /**
+     * Parses a command to list all tags globally across all notes.
+     * Expected format: list-tags-all
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return A ListTagsGlobalCommand object.
+     * @throws ZettelException If the format is invalid.
+     */
+    private static Command parseListTagsGlobalCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 1) {
+            throw new InvalidFormatException(LIST_TAGS_GLOBAL_FORMAT);
+        }
+        return new ListTagsGlobalCommand();
+    }
+
+    /**
      * Parses a link notes command to create a unidirectional link between two notes.
      * @param inputs The tokenized user input split by spaces.
      * @return A LinkNotesCommand object with the note IDs to link.
@@ -475,5 +498,22 @@ public class Parser {
         String noteId2 = parseNoteId(inputs[2], "unlink in both directions");
 
         return new UnlinkBothNotesCommand(noteId1, noteId2);
+    }
+
+    /**
+     * Parses a list-tags command to display all tags associated with a specific note.
+     * @param inputs The tokenized user input split by spaces.
+     * @return A ListTagsIndividualNoteCommand object with the note ID.
+     * @throws ZettelException If the format is invalid or note ID is malformed.
+     */
+    private static Command parseListTagsIndividualNoteCommand(String[] inputs) throws ZettelException {
+        // expected format: list-tags <NOTE_ID>
+        if (inputs.length != 2) {
+            throw new InvalidFormatException(LIST_TAGS_INDIVIDUAL_NOTE_FORMAT);
+        }
+
+        String noteId = parseNoteId(inputs[1], "list tags for");
+ 
+        return new ListTagsIndividualNoteCommand(noteId);
     }
 }

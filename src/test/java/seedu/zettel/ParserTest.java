@@ -2,6 +2,7 @@ package seedu.zettel;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import seedu.zettel.commands.Command;
@@ -13,6 +14,7 @@ import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.LinkBothNotesCommand;
 import seedu.zettel.commands.LinkNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
+import seedu.zettel.commands.ListTagsIndividualNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.PinNoteCommand;
 import seedu.zettel.commands.TagNoteCommand;
@@ -579,4 +581,81 @@ class ParserTest {
     void testParseUnlinkBothWithInvalidHexCharactersSecondIdThrowsInvalidFormatException() {
         assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both abcd1234 ghijk890"));
     }
+
+    //@@author danielkwan2004-reused
+    //Reused from testParseUnlinkBoth tests above with modifications
+    //list-tags command parser tests
+    @Test
+    void testParseListTagsIndividualNoteWithValidIdReturnsListTagsIndividualNoteCommand() throws ZettelException {
+        Command command = Parser.parse("list-tags abcd1234");
+        assertTrue(command instanceof ListTagsIndividualNoteCommand);
+    }
+
+    @Test
+    void testParseListTagsIndividualNoteWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags"));
+    }
+
+    @Test
+    void testParseListTagsIndividualNoteWithTooManyArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags abcd1234 ef567890"));
+    }
+
+    @Test
+    void testParseListTagsIndividualNoteWithTooShortIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags abc123"));
+    }
+
+    @Test
+    void testParseListTagsIndividualNoteWithTooLongIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags abcd12345"));
+    }
+
+    @Test
+    void testParseListTagsIndividualNoteWithSpecialCharactersIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags abcd@234"));
+    }
+
+    @Test
+    void testParseListTagsIndividualNoteWithUppercaseIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags ABCD1234"));
+    }
+
+    @Test
+    void testParseListTagsIndividualNoteWithInvalidHexCharactersIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags abcdefgh"));
+    }
+
+    @Test
+    void testParseListTagsIndividualNoteWithWhitespaceInIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags abc 1234"));
+    }
+
+    @Test
+    void testParseListTagsIndividualNoteWithEmptyStringIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags "));
+    }
+
+    @Test
+    void testParseListTagsIndividualNoteWithMixedCaseIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags AbCd1234"));
+    }
+
+    @Test
+    void testParseListTagsIndividualNoteWithSymbolsIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-tags abcd#234"));
+    }
+
+    @Test
+    void testParseListTagsIndividualNoteWithNumbersOnlyIdReturnsListTagsIndividualNoteCommand() throws ZettelException {
+        Command command = Parser.parse("list-tags 12345678");
+        assertTrue(command instanceof ListTagsIndividualNoteCommand);
+    }
+
+    @Test
+    void testParseListTagsIndividualNoteWithLettersOnlyIdReturnsListTagsIndividualNoteCommand() throws ZettelException {
+        Command command = Parser.parse("list-tags abcdefab");
+        assertTrue(command instanceof ListTagsIndividualNoteCommand);
+    }
+    //@@author
 }
