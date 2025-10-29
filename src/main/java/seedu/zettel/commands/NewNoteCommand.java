@@ -101,7 +101,8 @@ public class NewNoteCommand extends Command {
 
                 ui.showNoteSavedFromEditor();
             } catch (EditorNotFoundException e) {
-                throw new EditorNotFoundException("Could not open text editor, empty body will be used: " + e.getMessage());
+                throw new EditorNotFoundException("Could not open text editor, empty body will be used: " +
+                        e.getMessage());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt(); // preserves interrupted state
                 throw new ZettelException("Editor was interrupted: " + e.getMessage());
@@ -115,4 +116,3 @@ public class NewNoteCommand extends Command {
         ui.showAddedNote(newNote);
     }
 }
-
