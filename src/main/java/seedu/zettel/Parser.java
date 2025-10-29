@@ -346,6 +346,14 @@ public class Parser {
         return new NewTagCommand(tag);
     }
 
+    /**
+     * Parses a command to list all tags globally across all notes.
+     * Expected format: list-tags-all
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return A ListTagsGlobalCommand object.
+     * @throws ZettelException If the format is invalid.
+     */
     private static Command parseListTagsGlobalCommand(String[] inputs) throws ZettelException {
         if (inputs.length != 1) {
             throw new InvalidFormatException(LIST_TAGS_GLOBAL_FORMAT);
