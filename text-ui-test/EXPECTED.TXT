@@ -4,41 +4,41 @@ ____________________________________________________________
 ____________________________________________________________
 
  Available Commands:
-   init <repo-name>                - Initialize a new repository
-   new -t <title> [-b <body>]      - Create a new note
-   edit <note-id>                  - Edit an existing note
-   list [-p]                       - List all notes (or pinned only)
-   delete [-f] <note-id>           - Delete a note by ID
-   pin <note-id>                   - Pin a note
-   unpin <note-id>                 - Unpin a note
-   new-tag <tag-name>              - Adds a tag
-   add-tag <note-id> <tag-name>    - Tag a note
-   link <source-id> <target-id>    - Link two notes
-   unlink <source-id> <target-id>  - Unlink two notes
-   link-both <id1> <id2>           - Link two notes in both directions
-   unlink-both <id1> <id2>         - Unlink two notes in both directions
-   list-incoming-links <note-id>   - Show incoming linked notes
-   list-outgoing-links <note-id>   - Show outgoing linked notes
-   list-tags-all                   - Lists all tags that exist globally
-   list-tags <note-id>             - List tags for an single note
-   delete-tag [-f] <note-id> <tag> - Delete a tag from a note
-   delete-tag-globally [-f] <tag>  - Delete a tag from all notes
-   rename-tag <old-tag> <new-tag>  - Rename a tag globally
-   archive <note-id>               - Moves note to archive folder
-   unarchive <note-id>             - Moves note out of archive folder
-   find <text>                     - Search for notes
-   help                             - Show this list of commands
-   bye                             - Exit the application
+   init <repo-name>                  - Initialize a new repository
+   change-repo[pository] <repo-name> - Switch to another existing repository
+   current-repo[pository]            - Show the name of the current repository
+   new -t <title> [-b <body>]        - Create a new note
+   edit <note-id>                    - Edit an existing note
+   list [-p]                         - List all notes (or pinned only)
+   delete [-f] <note-id>             - Delete a note by ID
+   pin <note-id>                     - Pin a note
+   unpin <note-id>                   - Unpin a note
+   new-tag <tag-name>                - Adds a tag
+   add-tag <note-id> <tag-name>      - Tag a note
+   link <source-id> <target-id>      - Link two notes
+   unlink <source-id> <target-id>    - Unlink two notes
+   link-both <id1> <id2>             - Link two notes in both directions
+   unlink-both <id1> <id2>           - Unlink two notes in both directions
+   list-incoming-links <note-id>     - Show incoming linked notes
+   list-outgoing-links <note-id>     - Show outgoing linked notes
+   list-tags-all                     - Lists all tags that exist globally
+   list-tags <note-id>               - List tags for an single note
+   delete-tag [-f] <note-id> <tag>   - Delete a tag from a note
+   delete-tag-globally [-f] <tag>    - Delete a tag from all notes
+   rename-tag <old-tag> <new-tag>    - Rename a tag globally
+   find <text>                       - Search for notes
+   help                              - Show this list of commands
+   bye                               - Exit the application
 
 ____________________________________________________________
-Note created: test1.txt #4ede29ad
-Note created: test2.txt #b0d5476b
-Note created: test3.txt #e69569ea
+Note created: test1.txt #35413cb9
+Note created: test2.txt #3fc6da0d
+Note created: test3.txt #b09d6cd3
 You have 3 notes:
-    1. test3.txt 2025-10-30 e69569ea
-    2. test2.txt 2025-10-30 b0d5476b
-    3. test1.txt 2025-10-30 4ede29ad
- Here are the matching notes in your list:
- 1. test3.txt 2025-10-30 e69569ea
- 2. test2.txt 2025-10-30 b0d5476b
- 3. test1.txt 2025-10-30 4ede29ad
+    1. test3.txt 2025-10-30 b09d6cd3
+    2. test2.txt 2025-10-30 3fc6da0d
+    3. test1.txt 2025-10-30 35413cb9
+Here are the matching notes in your list:
+ 1. test3.txt 2025-10-30 b09d6cd3
+ 2. test2.txt 2025-10-30 3fc6da0d
+ 3. test1.txt 2025-10-30 35413cb9

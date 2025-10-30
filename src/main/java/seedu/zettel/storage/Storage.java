@@ -385,6 +385,15 @@ public class Storage {
     }
 
     /**
+     * Gets the list of all available repositories.
+     *
+     * @return an ArrayList containing the names of all repositories
+     */
+    public ArrayList<String> getRepoList() {
+        return new ArrayList<>(repoList);
+    }
+
+    /**
      * Gets the archive folder name used inside repositories (e.g. "archive" by default).
      * Exposes the name so callers (commands) can write the archive correctly.
      */

@@ -247,7 +247,7 @@ public class DeleteTagFromNoteCommandTest {
 
         String output = outputStream.toString();
         assertTrue(output.contains("Confirm deletion of tag 'java' on note # 'abcd1234'? (y/n)"));
-        assertTrue(output.contains(" Tag 'java' has been deleted from note #abcd1234."));
+        assertTrue(output.contains("Tag 'java' has been deleted from note #abcd1234."));
         assertFalse(note1.getTags().contains("java"));
     }
 

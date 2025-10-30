@@ -70,21 +70,84 @@ public class FileSystemManager {
     }
 
     /**
-     * Creates the configuration file with default repository settings if it doesn't exist.
+     * Creates the configuration file with repository settings if it doesn't exist.
+     * If the config file is missing, attempts to reconstruct it from existing repositories.
      *
-     * @param defaultRepo the default repository name to use in the config file
+     * Config file format:
+     * Line 1: Current repository name
+     * Line 2: Default repository name
+     *
+     * @param defaultRepo the default repository name to use if no repositories exist
      */
     public void createConfigFile(String defaultRepo) {
         Path configPath = rootPath.resolve(CONFIG_FILE);
         try {
             if (Files.notExists(configPath)) {
                 Files.createFile(configPath);
-                List<String> lines = List.of(defaultRepo, defaultRepo);
+
+                List<String> existingRepos = findExistingRepositories();
+
+                String currentRepo;
+                String defaultRepoToUse;
+
+                if (!existingRepos.isEmpty()) {
+                    // Use first found repository as both current and default
+                    currentRepo = existingRepos.get(0);
+                    defaultRepoToUse = existingRepos.get(0);
+                    System.out.println("Reconstructed config from existing repositories.");
+                    System.out.println("Found repositories: " + String.join(", ", existingRepos));
+                    System.out.println("Set '" + currentRepo + "' as current and default repository.");
+                } else {
+                    // No existing repos found, use provided default
+                    currentRepo = defaultRepo;
+                    defaultRepoToUse = defaultRepo;
+                }
+
+                List<String> lines = List.of(currentRepo, defaultRepoToUse);
                 Files.write(configPath, lines);
             }
         } catch (IOException e) {
             System.out.println("Error creating " + CONFIG_FILE + ".");
         }
+    }
+
+    /**
+     * Scans the root directory to find existing repository folders.
+     * A valid repository must contain the required subdirectories and index file.
+     *
+     * @return list of repository names found in the root directory
+     */
+    private List<String> findExistingRepositories() {
+        List<String> repos = new ArrayList<>();
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(rootPath)) {
+            for (Path entry : stream) {
+                if (Files.isDirectory(entry) && isValidRepository(entry)) {
+                    repos.add(entry.getFileName().toString());
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error scanning for existing repositories: " + e.getMessage());
+        }
+
+        return repos;
+    }
+
+    /**
+     * Checks if a directory is a valid Zettel repository.
+     * A valid repository must have a notes/ directory, archive/ directory, and index.txt file.
+     *
+     * @param repoPath the path to check
+     * @return true if the directory is a valid repository
+     */
+    private boolean isValidRepository(Path repoPath) {
+        Path notesDir = repoPath.resolve(REPO_NOTES);
+        Path archiveDir = repoPath.resolve(REPO_ARCHIVE);
+        Path indexFile = repoPath.resolve(REPO_INDEX);
+
+        return Files.isDirectory(notesDir) &&
+                Files.isDirectory(archiveDir) &&
+                Files.isRegularFile(indexFile);
     }
 
 

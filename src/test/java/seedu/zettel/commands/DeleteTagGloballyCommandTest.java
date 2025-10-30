@@ -86,7 +86,7 @@ public class DeleteTagGloballyCommandTest {
         assertFalse(notes.get(1).getTags().contains("common"));
 
         String out = outputStream.toString();
-        assertTrue(out.contains(" Tag 'common' has been deleted across all notes, globally."));
+        assertTrue(out.contains("Tag 'common' has been deleted across all notes, globally."));
     }
 
     @Test
@@ -100,7 +100,7 @@ public class DeleteTagGloballyCommandTest {
 
         String out = outputStream.toString();
         assertTrue(out.contains("Confirm deletion of tag 'java'? (y/n)"));
-        assertTrue(out.contains(" Tag 'java' has been deleted across all notes, globally."));
+        assertTrue(out.contains("Tag 'java' has been deleted across all notes, globally."));
     }
 
     @Test
