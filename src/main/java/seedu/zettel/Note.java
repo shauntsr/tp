@@ -13,7 +13,6 @@ import java.util.logging.Logger;
  * Each note has a unique 8-character hash-based ID, title, body, and metadata.
  */
 public class Note {
-    // Logger for this class
     private static final Logger logger = Logger.getLogger(Note.class.getName());
 
     // Date formatter for toString method
@@ -63,7 +62,6 @@ public class Note {
         this.pinned = false;
         this.archived = false;
         this.archiveName = null;
-        this.logs = new ArrayList<>();
         this.tags = new ArrayList<>();
         this.outgoingLinks = new HashSet<>();
         this.incomingLinks = new HashSet<>();
@@ -84,11 +82,10 @@ public class Note {
      * @param pinned Whether the note is pinned
      * @param archived Whether the note is archived
      * @param archiveName The archive name if archived, null otherwise
-     * @param logs The list of log entries for this note
      */
     public Note(String id, String title, String filename, String body,
                 Instant createdAt, Instant modifiedAt, boolean pinned,
-                boolean archived, String archiveName, List<String> logs, List<String> tags) {
+                boolean archived, String archiveName, List<String> tags) {
         assert id.length() == ID_LENGTH : "Note ID must be " + ID_LENGTH + " characters long";
         this.id = id;
         this.title = title;
@@ -99,10 +96,9 @@ public class Note {
         this.pinned = pinned;
         this.archived = archived;
         this.archiveName = archiveName;
-        this.logs = logs != null ? new ArrayList<>(logs) : new ArrayList<>();
         this.tags = tags != null ? new ArrayList<>(tags) : new ArrayList<>();
-        this.outgoingLinks = outgoingLinks != null ? new HashSet<>(outgoingLinks) : new HashSet<>();
-        this.incomingLinks = incomingLinks != null ? new HashSet<>(incomingLinks) : new HashSet<>();
+        this.outgoingLinks = new HashSet<>();
+        this.incomingLinks = new HashSet<>();
         numberOfNotes++;
     }
 
@@ -214,9 +210,6 @@ public class Note {
      *
      * @return A new ArrayList containing the log entries
      */
-    public List<String> getLogs() {
-        return new ArrayList<>(logs); // Return copy to maintain encapsulation
-    }
 
     public List<String> getTags() {
         return new ArrayList<>(tags);
@@ -312,26 +305,18 @@ public class Note {
         updateModifiedAt();
     }
 
-    /**
-     * Replaces the entire logs list with a new list.
-     *
-     * @param logs The new list of log entries, or null for an empty list
-     */
-    public void setLogs(List<String> logs) {
-        this.logs = logs != null ? new ArrayList<>(logs) : new ArrayList<>();
-    }
-
-    /**
-     * Adds a single log entry to this note's history.
-     *
-     * @param logEntry The log entry to add
-     */
-    public void addLog(String logEntry) {
-        this.logs.add(logEntry);
-    }
 
     public void addTag(String tag) {
         this.tags.add(tag);
+    }
+
+    /**
+     * Removes a tag from this note's tags list.
+     *
+     * @param tag The tag to remove
+     */
+    public void removeTag(String tag) {
+        this.tags.remove(tag);
     }
 
     /**
@@ -340,7 +325,9 @@ public class Note {
      * @param noteId The note ID to add
      */
     public void addOutgoingLink(String noteId) {
-        this.outgoingLinks.add(noteId);
+        if (noteId != null && !noteId.trim().isEmpty()) {
+            this.outgoingLinks.add(noteId.trim());
+        }
     }
     /**
      * Adds a note ID to the "incomingLinks" set.
@@ -348,7 +335,9 @@ public class Note {
      * @param noteId The note ID to add
      */
     public void addIncomingLink(String noteId) {
-        this.incomingLinks.add(noteId);
+        if (noteId != null && !noteId.trim().isEmpty()) {
+            this.incomingLinks.add(noteId.trim());
+        }
     }
 
     /**

@@ -1,12 +1,15 @@
 package seedu.zettel.storage;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import seedu.zettel.Note;
@@ -61,6 +64,7 @@ public class Storage {
             for (String repo : repoList) {
                 validateRepo(repo);
             }
+            updateTagsOnInit();
         } catch (ZettelException e) {
             System.out.println("Error during init: " + e.getMessage());
         }
@@ -87,25 +91,24 @@ public class Storage {
     }
 
     /**
-     * Reads the tags line from the configuration file.
+     * Reads the tags line from the global tags.txt file.
      *
      * @return a list of tags, or an empty list if no tags are configured
      */
     public List<String> readTagsLine() {
-        Path configFile = fileSystemManager.getConfigPath();
+        Path tagsFile = fileSystemManager.getRootPath().resolve(FileSystemManager.TAGS_FILE);
         try {
-            List<String> lines = Files.readAllLines(configFile);
-            if (lines.size() >= 3) {
-                String tagsLine = lines.get(2).trim();
-                if (!tagsLine.isEmpty()) {
-                    return Arrays.stream(tagsLine.split("\\|"))
-                            .map(String::trim)
-                            .collect(Collectors.toList());
-                }
+            if (Files.exists(tagsFile)) {
+                return Files.readAllLines(tagsFile, StandardCharsets.UTF_8)
+                        .stream()
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .collect(Collectors.toList());
             }
         } catch (IOException e) {
-            System.out.println("Warning: failed to read tags line: " + e.getMessage());
+            System.out.println("Warning: failed to read tags.txt: " + e.getMessage());
         }
+
         return new ArrayList<>();
     }
 
@@ -146,7 +149,6 @@ public class Storage {
      * @throws ZettelException if there's an error writing to the config file
      */
     public void updateConfig(String newRepo) throws ZettelException {
-        logger.info("Updating config with current repository: " + newRepo);
         fileSystemManager.createConfigFile(DEFAULT_REPO);
         Path configFile = fileSystemManager.getConfigPath();
 
@@ -161,45 +163,75 @@ public class Storage {
                 lines.set(1, newRepo);
             }
             Files.write(configFile, lines);
-            logger.info("Config updated successfully");
         } catch (IOException e) {
-            logger.warning("Failed to update checked-out repo in .zettelConfig: " + e.getMessage());
             throw new ZettelException("Failed to update checked-out repo in .zettelConfig: " + e.getMessage());
         }
     }
 
     /**
-     * Updates the tags configuration in the config file.
+     * Updates the tags file on loading.
      *
      * @param tags the list of tags to write to the config file
      * @throws ZettelException if there's an error writing to the config file
      */
     public void updateTags(List<String> tags) throws ZettelException {
-        logger.info("Updating tags in config: " + tags);
-        fileSystemManager.createConfigFile(DEFAULT_REPO);
-        Path configFile = fileSystemManager.getConfigPath();
+        logger.info("Updating tags in tags.txt: " + tags);
 
-        try (Stream<String> stream = Files.lines(configFile)) {
-            List<String> lines = stream.collect(Collectors.toList());
-            String tagsLine = (tags == null) ? "" : String.join(" | ", tags);
-            if (lines.isEmpty()) {
-                lines.add(DEFAULT_REPO);
-                lines.add(repoName);
-                lines.add(tagsLine);
-            } else if (lines.size() == 1) {
-                lines.add(repoName);
-                lines.add(tagsLine);
-            } else if (lines.size() == 2) {
-                lines.add(tagsLine);
-            } else {
-                lines.set(1, repoName);
-                lines.set(2, tagsLine);
-            }
-            Files.write(configFile, lines);
-            logger.info("Tags updated successfully");
+        fileSystemManager.validateTagsFile(); // Ensure tags file exists
+        Path rootPath= fileSystemManager.getRootPath();
+        Path tagsFile = rootPath.resolve(FileSystemManager.TAGS_FILE);
+
+        try {
+            Files.write(tagsFile, tags, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            logger.warning("Failed to update tags line in .zettelConfig: " + e.getMessage());
-            throw new ZettelException("Failed to update tags line in .zettelConfig: " + e.getMessage());
+            throw new ZettelException("Failed to update tags line in .tags.txt: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Updates the global tags.txt file with tags collected from all repositories.
+     * <p>
+     * - Ensures tags.txt exists (creates if missing).<br>
+     * - Preserves existing tags.<br>
+     * - Adds any missing tags found in notes across all repositories.<br>
+     * - Writes one tag per line (duplicates automatically removed).
+     *
+     * @throws ZettelException if tags file cannot be created or read
+     */
+    private void updateTagsOnInit() throws ZettelException {
+        fileSystemManager.validateTagsFile(); // Ensure tags file exists
+
+        // Get tags file path
+        Path rootPath = fileSystemManager.getRootPath();
+        Path tagsFile = rootPath.resolve(FileSystemManager.TAGS_FILE);
+
+        // Read existing tags
+        Set<String> tags = new HashSet<>();
+        try {
+            List<String> lines = Files.readAllLines(tagsFile, StandardCharsets.UTF_8);
+            for (String line: lines) {
+                String tag = line.trim();
+                tags.add(tag);
+            }
+        } catch (IOException e) {
+            throw new ZettelException("Failed to read existing tags: " + e.getMessage());
+        }
+
+        for (String repoName: repoList) {
+            Path indexPath = fileSystemManager.getIndexPath(repoName);
+            Path notesDir = fileSystemManager.getNotesPath(repoName);
+
+            List<Note> repoNotes = noteSerializer.loadNotes(indexPath,notesDir);
+            for (Note note: repoNotes) {
+                tags.addAll(note.getTags());
+            }
+        }
+
+        List<String> tagsList = new ArrayList<String>(tags);
+        try {
+            Files.write(tagsFile, tagsList, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new ZettelException("Failed to update existing tags: " + e.getMessage());
         }
     }
 
@@ -241,11 +273,10 @@ public class Storage {
      * @param repoName the name of the repository to create
      */
     public void createRepo(String repoName) {
-        logger.info("Creating repository: " + repoName);
+        //logger.info("Creating repository: " + repoName);
         boolean created = fileSystemManager.createRepoStructure(repoName);
         if (created) {
             addToConfig(repoName);
-            logger.info("Repository " + repoName + " successfully created");
         } else {
             logger.warning("Repository " + repoName + " already exists or creation failed");
         }
@@ -278,6 +309,7 @@ public class Storage {
             System.out.println("Error updating .zettelConfig: " + e.getMessage());
         }
     }
+
 
     /**
      * Changes the current repository to the specified repository.

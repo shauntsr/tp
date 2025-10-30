@@ -22,6 +22,9 @@ public class FileSystemManager {
     /** Configuration file name for storing repository settings. */
     static final String CONFIG_FILE = ".zettelConfig";
 
+    /** File name for storing all tags globally. */
+    static final String TAGS_FILE = "tags.txt";
+
     /** Directory name for storing note body files within a repository. */
     static final String REPO_NOTES = "notes";
 
@@ -81,6 +84,7 @@ public class FileSystemManager {
             System.out.println("Error creating " + CONFIG_FILE + ".");
         }
     }
+
 
     /**
      * Creates the directory structure for a new repository.
@@ -181,6 +185,26 @@ public class FileSystemManager {
         // Detect orphans in both directories
         detectOrphans(notesDir, expectedInNotes, repoName);
         detectOrphans(archiveDir, expectedInArchive, repoName);
+    }
+
+    /**
+     * Ensures that the global tags file exists in the root directory.
+     * <p>
+     * If the file already exists, the method returns {@code true}.
+     * If the file does not exist, it will be created and the method returns {@code false}.
+     * </p>
+     *
+     * @throws ZettelException if creating the tags file fails
+     */
+    public void validateTagsFile() throws ZettelException {
+        Path tagsFile = rootPath.resolve(TAGS_FILE);
+        try {
+            if (Files.notExists(tagsFile)) {
+                Files.createFile(tagsFile);
+            }
+        } catch (IOException e) {
+            throw new ZettelException("Error creating tags file: " + e.getMessage());
+        }
     }
 
     /**

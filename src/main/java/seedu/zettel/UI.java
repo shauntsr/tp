@@ -54,6 +54,13 @@ public class UI {
         System.out.println("   unpin <note-id>              - Unpin a note");
         System.out.println("   tag new <tag-name>           - Adds a tag");
         System.out.println("   tag add <note-id> <tag-name> - Tag a note");
+        System.out.println("   link <source-id> <target-id> - Link two notes");
+        System.out.println("   unlink <source-id> <target-id> - Unlink two notes");
+        System.out.println("   link-both <id1> <id2>        - Link two notes in both directions");
+        System.out.println("   unlink-both <id1> <id2>      - Unlink two notes in both directions");
+        System.out.println("   list-tags-all                - Lists all tags that exist globally");
+        System.out.println("   list-tags <note-id>          - List tags for an single note");
+        System.out.println("   delete-tag <note-id> <tag>   - Delete a tag from a note");
         System.out.println("   find <text>                  - Search for notes");
         System.out.println("   archive <note-id>            - Moves note to archive folder");
         System.out.println("   unarchive <note-id           - Moves note out of archive folder");
@@ -208,11 +215,11 @@ public class UI {
         System.out.println(" Repository /" + repoName + " has been created.");
     }
 
-    public void showTaggedNote(String noteID, String tag) {
+    public void showSuccessfullyTaggedNote(String noteID, String tag) {
         System.out.println(" Note #"+ noteID + " has been tagged with '"+ tag + "'");
     }
 
-    public void showTagAdded(String tag) {
+    public void showSuccessfullyAddedTag(String tag) {
         System.out.println(" Tag '"+ tag + "' has been added.");
     }
 
@@ -264,4 +271,22 @@ public class UI {
         System.out.println("Unarchived note: " + note.getFilename() + " (moved to notes/)");
     }
 
+    public void showTagsSingleNote(List<String> tags, String noteId) {
+        System.out.println(" Tags for note #" + noteId + ":");
+        for (int i = 0; i < tags.size(); i++) {
+            System.out.println(" " + (i + 1) + ". " + tags.get(i));
+        }
+    }
+
+    public void showTagsListGlobal(List<String> tags) {
+        System.out.println("You have " + tags.size() + " tags:");
+        // Show the list of tags.
+        for (int idx = 0; idx < tags.size(); idx++) {
+            System.out.println("    " + (idx + 1) + ". '" + tags.get(idx) + "'");
+        }
+    }
+
+    public void showSuccessfullyDeletedTagFromNote(String noteId, String tag) {
+        System.out.println(" Tag '" + tag + "' has been deleted from note #" + noteId + ".");
+    }
 }

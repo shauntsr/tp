@@ -125,8 +125,8 @@ public class LinkNotesCommandTest {
 
     @Test
     void testLinkAlreadyExistsThrowsException() throws ZettelException {
-        // The command checks: noteLinkedTo.get().isLinkedTo(noteIdLinkedBy)
-        // which checks if noteIdLinkedBy is in noteLinkedTo's linkedTo set
+        // The command checks: sourceNote.get().isLinkedTo(targetNoteId)
+        // which checks if targetNoteId is in sourceNote's outgoing links
         // So we need to add ef567890 to abcd1234's outgoingLinks set to simulate existing link
         Note note1 = notes.get(0);
         note1.addOutgoingLink("ef567890");  // Simulate the link already exists
@@ -153,12 +153,12 @@ public class LinkNotesCommandTest {
         Note note2 = notes.get(1); // ef567890
 
         // After linking abcd1234 → ef567890:
-        // - abcd1234's incomingLinks set contains ef567890
-        // - ef567890's outgoingLinks set contains abcd1234
-        assertTrue(note1.getIncomingLinks().contains("ef567890"), 
-                "First note should have second note in its incomingLinks set");
-        assertTrue(note2.getOutgoingLinks().contains("abcd1234"), 
-                "Second note should have first note in its outgoingLinks set");
+        // - abcd1234's outgoingLinks set contains ef567890
+        // - ef567890's incomingLinks set contains abcd1234
+        assertTrue(note1.getOutgoingLinks().contains("ef567890"),
+                "First note should have second note in its outgoingLinks set");
+        assertTrue(note2.getIncomingLinks().contains("abcd1234"),
+                "Second note should have first note in its incomingLinks set");
     }
 
     @Test
@@ -172,12 +172,12 @@ public class LinkNotesCommandTest {
         Note note2 = notes.get(1); // ef567890
 
         // After linking ef567890 → abcd1234:
-        // - ef567890's incomingLinks set contains abcd1234
-        // - abcd1234's outgoingLinks set contains ef567890
-        assertTrue(note2.getIncomingLinks().contains("abcd1234"), 
-                "Second note should have first note in its incomingLinks set");
-        assertTrue(note1.getOutgoingLinks().contains("ef567890"), 
-                "First note should have second note in its outgoingLinks set");
+        // - ef567890's outgoingLinks set contains abcd1234
+        // - abcd1234's incomingLinks set contains ef567890
+        assertTrue(note2.getOutgoingLinks().contains("abcd1234"),
+                "Second note should have first note in its outgoingLinks set");
+        assertTrue(note1.getIncomingLinks().contains("ef567890"),
+                "First note should have second note in its incomingLinks set");
     }
 
     @Test
@@ -200,17 +200,17 @@ public class LinkNotesCommandTest {
         Note note3Updated = notes.get(2); // 12345678
 
         // After linking abcd1234 → ef567890 and 12345678 → ef567890:
-        // - abcd1234's incomingLinks set contains ef567890
-        // - 12345678's incomingLinks set contains ef567890
-        // - ef567890's outgoingLinks set contains both abcd1234 and 12345678
-        assertTrue(note1.getIncomingLinks().contains("ef567890"), 
-                "First note should have second note in incomingLinks");
-        assertTrue(note3Updated.getIncomingLinks().contains("ef567890"), 
-                "Third note should have second note in incomingLinks");
-        assertTrue(note2.getOutgoingLinks().contains("abcd1234"), 
-                "Second note should have first note in outgoingLinks");
-        assertTrue(note2.getOutgoingLinks().contains("12345678"), 
-                "Second note should have third note in outgoingLinks");
+        // - abcd1234's outgoingLinks set contains ef567890
+        // - 12345678's outgoingLinks set contains ef567890
+        // - ef567890's incomingLinks set contains both abcd1234 and 12345678
+        assertTrue(note1.getOutgoingLinks().contains("ef567890"),
+                "First note should have second note in outgoingLinks");
+        assertTrue(note3Updated.getOutgoingLinks().contains("ef567890"),
+                "Third note should have second note in outgoingLinks");
+        assertTrue(note2.getIncomingLinks().contains("abcd1234"),
+                "Second note should have first note in incomingLinks");
+        assertTrue(note2.getIncomingLinks().contains("12345678"),
+                "Second note should have third note in incomingLinks");
     }
 
     @Test
@@ -233,17 +233,16 @@ public class LinkNotesCommandTest {
         Note note3Updated = notes.get(2); // 12345678
 
         // After linking abcd1234 → ef567890 and abcd1234 → 12345678:
-        // - abcd1234's incomingLinks set contains both ef567890 and 12345678
-        // - ef567890's outgoingLinks set contains abcd1234
-        // - 12345678's outgoingLinks set contains abcd1234
-        assertTrue(note1.getIncomingLinks().contains("ef567890"), 
-                "First note should have second note in incomingLinks");
-        assertTrue(note1.getIncomingLinks().contains("12345678"), 
-                "First note should have third note in incomingLinks");
-        assertTrue(note2.getOutgoingLinks().contains("abcd1234"), 
-                "Second note should have first note in outgoingLinks");
-        assertTrue(note3Updated.getOutgoingLinks().contains("abcd1234"), 
-                "Third note should have first note in outgoingLinks");
+        // - abcd1234's outgoingLinks set contains both ef567890 and 12345678
+        // - ef567890's incomingLinks set contains abcd1234
+        // - 12345678's incomingLinks set contains abcd1234
+        assertTrue(note1.getOutgoingLinks().contains("ef567890"),
+                "First note should have second note in outgoingLinks");
+        assertTrue(note1.getOutgoingLinks().contains("12345678"),
+                "First note should have third note in outgoingLinks");
+        assertTrue(note2.getIncomingLinks().contains("abcd1234"),
+                "Second note should have first note in incomingLinks");
+        assertTrue(note3Updated.getIncomingLinks().contains("abcd1234"),
+                "Third note should have first note in incomingLinks");
     }
 }
-
