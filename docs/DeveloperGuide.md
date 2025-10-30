@@ -298,4 +298,263 @@ Opens note files in external text editor:
 * Validates interactive console availability
 * Waits for editor process to complete
 
+--------------------------------------------------------------------------------------------------------------------
+
+## **Implementation**
+
+This section describes noteworthy implementation details for key features.
+
+### Note Creation with Hash-Based IDs
+
+**Design Choice: Deterministic ID Generation**
+
+Unlike traditional incremental IDs or UUIDs, Zettel uses hash-based IDs generated from the note's title and creation timestamp. This is inspired from Git's commit hash.
+
+**Implementation:**
+
+```
+ID = SHA-256(title + createdAt)[0:4] → 8 hex characters
+```
+
+**Rationale:**
+* **Uniqueness**: SHA-256 collision probability is negligible for our use case
+* **User-friendly**: 8 characters is short enough to type manually
+* **No central counter**: No need to maintain global state across repositories
+
+#### Design Considerations
+
+**Aspect: How to assign unique note identifiers**
+
+* **Alternative 1: (rejected)** Incremental integer IDs.
+    * Pros: Simple, human-readable, easy to reference in commands.
+    * Cons: Possible conflicts if multiple repositories are merged manually.
+
+* **Alternative 2: (rejected)** Timestamp-based UUIDs.
+    * Pros: Globally unique across repositories, supports synchronization.
+    * Cons: Less readable and harder to manually type or recall.
+
+<img src="images/NoteCreationActivity.png" width="464" />
+
+**Sequence:**
+1. User provides title (and optional body)
+2. `NewNoteCommand` captures current timestamp
+3. `IdGenerator` hashes title+timestamp → 8-char ID
+4. Filename derived from title (spaces substituted with underscores, append .txt)
+5. Check for duplicate filename in existing notes
+6. If body is null (no -b flag passed), open external editor for body input
+7. Create `Note` object
+8. Save to storage (both index.txt and body file)
+
+### Linking System
+
+**Design Choice: Bidirectional Link Tracking**
+
+Notes maintain both outgoing and incoming link sets to enable efficient graph operations.
+
+**Data Structure:**
+```java
+private HashSet<String> outgoingLinks;  // IDs this note links to
+private HashSet<String> incomingLinks;  // IDs that link to this note
+```
+
+**Operations:**
+
+1. **Link (Unidirectional):**
+   - `sourceNote.addOutgoingLink(targetId)`
+   - `targetNote.addIncomingLink(sourceId)`
+
+2. **Link-Both (Bidirectional):**
+   - Performs Link operation in both directions
+
+3. **Unlink:**
+   - Removes link from both source's outgoing and target's incoming
+
+4. **Delete Note Cleanup:**
+   - For each outgoing link: remove from target's incoming links
+   - For each incoming link: remove from source's outgoing links
+
+<img src="images/LinkCreationSequence.png" width="893" />
+
+**Rationale:**
+* O(1) lookup for "does note A link to note B?"
+* O(1) retrieval of all incoming or outgoing links
+* Automatic cleanup prevents dangling links
+* Supports graph algorithms (BFS, DFS) for future features
+
+#### Design Considerations
+
+**Aspect: How note linking is represented**
+
+* **Alternative 1 (current choice):** Use text-based note IDs stored in metadata.
+    * Pros: Minimal overhead, links remain functional even if filenames change.
+    * Cons: Broken links possible if IDs are deleted or recycled.
+
+* **Alternative 2:** Use filename-based linking.
+    * Pros: Intuitive for users browsing directly in the file system.
+    * Cons: Breaks easily if note titles are renamed.
+
+### Tag Management System
+
+**Design Choice: Global Tag List + Note-Level Tags**
+
+Tags are stored both globally (in `tags.txt`) and per-note (in `index.txt`).
+
+**Architecture:**
+* `tags.txt` - Master list of all existing tags (one per line)
+* Each `Note` has a `List<String> tags` field
+* Tags in note metadata are serialized as `tag1;;tag2;;tag3`
+
+**Operations:**
+
+1. **new-tag**: Adds tag to global list
+2. **add-tag**: Adds existing global tag to specific note
+3. **delete-tag**: Removes tag from specific note
+4. **delete-tag-globally**: Removes tag from global list AND all notes
+5. **rename-tag**: Renames tag globally across all notes
+
+<img src="images/RenameTagSequence.png" width="908" />
+
+**Why Global Tag List?**
+* Ensures consistency (no typos creating new tags)
+* Enables tag autocomplete (future feature)
+* Provides single source of truth for valid tags
+* Simplifies tag management and cleanup
+
+#### Design Considerations
+
+**Aspect: How tags are stored and referenced**
+
+* **Alternative 1 (current choice):** Store tags directly in each note file.
+    * Pros: Simpler to parse, avoids dependency on central tag index.
+    * Cons: Harder to rename or update tags globally across all notes.
+
+* **Alternative 2:** Maintain a global tag registry containing all references.
+    * Pros: Easier to enforce consistency and support global renaming.
+    * Cons: Adds complexity and potential desync issues if index is corrupted.
+
+### Archive System
+
+**Design Choice: Separate Archive Directory**
+
+Archived notes are physically moved to `archive/` subdirectory rather than just flagged.
+
+**Structure:**
+```
+repo/
+├── notes/          # Active notes
+│   └── note1.txt
+└── archive/        # Archived notes
+    └── note2.txt
+```
+
+**Implementation:**
+
+1. **Archive Operation:**
+   - Set `note.archived = true`
+   - Move file from `notes/` to `archive/`
+   - Update index.txt with archived flag
+
+2. **Unarchive Operation:**
+   - Set `note.archived = false`
+   - Move file from `archive/` back to `notes/`
+   - Update index.txt
+
+<img src="images/ArchiveFlowActivity.png" width="727" />
+
+**Advantages:**
+* Clear visual separation in file system
+* Easy backup of active vs archived notes
+* Reduces clutter in notes directory
+* Metadata (index.txt) still tracks all notes
+
+#### Design Considerations
+
+**Aspect: How archived notes are handled**
+
+* **Alternative 1 (current choice):** Move notes to a dedicated `/archive` directory.
+    * Pros: Keeps active directory uncluttered, simple to restore.
+    * Cons: Requires file I/O each time and can cause path issues if linked notes are moved.
+
+* **Alternative 2:** Use only an “archived” flag in metadata instead of physical move.
+    * Pros: Keeps links intact, avoids file system changes.
+    * Cons: Requires more parsing logic and filtering in commands.
+
+### Storage Validation and Recovery
+
+**Design Choice: Robust Validation with Auto-Recovery**
+
+Storage performs validation on every save and automatically repairs common issues.
+
+**Validation Checks:**
+
+1. **Directory Structure:**
+   - Ensures `notes/`, `archive/`, `index.txt` exist
+   - Creates missing directories/files
+
+2. **Body File Validation:**
+   - Checks each note listed in index.txt has corresponding body file
+   - Creates empty body files for missing entries
+
+3. **Orphan Detection:**
+   - Identifies `.txt` files in notes/archive not referenced in index
+   - Warns user but doesn't auto-delete
+
+4. **Config File Validation:**
+   - Ensures `.zettelConfig` exists
+   - Validates current repository exists
+   - Note: if `.zettelConfig` is forcibly removed by user, on validation a new default `.zettelConfig` is created; as such previously created repos are lost to the program.
+
+<img src="images/StorageValidationFlow.png" width="479" />
+
+**Recovery Strategy:**
+* Non-destructive: Never deletes data automatically
+* Creates missing files with safe defaults (empty content)
+* Warns about inconsistencies without blocking operations
+* Allows manual intervention for orphaned files
+
+### Editor Integration
+
+**Design Choice: External Editor for Note Bodies**
+
+Rather than implementing a built-in editor, Zettel opens notes in the user's preferred text editor.
+
+**Editor Selection Priority:**
+1. `$VISUAL` environment variable
+2. `$EDITOR` environment variable
+3. Common CLI editors: vim, nano, vi
+4. Platform-specific: notepad.exe (Windows)
+
+**Implementation:**
+
+```java
+Process process = new ProcessBuilder(editor, filepath)
+    .inheritIO()
+    .start();
+int exitCode = process.waitFor();
+```
+
+<img src="images/EditorIntegrationSequence.png" width="812" />
+
+**Advantages:**
+* Leverages user's existing editor preferences
+* No need to implement complex text editing UI
+* Supports advanced editing features (syntax highlighting, etc.)
+* Works seamlessly in terminal environments
+
+**Challenges:**
+* Requires interactive console (doesn't work in IDE run mode)
+* Must validate editor availability
+* Need to handle editor process lifecycle
+
+#### Design Considerations
+
+**Aspect: How users edit notes**
+
+* **Alternative 1 (current choice):** Invoke system default editor via environment variables (e.g. `$EDITOR`).
+    * Pros: Respects user preferences, no external UI dependencies.
+    * Cons: Dependent on correct environment configuration.
+
+* **Alternative 2:** Embed a simple text editor inside the CLI.
+    * Pros: Uniform behavior across systems.
+    * Cons: Breaks minimalist philosophy; adds maintenance burden.
 
