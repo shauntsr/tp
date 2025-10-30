@@ -29,7 +29,7 @@ public class UI {
      */
     public String readCommand() {
         if (!scanner.hasNextLine()) {
-            return "bye";  // Auto-exit when no more input (prevents hanging in CI)
+            return "bye";
         }
         return scanner.nextLine();
     }
@@ -44,6 +44,15 @@ public class UI {
         System.out.println(" What can I do for you?");
         printLine();
         System.out.println();
+        showHelp();
+        printLine();
+    }
+
+    /**
+     * Displays the list of all available commands and their formats.
+     * This method is called by HelpCommand and showWelcome.
+     */
+    public void showHelp() {
         System.out.println(" Available Commands:");
         System.out.println("   init <repo-name>                - Initialize a new repository");
         System.out.println("   new -t <title> [-b <body>]      - Create a new note");
@@ -68,9 +77,9 @@ public class UI {
         System.out.println("   archive <note-id>               - Moves note to archive folder");
         System.out.println("   unarchive <note-id>             - Moves note out of archive folder");
         System.out.println("   find <text>                     - Search for notes");
+        System.out.println("   help                             - Show this list of commands");
         System.out.println("   bye                             - Exit the application");
         System.out.println();
-        printLine();
     }
 
 

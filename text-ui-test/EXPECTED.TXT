@@ -27,6 +27,7 @@ ____________________________________________________________
    archive <note-id>               - Moves note to archive folder
    unarchive <note-id>             - Moves note out of archive folder
    find <text>                     - Search for notes
+   help                             - Show this list of commands
    bye                             - Exit the application
 
 ____________________________________________________________

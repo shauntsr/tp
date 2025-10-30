@@ -11,6 +11,7 @@ import seedu.zettel.commands.DeleteTagGloballyCommand;
 import seedu.zettel.commands.EditNoteCommand;
 import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.FindNoteCommand;
+import seedu.zettel.commands.HelpCommand;
 import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.LinkBothNotesCommand;
 import seedu.zettel.commands.LinkNotesCommand;
@@ -59,8 +60,9 @@ public class Parser {
     private static final String DELETE_TAG_FORMAT = "Delete tag command format should be: delete-tag [-f] "
             + "<NOTE_ID> <TAG>";
     private static final String DELETE_TAG_GLOBALLY_FORMAT = "Delete tag globally format should be: "
-        + "delete-tag-globally [-f] <TAG>";
+            + "delete-tag-globally [-f] <TAG>";
     private static final String RENAME_TAG_FORMAT = "Rename tag format should be: rename-tag <OLD_TAG> <NEW_TAG>";
+    private static final String HELP_FORMAT = "Help format should be: help";
     private static final String NOTE_EMPTY = "Note title cannot be empty!";
     private static final String TAG_EMPTY = "Tag cannot be empty!";
     private static final String ID_EMPTY = "Please specify a Note ID to ";
@@ -123,6 +125,7 @@ public class Parser {
         case "delete-tag" -> parseDeleteTagFromNoteCommand(inputs);
         case "delete-tag-globally" -> parseDeleteTagGloballyCommand(inputs);
         case "rename-tag" -> parseRenameTagCommand(inputs);
+        case "help" -> parseHelpCommand(inputs);
         default -> throw new InvalidInputException(command);
         };
     }
@@ -677,5 +680,20 @@ public class Parser {
         }
 
         return new RenameTagCommand(oldTag, newTag);
+    }
+
+    /**
+     * Parses a help command.
+     * Expected format: help
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return A HelpCommand object.
+     * @throws ZettelException If the format is invalid.
+     */
+    private static Command parseHelpCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 1) {
+            throw new InvalidFormatException(HELP_FORMAT);
+        }
+        return new HelpCommand();
     }
 }
