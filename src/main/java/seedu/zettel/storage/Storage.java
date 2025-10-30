@@ -30,6 +30,7 @@ public class Storage {
 
     private String repoName = DEFAULT_REPO;
     private ArrayList<String> repoList = new ArrayList<>();
+
     /**
      * Constructs a Storage instance with the specified root path.
      *
@@ -147,7 +148,6 @@ public class Storage {
      * @throws ZettelException if there's an error writing to the config file
      */
     public void updateConfig(String newRepo) throws ZettelException {
-        logger.info("Updating config with current repository: " + newRepo);
         fileSystemManager.createConfigFile(DEFAULT_REPO);
         Path configFile = fileSystemManager.getConfigPath();
 
@@ -162,9 +162,7 @@ public class Storage {
                 lines.set(1, newRepo);
             }
             Files.write(configFile, lines);
-            logger.info("Config updated successfully");
         } catch (IOException e) {
-            logger.warning("Failed to update checked-out repo in .zettelConfig: " + e.getMessage());
             throw new ZettelException("Failed to update checked-out repo in .zettelConfig: " + e.getMessage());
         }
     }
@@ -273,11 +271,10 @@ public class Storage {
      * @param repoName the name of the repository to create
      */
     public void createRepo(String repoName) {
-        logger.info("Creating repository: " + repoName);
+        //logger.info("Creating repository: " + repoName);
         boolean created = fileSystemManager.createRepoStructure(repoName);
         if (created) {
             addToConfig(repoName);
-            logger.info("Repository " + repoName + " successfully created");
         } else {
             logger.warning("Repository " + repoName + " already exists or creation failed");
         }
