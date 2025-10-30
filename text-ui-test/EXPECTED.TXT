@@ -17,10 +17,13 @@ ____________________________________________________________
    unlink <source-id> <target-id> - Unlink two notes
    link-both <id1> <id2>        - Link two notes in both directions
    unlink-both <id1> <id2>      - Unlink two notes in both directions
+   list-incoming-links <note-id> - Show incoming linked notes
+   list-outgoing-links <note-id> - Show outgoing linked notes
    list-tags-all                - Lists all tags that exist globally
    list-tags <note-id>          - List tags for an single note
    delete-tag [-f] <note-id> <tag> - Delete a tag from a note
    delete-tag-globally [-f] <tag> - Delete a tag from all notes
+   rename-tag <old-tag> <new-tag> - Rename a tag globally
    find <text>                  - Search for notes
    bye                          - Exit the application
 
