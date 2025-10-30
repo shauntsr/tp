@@ -106,7 +106,7 @@ class NoteSerializerTest {
         Files.writeString(notesDir.resolve("third.txt"), "Body3");
 
         serializer.saveNotes(Arrays.asList(note1, note2, note3), indexPath);
-        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir);
+        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir, archiveDir);
 
         assertEquals(3, loaded.size());
 
@@ -329,7 +329,7 @@ class NoteSerializerTest {
 
         // Save and load
         serializer.saveNotes(Arrays.asList(note1, note2, note3), indexPath);
-        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir);
+        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir, archiveDir);
 
         assertEquals(3, loaded.size());
 

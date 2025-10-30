@@ -220,8 +220,9 @@ public class Storage {
         for (String repoName: repoList) {
             Path indexPath = fileSystemManager.getIndexPath(repoName);
             Path notesDir = fileSystemManager.getNotesPath(repoName);
+            Path archiveDir = fileSystemManager.getArchivePath(repoName);
 
-            List<Note> repoNotes = noteSerializer.loadNotes(indexPath,notesDir);
+            List<Note> repoNotes = noteSerializer.loadNotes(indexPath, notesDir, archiveDir);
             for (Note note: repoNotes) {
                 tags.addAll(note.getTags());
             }
