@@ -391,6 +391,9 @@ public class Storage {
      */
     public ArrayList<String> getRepoList() {
         return new ArrayList<>(repoList);
+    }
+
+    /**
      * Gets the archive folder name used inside repositories (e.g. "archive" by default).
      * Exposes the name so callers (commands) can write the archive correctly.
      */
