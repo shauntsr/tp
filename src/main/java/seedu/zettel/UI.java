@@ -333,7 +333,7 @@ public class UI {
     }
 
     public void showRepoChanged(String repoName) {
-        System.out.println("Changed to repository: /" + repoName);
+        System.out.println("Successfully changed to repository: /" + repoName);
     }
 
     public void showCurrentRepo(String repoName) {
