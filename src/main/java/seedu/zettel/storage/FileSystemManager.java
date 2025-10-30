@@ -5,11 +5,13 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import seedu.zettel.exceptions.FailedMoveNoteException;
 import seedu.zettel.exceptions.InvalidRepoException;
 import seedu.zettel.exceptions.ZettelException;
 
@@ -293,5 +295,31 @@ public class FileSystemManager {
      */
     public Path getConfigPath() {
         return rootPath.resolve(CONFIG_FILE);
+    }
+
+    /**
+     * Moves a note file between the notes and archive directories.
+     *
+     * @param filename the name of the note file to move
+     * @param repoName the name of the repository containing the note
+     * @param toArchive true to move to archive, false to move to notes
+     * @throws ZettelException if the file move operation fails
+     */
+    public void moveNoteBetweenDirectories(String filename, String repoName, boolean toArchive)
+            throws ZettelException {
+        Path sourcePath = toArchive
+                ? getNotesPath(repoName).resolve(filename)
+                : getArchivePath(repoName).resolve(filename);
+        Path destPath = toArchive
+                ? getArchivePath(repoName).resolve(filename)
+                : getNotesPath(repoName).resolve(filename);
+
+        try {
+            Files.move(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            String action = toArchive ? "archive" : "unarchive";
+            throw new FailedMoveNoteException("Failed to " + action + " note file '" + filename + "': "
+                    + e.getMessage());
+        }
     }
 }

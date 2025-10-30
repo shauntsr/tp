@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -394,21 +393,13 @@ public class Storage {
     }
 
     /**
-     * Moves a note file between the notes and archive directories.
+     * Moves a note file between the notes and archive directories in the current repository.
      *
      * @param filename the name of the note file to move
      * @param toArchive true to move to archive, false to move to notes
      * @throws ZettelException if the file move operation fails
      */
     public void moveNoteBetweenDirectories(String filename, boolean toArchive) throws ZettelException {
-        Path sourcePath = toArchive ? getNotePath(filename) : getArchivePath(filename);
-        Path destPath = toArchive ? getArchivePath(filename) : getNotePath(filename);
-
-        try {
-            Files.move(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            String action = toArchive ? "archive" : "unarchive";
-            throw new ZettelException("Failed to " + action + " note file '" + filename + "': " + e.getMessage());
-        }
+        fileSystemManager.moveNoteBetweenDirectories(filename, repoName, toArchive);
     }
 }
