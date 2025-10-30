@@ -78,9 +78,9 @@ public class Parser {
                     " 'incoming-links' or 'outgoing-links'.";
     private static final String LIST_LINKED_FORMAT = "List linked notes format should be: list "
                     + "<incoming-links/outgoing-links> <NOTE_ID>";
-    private static final String ARCHIVE_NOTES_FORMAT = "Invalid format. Usage: " +
+    private static final String ARCHIVE_NOTES_FORMAT = "Archive notes format should be: " +
                     "archive <NOTE_ID>";
-    private static final String UNARCHIVE_NOTES_FORMAT = "Invalid format. Usage: " +
+    private static final String UNARCHIVE_NOTES_FORMAT = "Unarchive notes format should be: " +
                     "unarchive <NOTE_ID>";
     private static final String LIST_INCOMING_LINKS_FORMAT =
         "List incoming links format should be: list-incoming-links <NOTE_ID>";
@@ -169,9 +169,6 @@ public class Parser {
      * @throws ZettelException If the command format is invalid.
      */
     private static Command parseListNoteCommand(String[] inputs) throws ZettelException {
-        if (inputs.length >= 3 && !inputs[1].startsWith("-")) {
-            return parseListLinkedNotesCommand(inputs);
-        }
 
         if (inputs.length < 1) {
             throw new InvalidFormatException(LIST_FORMAT);
