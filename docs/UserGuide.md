@@ -182,6 +182,45 @@ unpin ccfd2e51
 Got it. I've unpinned this note: ccfd2e51
 ```
 
+### Viewing All Commands: `help`
+
+Displays a complete list of available commands and their descriptions.
+
+**Format:**
+
+```
+help
+```
+
+**Expected Output:**s
+
+```
+Available Commands:
+   init <repo-name>                 - Initialize a new repository
+   new -t <title> [-b <body>]       - Create a new note
+   edit <note-id>                   - Edit an existing note
+   list [-p]                        - List all notes (or pinned only)
+   delete [-f] <note-id>            - Delete a note by ID
+   pin <note-id>                    - Pin a note
+   unpin <note-id>                  - Unpin a note
+   new-tag <tag-name>               - Adds a tag
+   add-tag <note-id> <tag-name>     - Tag a note
+   link <source-id> <target-id>     - Link two notes
+   unlink <source-id> <target-id>   - Unlink two notes
+   link-both <id1> <id2>            - Link two notes in both directions
+   unlink-both <id1> <id2>          - Unlink two notes in both directions
+   list-incoming-links <note-id>    - Show incoming linked notes
+   list-outgoing-links <note-id>    - Show outgoing linked notes
+   list-tags-all                    - Lists all tags that exist globally
+   list-tags <note-id>              - List tags for an single note
+   delete-tag [-f] <note-id> <tag>  - Delete a tag from a note
+   delete-tag-globally [-f] <tag>   - Delete a tag from all notes
+   rename-tag <old-tag> <new-tag>   - Rename a tag globally
+   find <text>                      - Search for notes
+   help                             - Show this list of commands
+   bye                              - Exit the application
+```
+
 ## Command Summary
 * Start a new Zettelkasten repository: `init <repository-name>`
 * Add a new note: `new -t <TITLE> [-b <BODY>]`
@@ -191,3 +230,4 @@ Got it. I've unpinned this note: ccfd2e51
 * Delete a note (without confirmation): `delete -f <NOTE_ID>`
 * Pin a note: `pin <NOTE_ID>`
 * Unpin a note: `unpin <NOTE_ID>`
+* View all commands: `help`
