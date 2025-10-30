@@ -203,13 +203,13 @@ public class Parser {
                     throw new InvalidFormatException(LIST_FORMAT);
                 }
                 showPinned = true;
-                }
+            }
             case "-a" -> {
                 if (showArchived) {
                     throw new InvalidFormatException(LIST_FORMAT);
                 }
                 showArchived = true;
-                }
+            }
             default -> throw new InvalidFormatException(LIST_FORMAT);
             }
         }
