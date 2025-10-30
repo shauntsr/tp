@@ -3,6 +3,7 @@ package seedu.zettel.commands;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 
 import seedu.zettel.Note;
 import seedu.zettel.UI;
@@ -17,8 +18,9 @@ import seedu.zettel.storage.Storage;
  * This command removes a tag from the note's tag list.
  */
 public class DeleteTagFromNoteCommand extends Command {
-    private String noteId;
-    private String tag;
+    private final String noteId;
+    private final String tag;
+    private final boolean isForce;
 
     /**
      * Constructs a DeleteTagFromNoteCommand with the specified note ID and tag.
@@ -26,9 +28,10 @@ public class DeleteTagFromNoteCommand extends Command {
      * @param noteId The ID of the note.
      * @param tag The tag to be deleted.
      */
-    public DeleteTagFromNoteCommand(String noteId, String tag) {
+    public DeleteTagFromNoteCommand(String noteId, String tag, boolean isForce) {
         this.noteId = noteId;
         this.tag = tag;
+        this.isForce = isForce;
     }
 
     @Override
@@ -53,8 +56,20 @@ public class DeleteTagFromNoteCommand extends Command {
             throw new TagNotFoundException("Tag '" + tag + "' does not exist for note with ID '" + noteId + "'.");
         }
 
-        // Remove the tag from the note
-        note.get().removeTag(tag);  
-        ui.showSuccessfullyDeletedTagFromNote(noteId, tag);
+        boolean shouldDelete = isForce;
+        if (!isForce) {
+            ui.showDeleteTagFromNoteConfirmation(tag, noteId);
+
+            Scanner scanner = new Scanner(System.in);
+            String input = scanner.nextLine().trim().toLowerCase();
+            shouldDelete = input.equals("y") || input.equals("yes");
+        }
+
+        if (shouldDelete) {
+            note.get().removeTag(tag);
+            ui.showSuccessfullyDeletedTagFromNote(noteId, tag);
+        } else {
+            ui.showDeletionCancelled();
+        }
     }
 }
