@@ -234,29 +234,32 @@ help
 
 ```
 Available Commands:
-   init <repo-name>                 - Initialize a new repository
-   new -t <title> [-b <body>]       - Create a new note
-   edit <note-id>                   - Edit an existing note
-   list [-p]                        - List all notes (or pinned only)
-   delete [-f] <note-id>            - Delete a note by ID
-   pin <note-id>                    - Pin a note
-   unpin <note-id>                  - Unpin a note
-   new-tag <tag-name>               - Adds a tag
-   add-tag <note-id> <tag-name>     - Tag a note
-   link <source-id> <target-id>     - Link two notes
-   unlink <source-id> <target-id>   - Unlink two notes
-   link-both <id1> <id2>            - Link two notes in both directions
-   unlink-both <id1> <id2>          - Unlink two notes in both directions
-   list-incoming-links <note-id>    - Show incoming linked notes
-   list-outgoing-links <note-id>    - Show outgoing linked notes
-   list-tags-all                    - Lists all tags that exist globally
-   list-tags <note-id>              - List tags for an single note
-   delete-tag [-f] <note-id> <tag>  - Delete a tag from a note
-   delete-tag-globally [-f] <tag>   - Delete a tag from all notes
-   rename-tag <old-tag> <new-tag>   - Rename a tag globally
-   find <text>                      - Search for notes
-   help                             - Show this list of commands
-   bye                              - Exit the application
+    init <repo-name>                - Initialize a new repository
+    new -t <title> [-b <body>]      - Create a new note
+    edit <note-id>                  - Edit an existing note
+    list [-p] [-a]                  - List notes (pinned and/or archived filters)
+    delete [-f] <note-id>           - Delete a note by ID
+    pin <note-id>                   - Pin a note
+    unpin <note-id>                 - Unpin a note
+    new-tag <tag-name>              - Adds a tag
+    add-tag <note-id> <tag-name>    - Tag a note
+    link <source-id> <target-id>    - Link two notes
+    unlink <source-id> <target-id>  - Unlink two notes
+    link-both <id1> <id2>           - Link two notes in both directions
+    unlink-both <id1> <id2>         - Unlink two notes in both directions
+    list-incoming-links <note-id>   - Show incoming linked notes
+    list-outgoing-links <note-id>   - Show outgoing linked notes
+    list-tags-all                   - Lists all tags that exist globally
+    list-tags <note-id>             - List tags for an single note
+    delete-tag [-f] <note-id> <tag> - Delete a tag from a note
+    delete-tag-globally [-f] <tag>  - Delete a tag from all notes
+    rename-tag <old-tag> <new-tag>  - Rename a tag globally
+    archive <note-id>               - Moves note to archive folder
+    unarchive <note-id>             - Moves note out of archive folder
+    print-body <note-id>            - Print the body of a note
+    find <text>                     - Search for notes
+    help                             - Show this list of commands
+    bye                             - Exit the application
 ```
 
 ## Command Summary
@@ -271,3 +274,26 @@ Available Commands:
 * Pin a note: `pin <NOTE_ID>`
 * Unpin a note: `unpin <NOTE_ID>`
 * View all commands: `help`
+* Print a note's body: `print-body <NOTE_ID>`
+
+---
+
+### Printing a Note Body: `print-body`
+
+Prints the full body of a note by its ID. Note ID must be 8 lowercase hexadecimal characters.
+
+**Format:**
+```
+print-body <NOTE_ID>
+```
+
+**Example:**
+```
+print-body abcd1234
+```
+
+**Expected Output:**
+```
+ Body of note #abcd1234:
+ Hello World
+```

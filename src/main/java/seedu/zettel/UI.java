@@ -57,7 +57,7 @@ public class UI {
         System.out.println("   init <repo-name>                - Initialize a new repository");
         System.out.println("   new -t <title> [-b <body>]      - Create a new note");
         System.out.println("   edit <note-id>                  - Edit an existing note");
-        System.out.println("   list [-p]                       - List all notes (or pinned only)");
+    System.out.println("   list [-p] [-a]                  - List notes (pinned and/or archived filters)");
         System.out.println("   delete [-f] <note-id>           - Delete a note by ID");
         System.out.println("   pin <note-id>                   - Pin a note");
         System.out.println("   unpin <note-id>                 - Unpin a note");
@@ -76,6 +76,7 @@ public class UI {
         System.out.println("   rename-tag <old-tag> <new-tag>  - Rename a tag globally");
         System.out.println("   archive <note-id>               - Moves note to archive folder");
         System.out.println("   unarchive <note-id>             - Moves note out of archive folder");
+        System.out.println("   print-body <note-id>            - Print the body of a note");
         System.out.println("   find <text>                     - Search for notes");
         System.out.println("   help                             - Show this list of commands");
         System.out.println("   bye                             - Exit the application");
@@ -330,5 +331,10 @@ public class UI {
     public void showSuccessfullyRenamedTag(String oldTag, String newTag) {
         System.out.println(" Tag '" + oldTag + "' has been renamed to '" + newTag 
                 + "' across all notes. All affected notes have been updated.");
+    }
+
+    public void showNoteBody(String noteId, String body) {
+        System.out.println(" Body of note #" + noteId + ":");
+        System.out.println(body);
     }
 }

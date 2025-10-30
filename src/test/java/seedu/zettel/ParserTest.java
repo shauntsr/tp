@@ -24,6 +24,7 @@ import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.NewTagCommand;
 import seedu.zettel.commands.PinNoteCommand;
 import seedu.zettel.commands.RenameTagCommand;
+import seedu.zettel.commands.PrintNoteBodyCommand;
 import seedu.zettel.commands.TagNoteCommand;
 import seedu.zettel.commands.UnlinkBothNotesCommand;
 import seedu.zettel.commands.UnlinkNotesCommand;
@@ -890,5 +891,26 @@ class ParserTest {
     @Test
     void testParseHelpWithArgumentsThrowsInvalidFormatException() {
         assertThrows(InvalidFormatException.class, () -> Parser.parse("help me"));
+    }
+
+    // ==================== Print Body Command Tests ====================
+
+    @Test
+    void testParsePrintBodyWithValidIdReturnsPrintNoteBodyCommand() throws ZettelException {
+        Command command = Parser.parse("print-body abcd1234");
+        assertInstanceOf(PrintNoteBodyCommand.class, command);
+    }
+
+    @Test
+    void testParsePrintBodyWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("print-body"));
+    }
+
+    @Test
+    void testParsePrintBodyWithInvalidIdThrowsInvalidFormatException() {
+        // uppercase hex should fail
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("print-body ABCD1234"));
+        // too short should fail
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("print-body abc"));
     }
 }
