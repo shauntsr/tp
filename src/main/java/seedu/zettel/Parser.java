@@ -19,6 +19,7 @@ import seedu.zettel.commands.ListTagsSingleNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.NewTagCommand;
 import seedu.zettel.commands.PinNoteCommand;
+import seedu.zettel.commands.RenameTagCommand;
 import seedu.zettel.commands.TagNoteCommand;
 import seedu.zettel.commands.UnlinkBothNotesCommand;
 import seedu.zettel.commands.UnlinkNotesCommand;
@@ -58,6 +59,7 @@ public class Parser {
             + "<NOTE_ID> <TAG>";
     private static final String DELETE_TAG_GLOBALLY_FORMAT = "Delete tag globally format should be: "
         + "delete-tag-globally [-f] <TAG>";
+    private static final String RENAME_TAG_FORMAT = "Rename tag format should be: rename-tag <OLD_TAG> <NEW_TAG>";
     private static final String NOTE_EMPTY = "Note title cannot be empty!";
     private static final String TAG_EMPTY = "Tag cannot be empty!";
     private static final String ID_EMPTY = "Please specify a Note ID to ";
@@ -75,6 +77,10 @@ public class Parser {
                     " 'incoming-links' or 'outgoing-links'.";
     private static final String LIST_LINKED_FORMAT = "List linked notes format should be: list "
                     + "<incoming-links/outgoing-links> <NOTE_ID>";
+    private static final String LIST_INCOMING_LINKS_FORMAT =
+        "List incoming links format should be: list-incoming-links <NOTE_ID>";
+    private static final String LIST_OUTGOING_LINKS_FORMAT =
+        "List outgoing links format should be: list-outgoing-links <NOTE_ID>";
 
     /**
      * Parses a user command string and returns the corresponding Command object.
@@ -103,10 +109,13 @@ public class Parser {
         case "unlink" -> parseUnlinkNotesCommand(inputs);
         case "link-both" -> parseLinkBothNotesCommand(inputs);
         case "unlink-both" -> parseUnlinkBothNotesCommand(inputs);
+        case "list-incoming-links" -> parseListIncomingLinksCommand(inputs);
+        case "list-outgoing-links" -> parseListOutgoingLinksCommand(inputs);
         case "list-tags-all" -> parseListTagsGlobalCommand(inputs);
         case "list-tags" -> parseListTagsSingleNoteCommand(inputs);
         case "delete-tag" -> parseDeleteTagFromNoteCommand(inputs);
         case "delete-tag-globally" -> parseDeleteTagGloballyCommand(inputs);
+        case "rename-tag" -> parseRenameTagCommand(inputs);
         default -> throw new InvalidInputException(command);
         };
     }
@@ -149,11 +158,7 @@ public class Parser {
      * @throws ZettelException If the command format is invalid.
      */
     private static Command parseListNoteCommand(String[] inputs) throws ZettelException {
-        // Check if this is a list linked notes command
-        if (inputs.length >= 3) {
-            return parseListLinkedNotesCommand(inputs);
-        }
-        
+        // Only handle generic list and pinned flag here.
         // Regular list command
         if (inputs.length != 1 && inputs.length != 2) {
             throw new InvalidFormatException(LIST_FORMAT);
@@ -431,6 +436,38 @@ public class Parser {
     }
 
     /**
+     * Parses a list-incoming-links command to display incoming links for a specific note.
+     * Expected format: list-incoming-links NOTE_ID
+     * 
+     * @param inputs The tokenized user input split by spaces.
+     * @return A ListLinkedNotesCommand object with the note ID.
+     * @throws ZettelException If the format is invalid or note ID is malformed.
+     */
+    private static Command parseListIncomingLinksCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 2) {
+            throw new InvalidFormatException(LIST_INCOMING_LINKS_FORMAT);
+        }
+        String noteId = parseNoteId(inputs[1], "list linked notes");
+        return new ListLinkedNotesCommand("incoming", noteId);
+    }
+
+    /**
+     * Parses a list-outgoing-links command to display outgoing links for a specific note.
+     * Expected format: list-outgoing-links NOTE_ID
+     * 
+     * @param inputs The tokenized user input split by spaces.
+     * @return A ListLinkedNotesCommand object with the note ID.
+     * @throws ZettelException If the format is invalid or note ID is malformed.
+     */
+    private static Command parseListOutgoingLinksCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 2) {
+            throw new InvalidFormatException(LIST_OUTGOING_LINKS_FORMAT);
+        }
+        String noteId = parseNoteId(inputs[1], "list linked notes");
+        return new ListLinkedNotesCommand("outgoing", noteId);
+    }
+
+    /**
      * Parses an unlink notes command to remove a unidirectional link between two notes.
      * Expected format: unlink SOURCE_NOTE_ID TARGET_NOTE_ID
      *
@@ -566,5 +603,28 @@ public class Parser {
         }
         default -> throw new InvalidFormatException(DELETE_TAG_GLOBALLY_FORMAT);
         }
+    }
+
+    /**
+     * Parses a rename-tag command to rename an existing tag globally.
+     * Expected Format: rename-tag OLD_TAG NEW_TAG
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return A RenameTagCommand object with the old and new tag names.
+     * @throws ZettelException If the format is invalid or parameters are missing.
+     */
+    private static Command parseRenameTagCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 3) {
+            throw new InvalidFormatException(RENAME_TAG_FORMAT);
+        }
+
+        String oldTag = inputs[1].trim();
+        String newTag = inputs[2].trim();
+
+        if (oldTag.isEmpty() || newTag.isEmpty()) {
+            throw new EmptyDescriptionException("Old tag or new tag cannot be empty!");
+        }
+
+        return new RenameTagCommand(oldTag, newTag);
     }
 }

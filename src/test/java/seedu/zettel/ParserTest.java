@@ -15,6 +15,7 @@ import seedu.zettel.commands.FindNoteCommand;
 import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.LinkBothNotesCommand;
 import seedu.zettel.commands.LinkNotesCommand;
+import seedu.zettel.commands.ListLinkedNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
 import seedu.zettel.commands.ListTagsSingleNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
@@ -773,6 +774,51 @@ class ParserTest {
     @Test
     void testParseDeleteTagGloballyWithTooManyArgumentsThrowsInvalidFormatException() {
         assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag-globally common extra"));
+    }
+    // ==================== List Linked (Direct) Command Tests ====================
+
+    @Test
+    void testParseListIncomingLinksWithValidIdReturnsListLinkedNotesCommand() throws ZettelException {
+        Command command = Parser.parse("list-incoming-links abcd1234");
+        assertInstanceOf(ListLinkedNotesCommand.class, command);
+    }
+
+    @Test
+    void testParseListIncomingLinksWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-incoming-links"));
+    }
+
+    @Test
+    void testParseListIncomingLinksWithTooManyArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-incoming-links abcd1234 extra"));
+    }
+
+    @Test
+    void testParseListIncomingLinksWithInvalidIdThrowsInvalidFormatException() {
+        // Uppercase and non-hex should fail
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-incoming-links ABCD1234"));
+    }
+
+    @Test
+    void testParseListOutgoingLinksWithValidIdReturnsListLinkedNotesCommand() throws ZettelException {
+        Command command = Parser.parse("list-outgoing-links abcd1234");
+        assertInstanceOf(ListLinkedNotesCommand.class, command);
+    }
+
+    @Test
+    void testParseListOutgoingLinksWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-outgoing-links"));
+    }
+
+    @Test
+    void testParseListOutgoingLinksWithTooManyArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-outgoing-links abcd1234 extra"));
+    }
+
+    @Test
+    void testParseListOutgoingLinksWithInvalidIdThrowsInvalidFormatException() {
+        // Too short should fail
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-outgoing-links abc"));
     }
     //@@author
 }
