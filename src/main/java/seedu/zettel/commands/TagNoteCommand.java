@@ -73,7 +73,6 @@ public class TagNoteCommand extends Command {
         }
 
         note.addTag(tag);
-        storage.save(notes);
         ui.showSuccessfullyTaggedNote(noteID, tag);
     }
 
