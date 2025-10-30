@@ -9,7 +9,7 @@ ____________________________________________________________
    current-repo[pository]            - Show the name of the current repository
    new -t <title> [-b <body>]        - Create a new note
    edit <note-id>                    - Edit an existing note
-   list [-p]                         - List all notes (or pinned only)
+   list [-p] [-a]                    - List all notes (or pinned only)
    delete [-f] <note-id>             - Delete a note by ID
    pin <note-id>                     - Pin a note
    unpin <note-id>                   - Unpin a note
@@ -26,6 +26,9 @@ ____________________________________________________________
    delete-tag [-f] <note-id> <tag>   - Delete a tag from a note
    delete-tag-globally [-f] <tag>    - Delete a tag from all notes
    rename-tag <old-tag> <new-tag>    - Rename a tag globally
+   archive <note-id>               - Moves note to archive folder
+   unarchive <note-id>             - Moves note out of archive folder
+   print-body <note-id>            - Print the body of a note
    find <text>                       - Search for notes
    help                              - Show this list of commands
    bye                               - Exit the application

@@ -60,11 +60,16 @@ Note created: New_Note.txt #e0e7b989
 
 ### Listing Notes (with filters): `list`
 
-Lists notes in the repository with optional filters for pinned and archived notes.
+Lists notes with precise filters for pinned and archived states.
 
 • `-p` shows only pinned notes.  
-• `-a` includes archived notes in the listing.  
-Both flags are optional and can be combined in any order.
+• `-a` shows only archived notes.  
+You can combine flags in any order; behavior is defined by this matrix:
+
+- `list` → pinned = X, archived = 0 (all unarchived notes)
+- `list -a` → pinned = X, archived = 1 (all archived notes)
+- `list -p` → pinned = 1, archived = 0 (pinned and unarchived)
+- `list -p -a` → pinned = 1, archived = 1 (pinned and archived)
 
 **Format:**
 ```
@@ -87,7 +92,7 @@ You have 3 notes:
     3. file.txt 2025-10-16 55bb2cac
 ```
 
-#### To view all notes (including archived), pinned or unpinned
+#### To view archived notes (pinned and unpinned)
 Use the `-a` flag.
 
 **Example:**
@@ -97,15 +102,12 @@ list -a
 
 **Expected Output:**
 ```
-You have 5 notes:
-    1. New_Note.txt 2025-10-17 e0e7b989
-    2. brrr_againi.txt 2025-10-16 ccfd2e51
-    3. file.txt 2025-10-16 55bb2cac
-    4. Archived_Note.txt 2025-10-10 a1b2c3d4
-    5. Old_Research.txt 2025-10-08 a9f0e1d2
+You have 2 notes (archived):
+    1. Archived_Note.txt 2025-10-10 a1b2c3d4
+    2. Old_Research.txt 2025-10-08 a9f0e1d2
 ```
 
-#### To view pinned notes across both archived and unarchived
+#### To view pinned notes that are archived only
 Use both `-p` and `-a` (in any order).
 
 **Example:**
@@ -115,9 +117,8 @@ list -a -p
 
 **Expected Output:**
 ```
-You have 2 pinned notes:
-    1. file.txt 2025-10-16 55bb2cac
-    2. Archived_Note.txt 2025-10-10 a1b2c3d4
+You have 1 pinned archived notes:
+    1. Archived_Note.txt 2025-10-10 a1b2c3d4
 ```
 
 #### To view pinned notes that are unarchived only
@@ -233,40 +234,66 @@ help
 
 ```
 Available Commands:
-   init <repo-name>                 - Initialize a new repository
-   new -t <title> [-b <body>]       - Create a new note
-   edit <note-id>                   - Edit an existing note
-   list [-p]                        - List all notes (or pinned only)
-   delete [-f] <note-id>            - Delete a note by ID
-   pin <note-id>                    - Pin a note
-   unpin <note-id>                  - Unpin a note
-   new-tag <tag-name>               - Adds a tag
-   add-tag <note-id> <tag-name>     - Tag a note
-   link <source-id> <target-id>     - Link two notes
-   unlink <source-id> <target-id>   - Unlink two notes
-   link-both <id1> <id2>            - Link two notes in both directions
-   unlink-both <id1> <id2>          - Unlink two notes in both directions
-   list-incoming-links <note-id>    - Show incoming linked notes
-   list-outgoing-links <note-id>    - Show outgoing linked notes
-   list-tags-all                    - Lists all tags that exist globally
-   list-tags <note-id>              - List tags for an single note
-   delete-tag [-f] <note-id> <tag>  - Delete a tag from a note
-   delete-tag-globally [-f] <tag>   - Delete a tag from all notes
-   rename-tag <old-tag> <new-tag>   - Rename a tag globally
-   find <text>                      - Search for notes
-   help                             - Show this list of commands
-   bye                              - Exit the application
+    init <repo-name>                - Initialize a new repository
+    new -t <title> [-b <body>]      - Create a new note
+    edit <note-id>                  - Edit an existing note
+    list [-p] [-a]                  - List notes (pinned and/or archived filters)
+    delete [-f] <note-id>           - Delete a note by ID
+    pin <note-id>                   - Pin a note
+    unpin <note-id>                 - Unpin a note
+    new-tag <tag-name>              - Adds a tag
+    add-tag <note-id> <tag-name>    - Tag a note
+    link <source-id> <target-id>    - Link two notes
+    unlink <source-id> <target-id>  - Unlink two notes
+    link-both <id1> <id2>           - Link two notes in both directions
+    unlink-both <id1> <id2>         - Unlink two notes in both directions
+    list-incoming-links <note-id>   - Show incoming linked notes
+    list-outgoing-links <note-id>   - Show outgoing linked notes
+    list-tags-all                   - Lists all tags that exist globally
+    list-tags <note-id>             - List tags for an single note
+    delete-tag [-f] <note-id> <tag> - Delete a tag from a note
+    delete-tag-globally [-f] <tag>  - Delete a tag from all notes
+    rename-tag <old-tag> <new-tag>  - Rename a tag globally
+    archive <note-id>               - Moves note to archive folder
+    unarchive <note-id>             - Moves note out of archive folder
+    print-body <note-id>            - Print the body of a note
+    find <text>                     - Search for notes
+    help                             - Show this list of commands
+    bye                             - Exit the application
 ```
 
 ## Command Summary
 * Start a new Zettelkasten repository: `init <repository-name>`
 * Add a new note: `new -t <TITLE> [-b <BODY>]`
 * List unarchived notes: `list`
+* List archived notes: `list -a`
 * List only pinned (unarchived): `list -p`
-* List all notes including archived: `list -a`
-* List pinned including archived: `list -a -p`
+* List only pinned (archived): `list -a -p`
 * Delete a note (with confirmation): `delete <NOTE_ID>`
 * Delete a note (without confirmation): `delete -f <NOTE_ID>`
 * Pin a note: `pin <NOTE_ID>`
 * Unpin a note: `unpin <NOTE_ID>`
 * View all commands: `help`
+* Print a note's body: `print-body <NOTE_ID>`
+
+---
+
+### Printing a Note Body: `print-body`
+
+Prints the full body of a note by its ID. Note ID must be 8 lowercase hexadecimal characters.
+
+**Format:**
+```
+print-body <NOTE_ID>
+```
+
+**Example:**
+```
+print-body abcd1234
+```
+
+**Expected Output:**
+```
+ Body of note #abcd1234:
+ Hello World
+```
