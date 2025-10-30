@@ -58,17 +58,21 @@ Note created: New_Note.txt #e0e7b989
 
 ---
 
-### Listing All Notes: `list`
+### Listing Notes (with filters): `list`
 
-Lists all existing notes, alongside their creation time.
+Lists notes in the repository with optional filters for pinned and archived notes.
+
+• `-p` shows only pinned notes.  
+• `-a` includes archived notes in the listing.  
+Both flags are optional and can be combined in any order.
 
 **Format:**
 ```
-list [-p]
+list [-p] [-a]
 ```
 
-#### To view all notes
-Use the command without the flag.
+#### To view unarchived notes (pinned and unpinned)
+Use the command without flags.
 
 **Example:**
 ```
@@ -83,8 +87,41 @@ You have 3 notes:
     3. file.txt 2025-10-16 55bb2cac
 ```
 
-#### To view only pinned notes:
-Use the `-p` flag.
+#### To view all notes (including archived), pinned or unpinned
+Use the `-a` flag.
+
+**Example:**
+```
+list -a
+```
+
+**Expected Output:**
+```
+You have 5 notes:
+    1. New_Note.txt 2025-10-17 e0e7b989
+    2. brrr_againi.txt 2025-10-16 ccfd2e51
+    3. file.txt 2025-10-16 55bb2cac
+    4. Archived_Note.txt 2025-10-10 a1b2c3d4
+    5. Old_Research.txt 2025-10-08 a9f0e1d2
+```
+
+#### To view pinned notes across both archived and unarchived
+Use both `-p` and `-a` (in any order).
+
+**Example:**
+```
+list -a -p
+```
+
+**Expected Output:**
+```
+You have 2 pinned notes:
+    1. file.txt 2025-10-16 55bb2cac
+    2. Archived_Note.txt 2025-10-10 a1b2c3d4
+```
+
+#### To view pinned notes that are unarchived only
+Use the `-p` flag without `-a`.
 
 **Example:**
 ```
@@ -224,8 +261,10 @@ Available Commands:
 ## Command Summary
 * Start a new Zettelkasten repository: `init <repository-name>`
 * Add a new note: `new -t <TITLE> [-b <BODY>]`
-* List all notes: `list`
-* List only pinned notes: `list -p`
+* List unarchived notes: `list`
+* List only pinned (unarchived): `list -p`
+* List all notes including archived: `list -a`
+* List pinned including archived: `list -a -p`
 * Delete a note (with confirmation): `delete <NOTE_ID>`
 * Delete a note (without confirmation): `delete -f <NOTE_ID>`
 * Pin a note: `pin <NOTE_ID>`
