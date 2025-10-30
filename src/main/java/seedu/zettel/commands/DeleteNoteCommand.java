@@ -68,7 +68,7 @@ public class DeleteNoteCommand extends Command {
 
         boolean shouldDelete = isForce;
         if (!isForce) {
-            ui.showDeleteConfirmation(noteId, note.getTitle());
+            ui.showDeleteNoteConfirmation(noteId, note.getTitle());
 
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine().trim().toLowerCase();

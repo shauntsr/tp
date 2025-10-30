@@ -8,12 +8,14 @@ import org.junit.jupiter.api.Test;
 import seedu.zettel.commands.Command;
 import seedu.zettel.commands.DeleteNoteCommand;
 import seedu.zettel.commands.DeleteTagFromNoteCommand;
+import seedu.zettel.commands.DeleteTagGloballyCommand;
 import seedu.zettel.commands.EditNoteCommand;
 import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.FindNoteCommand;
 import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.LinkBothNotesCommand;
 import seedu.zettel.commands.LinkNotesCommand;
+import seedu.zettel.commands.ListLinkedNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
 import seedu.zettel.commands.ListTagsSingleNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
@@ -262,44 +264,44 @@ class ParserTest {
     // ==================== Tag Command Tests ====================
 
     @Test
-    void testParseTagAddWithValidIdAndTagReturnsTagNoteCommand() throws ZettelException {
-        Command command = Parser.parse("tag add abcd1234 urgent");
+    void testParseAddTagWithValidIdAndTagReturnsTagNoteCommand() throws ZettelException {
+        Command command = Parser.parse("add-tag abcd1234 urgent");
         assertInstanceOf(TagNoteCommand.class, command);
     }
 
     @Test
-    void testParseTagAddWithoutArgumentsThrowsInvalidFormatException() {
-        assertThrows(InvalidFormatException.class, () -> Parser.parse("tag add"));
+    void testParseAddTagWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("add-tag"));
     }
 
     @Test
-    void testParseTagAddWithOnlyNoteIdThrowsInvalidFormatException() {
-        assertThrows(InvalidFormatException.class, () -> Parser.parse("tag add abcd1234"));
+    void testParseAddTagWithOnlyNoteIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("add-tag abcd1234"));
     }
 
     @Test
-    void testParseTagAddWithTooShortIdThrowsInvalidFormatException() {
-        assertThrows(InvalidFormatException.class, () -> Parser.parse("tag add abc urgent"));
+    void testParseAddTagWithTooShortIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("add-tag abc urgent"));
     }
 
     @Test
-    void testParseTagAddWithTooLongIdThrowsInvalidFormatException() {
-        assertThrows(InvalidFormatException.class, () -> Parser.parse("tag add abcd12345 urgent"));
+    void testParseAddTagWithTooLongIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("add-tag abcd12345 urgent"));
     }
 
     @Test
-    void testParseTagAddWithSpecialCharactersIdThrowsInvalidFormatException() {
-        assertThrows(InvalidFormatException.class, () -> Parser.parse("tag add abcd-234 urgent"));
+    void testParseAddTagWithSpecialCharactersIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("add-tag abcd-234 urgent"));
     }
 
     @Test
-    void testParseTagAddWithUppercaseIdThrowsInvalidFormatException() {
-        assertThrows(InvalidFormatException.class, () -> Parser.parse("tag add ABCD1234 urgent"));
+    void testParseAddTagWithUppercaseIdThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("add-tag ABCD1234 urgent"));
     }
 
     @Test
-    void testParseTagAddWithInvalidHexCharactersThrowsInvalidFormatException() {
-        assertThrows(InvalidFormatException.class, () -> Parser.parse("tag add abcdefgh urgent"));
+    void testParseAddTagWithInvalidHexCharactersThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("add-tag abcdefgh urgent"));
     }
 
     @Test
@@ -671,6 +673,13 @@ class ParserTest {
     }
 
     @Test
+    void testParseDeleteTagFromNoteWithForceFlagReturnsDeleteTagFromNoteCommand()
+            throws ZettelException {
+        Command command = Parser.parse("delete-tag -f abcd1234 java");
+        assertTrue(command instanceof DeleteTagFromNoteCommand);
+    }
+
+    @Test
     void testParseDeleteTagFromNoteWithoutArgumentsThrowsInvalidFormatException() {
         assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag"));
     }
@@ -742,6 +751,74 @@ class ParserTest {
             throws ZettelException {
         Command command = Parser.parse("delete-tag abcdefab java");
         assertTrue(command instanceof DeleteTagFromNoteCommand);
+    }
+    
+    // delete-tag-globally command parser tests
+    @Test
+    void testParseDeleteTagGloballyWithValidTagReturnsDeleteTagGloballyCommand() throws ZettelException {
+        Command command = Parser.parse("delete-tag-globally common");
+        assertTrue(command instanceof DeleteTagGloballyCommand);
+    }
+
+    @Test
+    void testParseDeleteTagGloballyWithForceFlagReturnsDeleteTagGloballyCommand() throws ZettelException {
+        Command command = Parser.parse("delete-tag-globally -f common");
+        assertTrue(command instanceof DeleteTagGloballyCommand);
+    }
+
+    @Test
+    void testParseDeleteTagGloballyWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag-globally"));
+    }
+
+    @Test
+    void testParseDeleteTagGloballyWithTooManyArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("delete-tag-globally common extra"));
+    }
+    // ==================== List Linked (Direct) Command Tests ====================
+
+    @Test
+    void testParseListIncomingLinksWithValidIdReturnsListLinkedNotesCommand() throws ZettelException {
+        Command command = Parser.parse("list-incoming-links abcd1234");
+        assertInstanceOf(ListLinkedNotesCommand.class, command);
+    }
+
+    @Test
+    void testParseListIncomingLinksWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-incoming-links"));
+    }
+
+    @Test
+    void testParseListIncomingLinksWithTooManyArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-incoming-links abcd1234 extra"));
+    }
+
+    @Test
+    void testParseListIncomingLinksWithInvalidIdThrowsInvalidFormatException() {
+        // Uppercase and non-hex should fail
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-incoming-links ABCD1234"));
+    }
+
+    @Test
+    void testParseListOutgoingLinksWithValidIdReturnsListLinkedNotesCommand() throws ZettelException {
+        Command command = Parser.parse("list-outgoing-links abcd1234");
+        assertInstanceOf(ListLinkedNotesCommand.class, command);
+    }
+
+    @Test
+    void testParseListOutgoingLinksWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-outgoing-links"));
+    }
+
+    @Test
+    void testParseListOutgoingLinksWithTooManyArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-outgoing-links abcd1234 extra"));
+    }
+
+    @Test
+    void testParseListOutgoingLinksWithInvalidIdThrowsInvalidFormatException() {
+        // Too short should fail
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-outgoing-links abc"));
     }
     //@@author
 }
