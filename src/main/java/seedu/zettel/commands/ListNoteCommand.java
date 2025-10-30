@@ -26,7 +26,8 @@ public class ListNoteCommand extends Command {
      * Constructs a ListNoteCommand.
      *
      * @param showsPinnedOnly  If true, only pinned notes will be listed.
-     * @param showsArchivedOnly If true, only archived notes will be listed; if false, only non-archived notes will be listed.
+     * @param showsArchivedOnly If true, only archived notes will be listed;
+     *                          if false, only non-archived notes will be listed.
      */
     public ListNoteCommand(boolean showsPinnedOnly, boolean showsArchivedOnly) {
         this.showsPinnedOnly = showsPinnedOnly;
