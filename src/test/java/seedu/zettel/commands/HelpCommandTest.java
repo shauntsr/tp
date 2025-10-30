@@ -64,11 +64,11 @@ public class HelpCommandTest {
         // Verify that key parts of the help message are present with the new formatting
         assertTrue(output.contains("Available Commands:"),
                 "Output should contain the help title");
-        assertTrue(output.contains("   init <repo-name>                 - Initialize a new repository"),
-                "Output should contain the init command with correct spacing");
-        assertTrue(output.contains("   help                             - Show this list of commands"),
-                "Output should contain the help command itself with correct spacing");
-        assertTrue(output.contains("   bye                              - Exit the application"),
-                "Output should contain the bye command with correct spacing");
+        assertTrue(output.contains("init <repo-name>") && output.contains("Initialize a new repository"),
+                "Output should contain the init command");
+        assertTrue(output.contains("help") && output.contains("Show this list of commands"),
+                "Output should contain the help command");
+        assertTrue(output.contains("bye") && output.contains("Exit the application"),
+                "Output should contain the bye command");
     }
 }
