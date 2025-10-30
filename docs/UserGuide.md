@@ -60,11 +60,16 @@ Note created: New_Note.txt #e0e7b989
 
 ### Listing Notes (with filters): `list`
 
-Lists notes in the repository with optional filters for pinned and archived notes.
+Lists notes with precise filters for pinned and archived states.
 
 • `-p` shows only pinned notes.  
-• `-a` includes archived notes in the listing.  
-Both flags are optional and can be combined in any order.
+• `-a` shows only archived notes.  
+You can combine flags in any order; behavior is defined by this matrix:
+
+- `list` → pinned = X, archived = 0 (all unarchived notes)
+- `list -a` → pinned = X, archived = 1 (all archived notes)
+- `list -p` → pinned = 1, archived = 0 (pinned and unarchived)
+- `list -p -a` → pinned = 1, archived = 1 (pinned and archived)
 
 **Format:**
 ```
@@ -87,7 +92,7 @@ You have 3 notes:
     3. file.txt 2025-10-16 55bb2cac
 ```
 
-#### To view all notes (including archived), pinned or unpinned
+#### To view archived notes (pinned and unpinned)
 Use the `-a` flag.
 
 **Example:**
@@ -97,15 +102,12 @@ list -a
 
 **Expected Output:**
 ```
-You have 5 notes:
-    1. New_Note.txt 2025-10-17 e0e7b989
-    2. brrr_againi.txt 2025-10-16 ccfd2e51
-    3. file.txt 2025-10-16 55bb2cac
-    4. Archived_Note.txt 2025-10-10 a1b2c3d4
-    5. Old_Research.txt 2025-10-08 a9f0e1d2
+You have 2 notes (archived):
+    1. Archived_Note.txt 2025-10-10 a1b2c3d4
+    2. Old_Research.txt 2025-10-08 a9f0e1d2
 ```
 
-#### To view pinned notes across both archived and unarchived
+#### To view pinned notes that are archived only
 Use both `-p` and `-a` (in any order).
 
 **Example:**
@@ -115,9 +117,8 @@ list -a -p
 
 **Expected Output:**
 ```
-You have 2 pinned notes:
-    1. file.txt 2025-10-16 55bb2cac
-    2. Archived_Note.txt 2025-10-10 a1b2c3d4
+You have 1 pinned archived notes:
+    1. Archived_Note.txt 2025-10-10 a1b2c3d4
 ```
 
 #### To view pinned notes that are unarchived only
@@ -223,9 +224,9 @@ Got it. I've unpinned this note: ccfd2e51
 * Start a new Zettelkasten repository: `init <repository-name>`
 * Add a new note: `new -t <TITLE> [-b <BODY>]`
 * List unarchived notes: `list`
+* List archived notes: `list -a`
 * List only pinned (unarchived): `list -p`
-* List all notes including archived: `list -a`
-* List pinned including archived: `list -a -p`
+* List only pinned (archived): `list -a -p`
 * Delete a note (with confirmation): `delete <NOTE_ID>`
 * Delete a note (without confirmation): `delete -f <NOTE_ID>`
 * Pin a note: `pin <NOTE_ID>`
@@ -674,7 +675,7 @@ Note at abcd1234 unarchived
 - `init <repo-name>` — Initialize a new repository
 - `new -t <title> [-b <body>]` — Create a new note
 - `edit <note-id>` — Edit an existing note
-- `list [-p] [-a]` — List notes (pinned and/or include archived)
+- `list [-p] [-a]` — List notes (filters: `-p` pinned only, `-a` archived only; combine both for pinned archived only)
 - `delete [-f] <note-id>` — Delete a note by ID
 - `pin <note-id>` — Pin a note
 - `unpin <note-id>` — Unpin a note
