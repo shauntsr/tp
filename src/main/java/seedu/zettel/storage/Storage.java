@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -219,8 +220,9 @@ public class Storage {
         for (String repoName: repoList) {
             Path indexPath = fileSystemManager.getIndexPath(repoName);
             Path notesDir = fileSystemManager.getNotesPath(repoName);
+            Path archiveDir = fileSystemManager.getArchivePath(repoName);
 
-            List<Note> repoNotes = noteSerializer.loadNotes(indexPath,notesDir);
+            List<Note> repoNotes = noteSerializer.loadNotes(indexPath, notesDir, archiveDir);
             for (Note note: repoNotes) {
                 tags.addAll(note.getTags());
             }
@@ -242,6 +244,7 @@ public class Storage {
     public ArrayList<Note> load() {
         Path indexPath = fileSystemManager.getIndexPath(repoName);
         Path notesDir = fileSystemManager.getNotesPath(repoName);
+        Path archiveDir = fileSystemManager.getArchivePath(repoName);
 
         try {
             validateRepo(repoName);
@@ -250,7 +253,7 @@ public class Storage {
             return new ArrayList<>();
         }
 
-        return noteSerializer.loadNotes(indexPath, notesDir);
+        return noteSerializer.loadNotes(indexPath, notesDir, archiveDir);
     }
 
     /**
@@ -261,8 +264,8 @@ public class Storage {
      */
     private void validateRepo(String repoName) throws ZettelException {
         Path indexPath = fileSystemManager.getIndexPath(repoName);
-        List<String> expectedFiles = noteSerializer.getExpectedFilenames(indexPath);
-        fileSystemManager.validateRepoStructure(repoName, expectedFiles);
+        Map<String, Boolean> expectedFilesMap = noteSerializer.getExpectedFilenamesWithArchiveFlag(indexPath);
+        fileSystemManager.validateRepoStructure(repoName, expectedFilesMap);
     }
 
     /**
@@ -353,6 +356,16 @@ public class Storage {
     }
 
     /**
+     * Gets the path to a note file in the archive folder.
+     *
+     * @param filename the name of the note file
+     * @return the path to the note in the archive folder
+     */
+    public Path getArchivePath(String filename) {
+        return fileSystemManager.getArchivePath(repoName).resolve(filename);
+    }
+
+    /**
      * Deletes note's body text from the current repository.
      *
      * @param filename the name of the note of body text to delete
@@ -369,5 +382,24 @@ public class Storage {
         } catch (IOException e) {
             throw new ZettelException("Error while deleting body file '" + filename + "': " + e.getMessage());
         }
+    }
+
+    /**
+     * Gets the archive folder name used inside repositories (e.g. "archive" by default).
+     * Exposes the name so callers (commands) can write the archive correctly.
+     */
+    public String getArchiveFolderName() {
+        return FileSystemManager.REPO_ARCHIVE;
+    }
+
+    /**
+     * Moves a note file between the notes and archive directories in the current repository.
+     *
+     * @param filename the name of the note file to move
+     * @param toArchive true to move to archive, false to move to notes
+     * @throws ZettelException if the file move operation fails
+     */
+    public void moveNoteBetweenDirectories(String filename, boolean toArchive) throws ZettelException {
+        fileSystemManager.moveNoteBetweenDirectories(filename, repoName, toArchive);
     }
 }

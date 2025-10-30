@@ -1,5 +1,7 @@
 package seedu.zettel;
 
+import seedu.zettel.commands.ArchiveNoteCommand;
+import seedu.zettel.commands.NewTagCommand;
 import java.util.Arrays;
 
 import seedu.zettel.commands.Command;
@@ -9,6 +11,7 @@ import seedu.zettel.commands.DeleteTagGloballyCommand;
 import seedu.zettel.commands.EditNoteCommand;
 import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.FindNoteCommand;
+import seedu.zettel.commands.HelpCommand;
 import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.LinkBothNotesCommand;
 import seedu.zettel.commands.LinkNotesCommand;
@@ -17,7 +20,6 @@ import seedu.zettel.commands.ListNoteCommand;
 import seedu.zettel.commands.ListTagsGlobalCommand;
 import seedu.zettel.commands.ListTagsSingleNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
-import seedu.zettel.commands.NewTagCommand;
 import seedu.zettel.commands.PinNoteCommand;
 import seedu.zettel.commands.RenameTagCommand;
 import seedu.zettel.commands.TagNoteCommand;
@@ -58,8 +60,9 @@ public class Parser {
     private static final String DELETE_TAG_FORMAT = "Delete tag command format should be: delete-tag [-f] "
             + "<NOTE_ID> <TAG>";
     private static final String DELETE_TAG_GLOBALLY_FORMAT = "Delete tag globally format should be: "
-        + "delete-tag-globally [-f] <TAG>";
+            + "delete-tag-globally [-f] <TAG>";
     private static final String RENAME_TAG_FORMAT = "Rename tag format should be: rename-tag <OLD_TAG> <NEW_TAG>";
+    private static final String HELP_FORMAT = "Help format should be: help";
     private static final String NOTE_EMPTY = "Note title cannot be empty!";
     private static final String TAG_EMPTY = "Tag cannot be empty!";
     private static final String ID_EMPTY = "Please specify a Note ID to ";
@@ -77,6 +80,10 @@ public class Parser {
                     " 'incoming-links' or 'outgoing-links'.";
     private static final String LIST_LINKED_FORMAT = "List linked notes format should be: list "
                     + "<incoming-links/outgoing-links> <NOTE_ID>";
+    private static final String ARCHIVE_NOTES_FORMAT = "Archive notes format should be: " +
+                    "archive <NOTE_ID>";
+    private static final String UNARCHIVE_NOTES_FORMAT = "Unarchive notes format should be: " +
+                    "unarchive <NOTE_ID>";
     private static final String LIST_INCOMING_LINKS_FORMAT =
         "List incoming links format should be: list-incoming-links <NOTE_ID>";
     private static final String LIST_OUTGOING_LINKS_FORMAT =
@@ -109,6 +116,8 @@ public class Parser {
         case "unlink" -> parseUnlinkNotesCommand(inputs);
         case "link-both" -> parseLinkBothNotesCommand(inputs);
         case "unlink-both" -> parseUnlinkBothNotesCommand(inputs);
+        case "archive" -> parseArchiveNoteCommand(inputs, true);
+        case "unarchive" -> parseArchiveNoteCommand(inputs, false);
         case "list-incoming-links" -> parseListIncomingLinksCommand(inputs);
         case "list-outgoing-links" -> parseListOutgoingLinksCommand(inputs);
         case "list-tags-all" -> parseListTagsGlobalCommand(inputs);
@@ -116,6 +125,7 @@ public class Parser {
         case "delete-tag" -> parseDeleteTagFromNoteCommand(inputs);
         case "delete-tag-globally" -> parseDeleteTagGloballyCommand(inputs);
         case "rename-tag" -> parseRenameTagCommand(inputs);
+        case "help" -> parseHelpCommand(inputs);
         default -> throw new InvalidInputException(command);
         };
     }
@@ -148,28 +158,53 @@ public class Parser {
         return idString;
     }
 
+
     /**
      * Parses a list command to display notes.
-     * Accepts an optional -p flag to show only pinned notes.
-     * Routes to parseListLinkedNotesCommand if the format matches listing linked notes.
+     * Accepts optional flags:
+     *   -p  show only pinned notes
+     *   -a  show only archived notes
+     * Flags can be combined in any order (e.g. "list -a -p" or "list -p -a").
+     * Routes to parseListLinkedNotesCommand only when the second token is NOT a flag.
      *
      * @param inputs The tokenized user input split by spaces
      * @return A ListNoteCommand or ListLinkedNotesCommand object with the appropriate parameters.
      * @throws ZettelException If the command format is invalid.
      */
     private static Command parseListNoteCommand(String[] inputs) throws ZettelException {
-        // Only handle generic list and pinned flag here.
-        // Regular list command
-        if (inputs.length != 1 && inputs.length != 2) {
+
+        if (inputs.length < 1) {
             throw new InvalidFormatException(LIST_FORMAT);
         }
-        // command is for sure either "list" or "list <something>"
-        if (inputs.length == 1) {
-            return new ListNoteCommand(false);
-        } else if (!inputs[1].equals("-p")) {
-            throw new InvalidFormatException(LIST_FORMAT);
+
+        boolean showPinned = false;
+        boolean showArchived = false;
+
+        // parse flags if present (flags must start with '-' and be known)
+        for (int i = 1; i < inputs.length; i++) {
+            String tok = inputs[i].trim();
+            if (!tok.startsWith("-")) {
+                throw new InvalidFormatException(LIST_FORMAT);
+            }
+            switch (tok) {
+            case "-p":
+                if (showPinned) {
+                    throw new InvalidFormatException(LIST_FORMAT);
+                }
+                showPinned = true;
+                break;
+            case "-a":
+                if (showArchived) {
+                    throw new InvalidFormatException(LIST_FORMAT);
+                }
+                showArchived = true;
+                break;
+            default:
+                throw new InvalidFormatException(LIST_FORMAT);
+            }
         }
-        return new ListNoteCommand(true);
+
+        return new ListNoteCommand(showPinned, showArchived);
     }
 
     /**
@@ -524,6 +559,25 @@ public class Parser {
     }
 
     /**
+     * Parses an archive or unarchive command.
+     * Expected format: archive/unarchive NOTE_ID
+     *
+     * @param inputs        The tokenized user input split by spaces
+     * @param shouldArchive True for archive, false for unarchive
+     * @return              An ArchiveNoteCommand object with the note ID and action
+     * @throws ZettelException If the format is invalid or note ID is missing/malformed
+     */
+    private static Command parseArchiveNoteCommand(String[] inputs, boolean shouldArchive)
+            throws ZettelException {
+        if (inputs.length != 2) {
+            throw (shouldArchive) ? new InvalidFormatException(ARCHIVE_NOTES_FORMAT)
+                    : new InvalidFormatException(UNARCHIVE_NOTES_FORMAT);
+        }
+        String noteId = parseNoteId(inputs[1], shouldArchive ? "archive" : "unarchive");
+        return new ArchiveNoteCommand(noteId, shouldArchive);
+    }
+
+    /**
      * Parses a list-tags command to display all tags associated with a specific note.
      * @param inputs The tokenized user input split by spaces.
      * @return A ListTagsSingleNoteCommand object with the note ID.
@@ -626,5 +680,20 @@ public class Parser {
         }
 
         return new RenameTagCommand(oldTag, newTag);
+    }
+
+    /**
+     * Parses a help command.
+     * Expected format: help
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return A HelpCommand object.
+     * @throws ZettelException If the format is invalid.
+     */
+    private static Command parseHelpCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 1) {
+            throw new InvalidFormatException(HELP_FORMAT);
+        }
+        return new HelpCommand();
     }
 }

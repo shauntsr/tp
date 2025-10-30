@@ -26,13 +26,16 @@ class NoteSerializerTest {
     private NoteSerializer serializer;
     private Path indexPath;
     private Path notesDir;
+    private Path archiveDir;
 
     @BeforeEach
     void setUp() throws IOException {
         serializer = new NoteSerializer();
         indexPath = tempDir.resolve("index.txt");
         notesDir = tempDir.resolve("notes");
+        archiveDir = tempDir.resolve("archive");
         Files.createDirectories(notesDir);
+        Files.createDirectories(archiveDir);
     }
 
     @Test
@@ -47,7 +50,7 @@ class NoteSerializerTest {
         List<Note> notes = Arrays.asList(note);
         serializer.saveNotes(notes, indexPath);
 
-        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir);
+        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir, archiveDir);
 
         assertEquals(1, loaded.size());
         Note loadedNote = loaded.get(0);
@@ -75,7 +78,7 @@ class NoteSerializerTest {
         Files.writeString(notesDir.resolve("tagged.txt"), "Content");
 
         serializer.saveNotes(Arrays.asList(note), indexPath);
-        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir);
+        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir, archiveDir);
 
         assertEquals(1, loaded.size());
         assertEquals(tags, loaded.get(0).getTags());
@@ -103,7 +106,7 @@ class NoteSerializerTest {
         Files.writeString(notesDir.resolve("third.txt"), "Body3");
 
         serializer.saveNotes(Arrays.asList(note1, note2, note3), indexPath);
-        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir);
+        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir, archiveDir);
 
         assertEquals(3, loaded.size());
 
@@ -140,15 +143,17 @@ class NoteSerializerTest {
         Note note = new Note("xyz98765", "Pinned Archive", "pinned.txt", "Body", now, now,
                 true, true, "archive.zip", new ArrayList<>());
 
-        Files.writeString(notesDir.resolve("pinned.txt"), "Body");
+        // archived notes should have their bodies in the archive directory
+        Files.writeString(archiveDir.resolve("pinned.txt"), "Body");
 
         serializer.saveNotes(Arrays.asList(note), indexPath);
-        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir);
+        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir, archiveDir);
 
         assertEquals(1, loaded.size());
         assertTrue(loaded.get(0).isPinned());
         assertTrue(loaded.get(0).isArchived());
         assertEquals("archive.zip", loaded.get(0).getArchiveName());
+        assertEquals("Body", loaded.get(0).getBody());
     }
 
     @Test
@@ -164,7 +169,7 @@ class NoteSerializerTest {
         Files.writeString(notesDir.resolve("second.txt"), "Body2");
 
         serializer.saveNotes(Arrays.asList(note1, note2), indexPath);
-        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir);
+        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir, archiveDir);
 
         assertEquals(2, loaded.size());
         assertEquals("First", loaded.get(0).getTitle());
@@ -179,7 +184,7 @@ class NoteSerializerTest {
                 "2024-01-15T10:30:00Z | 0 | 0 |  |  |  | ";
         Files.writeString(indexPath, indexLine);
 
-        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir);
+        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir, archiveDir);
 
         assertEquals(1, loaded.size());
         assertEquals("", loaded.get(0).getBody());
@@ -189,7 +194,7 @@ class NoteSerializerTest {
     @Test
     void testLoadNotes_missingIndexFile() {
         Path nonExistent = tempDir.resolve("nonexistent.txt");
-        ArrayList<Note> loaded = serializer.loadNotes(nonExistent, notesDir);
+        ArrayList<Note> loaded = serializer.loadNotes(nonExistent, notesDir, archiveDir);
 
         assertTrue(loaded.isEmpty());
     }
@@ -199,7 +204,7 @@ class NoteSerializerTest {
         String corruptedLine = "invalid | data | format";
         Files.writeString(indexPath, corruptedLine);
 
-        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir);
+        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir, archiveDir);
 
         assertTrue(loaded.isEmpty());
     }
@@ -212,7 +217,7 @@ class NoteSerializerTest {
         Files.writeString(indexPath, "\n" + validLine + "\n\n");
         Files.writeString(notesDir.resolve("test.txt"), "Body");
 
-        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir);
+        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir, archiveDir);
 
         assertEquals(1, loaded.size());
     }
@@ -259,7 +264,7 @@ class NoteSerializerTest {
         Files.writeString(notesDir.resolve("special.txt"), "Body with \n newlines \t tabs");
 
         serializer.saveNotes(Arrays.asList(note), indexPath);
-        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir);
+        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir, archiveDir);
 
         assertEquals(1, loaded.size());
         assertEquals("Title with $pecial @chars!", loaded.get(0).getTitle());
@@ -273,7 +278,7 @@ class NoteSerializerTest {
         Files.writeString(indexPath, line);
         Files.writeString(notesDir.resolve("empty.txt"), "");
 
-        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir);
+        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir, archiveDir);
 
         assertEquals(1, loaded.size());
         assertEquals("", loaded.get(0).getTitle());
@@ -289,7 +294,7 @@ class NoteSerializerTest {
         Files.writeString(indexPath, line);
         Files.writeString(notesDir.resolve("test.txt"), "Body");
 
-        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir);
+        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir, archiveDir);
 
         assertEquals(1, loaded.size());
         assertTrue(loaded.get(0).getTags().isEmpty());
@@ -324,7 +329,7 @@ class NoteSerializerTest {
 
         // Save and load
         serializer.saveNotes(Arrays.asList(note1, note2, note3), indexPath);
-        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir);
+        ArrayList<Note> loaded = serializer.loadNotes(indexPath, notesDir, archiveDir);
 
         assertEquals(3, loaded.size());
 

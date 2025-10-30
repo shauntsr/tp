@@ -172,7 +172,7 @@ Output Methods:
 
 Note list format:
 ```
-You have 3 notes:
+You have 3 notes: 
     1. my_note.txt 2025-10-14 a1b2c3d4
     2. ideas.txt 2025-10-13 b2c3d4e5
     3. todo.txt 2025-10-12 c3d4e5f6
