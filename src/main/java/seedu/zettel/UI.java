@@ -54,32 +54,34 @@ public class UI {
      */
     public void showHelp() {
         System.out.println(" Available Commands:");
-        System.out.println("   init <repo-name>                - Initialize a new repository");
-        System.out.println("   new -t <title> [-b <body>]      - Create a new note");
-        System.out.println("   edit <note-id>                  - Edit an existing note");
-    System.out.println("   list [-p] [-a]                  - List notes (pinned and/or archived filters)");
-        System.out.println("   delete [-f] <note-id>           - Delete a note by ID");
-        System.out.println("   pin <note-id>                   - Pin a note");
-        System.out.println("   unpin <note-id>                 - Unpin a note");
-        System.out.println("   new-tag <tag-name>              - Adds a tag");
-        System.out.println("   add-tag <note-id> <tag-name>    - Tag a note");
-        System.out.println("   link <source-id> <target-id>    - Link two notes");
-        System.out.println("   unlink <source-id> <target-id>  - Unlink two notes");
-        System.out.println("   link-both <id1> <id2>           - Link two notes in both directions");
-        System.out.println("   unlink-both <id1> <id2>         - Unlink two notes in both directions");
-        System.out.println("   list-incoming-links <note-id>   - Show incoming linked notes");
-        System.out.println("   list-outgoing-links <note-id>   - Show outgoing linked notes");
-        System.out.println("   list-tags-all                   - Lists all tags that exist globally");
-        System.out.println("   list-tags <note-id>             - List tags for an single note");
-        System.out.println("   delete-tag [-f] <note-id> <tag> - Delete a tag from a note");
-        System.out.println("   delete-tag-globally [-f] <tag>  - Delete a tag from all notes");
-        System.out.println("   rename-tag <old-tag> <new-tag>  - Rename a tag globally");
+        System.out.println("   init <repo-name>                  - Initialize a new repository");
+        System.out.println("   change-repo[pository] <repo-name> - Switch to another existing repository");
+        System.out.println("   current-repo[pository]            - Show the name of the current repository");
+        System.out.println("   new -t <title> [-b <body>]        - Create a new note");
+        System.out.println("   edit <note-id>                    - Edit an existing note");
+        System.out.println("   list [-p] [-a]                    - List all notes (or pinned only)");
+        System.out.println("   delete [-f] <note-id>             - Delete a note by ID");
+        System.out.println("   pin <note-id>                     - Pin a note");
+        System.out.println("   unpin <note-id>                   - Unpin a note");
+        System.out.println("   new-tag <tag-name>                - Adds a tag");
+        System.out.println("   add-tag <note-id> <tag-name>      - Tag a note");
+        System.out.println("   link <source-id> <target-id>      - Link two notes");
+        System.out.println("   unlink <source-id> <target-id>    - Unlink two notes");
+        System.out.println("   link-both <id1> <id2>             - Link two notes in both directions");
+        System.out.println("   unlink-both <id1> <id2>           - Unlink two notes in both directions");
+        System.out.println("   list-incoming-links <note-id>     - Show incoming linked notes");
+        System.out.println("   list-outgoing-links <note-id>     - Show outgoing linked notes");
+        System.out.println("   list-tags-all                     - Lists all tags that exist globally");
+        System.out.println("   list-tags <note-id>               - List tags for an single note");
+        System.out.println("   delete-tag [-f] <note-id> <tag>   - Delete a tag from a note");
+        System.out.println("   delete-tag-globally [-f] <tag>    - Delete a tag from all notes");
+        System.out.println("   rename-tag <old-tag> <new-tag>    - Rename a tag globally");
         System.out.println("   archive <note-id>               - Moves note to archive folder");
         System.out.println("   unarchive <note-id>             - Moves note out of archive folder");
         System.out.println("   print-body <note-id>            - Print the body of a note");
-        System.out.println("   find <text>                     - Search for notes");
-        System.out.println("   help                             - Show this list of commands");
-        System.out.println("   bye                             - Exit the application");
+        System.out.println("   find <text>                       - Search for notes");
+        System.out.println("   help                              - Show this list of commands");
+        System.out.println("   bye                               - Exit the application");
         System.out.println();
     }
 
@@ -128,7 +130,7 @@ public class UI {
     public void showDeleteTagFromNoteConfirmation(String tag, String noteId) {
         System.out.println("Confirm deletion of tag '" + tag + "' on note # '" + noteId + "'? (y/n)");
     }
-    
+
 
     /**
      * Displays a generic error message.
@@ -143,7 +145,7 @@ public class UI {
      * Displays the goodbye message when the application exits.
      */
     public void showBye() {
-        System.out.println(" Bye. Hope to see you again soon!");
+        System.out.println("Bye. Hope to see you again soon!");
     }
 
     /**
@@ -215,7 +217,7 @@ public class UI {
      * Displays a message when no notes match a search query.
      */
     public void showNoNotesFound() {
-        System.out.println(" No notes found matching the search criteria.");
+        System.out.println("No notes found matching the search criteria.");
     }
 
     /**
@@ -224,7 +226,7 @@ public class UI {
      * @param matchedNotes The list of notes matching the search.
      */
     public void showFoundNotes(ArrayList<Note> matchedNotes) {
-        System.out.println(" Here are the matching notes in your list:");
+        System.out.println("Here are the matching notes in your list:");
         for (int i = 0; i < matchedNotes.size(); i++) {
             System.out.println(" " + (i + 1) + ". " + matchedNotes.get(i));
         }
@@ -237,7 +239,7 @@ public class UI {
      * @param noteId The ID of the note.
      */
     public void showJustPinnedNote(Note note, String noteId) {
-        System.out.println(" Got it. I've " + (note.isPinned() ? "pinned" : "unpinned") + " this note: " + noteId);
+        System.out.println("Got it. I've " + (note.isPinned() ? "pinned" : "unpinned") + " this note: " + noteId);
     }
 
     /**
@@ -246,15 +248,15 @@ public class UI {
      * @param repoName The name of the newly created repository.
      */
     public void showRepoInit(String repoName) {
-        System.out.println(" Repository /" + repoName + " has been created.");
+        System.out.println("Repository /" + repoName + " has been created.");
     }
 
     public void showSuccessfullyTaggedNote(String noteID, String tag) {
-        System.out.println(" Note #"+ noteID + " has been tagged with '"+ tag + "'");
+        System.out.println("Note #"+ noteID + " has been tagged with '"+ tag + "'");
     }
 
     public void showSuccessfullyAddedTag(String tag) {
-        System.out.println(" Tag '"+ tag + "' has been added.");
+        System.out.println("Tag '"+ tag + "' has been added.");
     }
 
     public void showOpeningEditor() {
@@ -270,14 +272,14 @@ public class UI {
     }
 
     public void showSuccessfulLinking(String referencingTitle, String linkedToTitle) {
-        System.out.println(" Note '" + referencingTitle + "' now links to note '" + linkedToTitle + "'.");
+        System.out.println("Note '" + referencingTitle + "' now links to note '" + linkedToTitle + "'.");
     }
 
     public void showLinkedNotes(ArrayList<Note> linkedNotes, String noteId, String listToShow) {
         if (listToShow.equals(LIST_INCOMING)) {
-            System.out.println(" Here are the notes that link to note #" + noteId + " (incoming):");
+            System.out.println("Here are the notes that link to note #" + noteId + " (incoming):");
         } else if (listToShow.equals(LIST_OUTGOING)) {
-            System.out.println(" Here are the notes that note #" + noteId + " links to (outgoing):");
+            System.out.println("Here are the notes that note #" + noteId + " links to (outgoing):");
         }
 
         for (int i = 0; i < linkedNotes.size(); i++) {
@@ -286,15 +288,15 @@ public class UI {
     }
 
     public void showSuccessfullyUnlinkedNotes(String sourceNoteId, String targetNoteId) {
-        System.out.println(" The link from note #" + sourceNoteId + " to note #" + targetNoteId + " has been removed.");
+        System.out.println("The link from note #" + sourceNoteId + " to note #" + targetNoteId + " has been removed.");
     }
 
     public void showSuccessfullyDoubleLinkedNotes(String noteTitle1, String noteTitle2) {
-        System.out.println(" Notes '" + noteTitle1 + "' and '" + noteTitle2 + "' are now linked in both directions.");
+        System.out.println("Notes '" + noteTitle1 + "' and '" + noteTitle2 + "' are now linked in both directions.");
     }
 
     public void showSuccessfullyUnlinkedBothNotes(String noteId1, String noteId2) {
-        System.out.println(" All links between note #" + noteId1 + " and note #" + noteId2 + " have been removed.");
+        System.out.println("All links between note #" + noteId1 + " and note #" + noteId2 + " have been removed.");
     }
 
     public void showArchivedNote(Note note) {
@@ -306,7 +308,7 @@ public class UI {
     }
 
     public void showTagsSingleNote(List<String> tags, String noteId) {
-        System.out.println(" Tags for note #" + noteId + ":");
+        System.out.println("Tags for note #" + noteId + ":");
         for (int i = 0; i < tags.size(); i++) {
             System.out.println(" " + (i + 1) + ". " + tags.get(i));
         }
@@ -321,20 +323,28 @@ public class UI {
     }
 
     public void showSuccessfullyDeletedTagFromNote(String noteId, String tag) {
-        System.out.println(" Tag '" + tag + "' has been deleted from note #" + noteId + ".");
+        System.out.println("Tag '" + tag + "' has been deleted from note #" + noteId + ".");
     }
 
     public void showSuccessfullyDeletedTag(String tag) {
-        System.out.println(" Tag '" + tag + "' has been deleted across all notes, globally.");
+        System.out.println("Tag '" + tag + "' has been deleted across all notes, globally.");
     }
 
     public void showSuccessfullyRenamedTag(String oldTag, String newTag) {
-        System.out.println(" Tag '" + oldTag + "' has been renamed to '" + newTag 
+        System.out.println("Tag '" + oldTag + "' has been renamed to '" + newTag
                 + "' across all notes. All affected notes have been updated.");
     }
 
     public void showNoteBody(String noteId, String body) {
         System.out.println(" Body of note #" + noteId + ":");
         System.out.println(body);
+    }
+
+    public void showRepoChanged(String repoName) {
+        System.out.println("Changed to repository: /" + repoName);
+    }
+
+    public void showCurrentRepo(String repoName) {
+        System.out.println("Current repository: /" + repoName);
     }
 }

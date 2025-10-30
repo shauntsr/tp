@@ -2,6 +2,7 @@ package seedu.zettel.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -156,4 +157,31 @@ public class StorageTest {
             assertTrue(lines.contains(tag), "tags.txt should contain tag: " + tag);
         }
     }
+    @Test
+    public void testGetRepoList_returnsAllRepos() throws Exception {
+        Path tempDir = Files.createTempDirectory("zettel-test-getrepolist");
+
+        Storage storage = new Storage(tempDir.toString());
+        storage.init();
+
+        storage.createRepo("repoA");
+        storage.createRepo("repoB");
+        storage.createRepo("repoC");
+
+        ArrayList<String> repoList = storage.getRepoList();
+
+        assertNotNull(repoList, "Repo list should not be null");
+        assertTrue(repoList.contains("main"), "Default 'main' repo should always exist");
+        assertTrue(repoList.contains("repoA"), "Repo list should contain 'repoA'");
+        assertTrue(repoList.contains("repoB"), "Repo list should contain 'repoB'");
+        assertTrue(repoList.contains("repoC"), "Repo list should contain 'repoC'");
+        assertTrue(repoList.size() >= 4, "Repo list should have at least 4 repos (main + 3 created)");
+
+
+        ArrayList<String> repoList2 = storage.getRepoList();
+        repoList2.add("fakeRepo");
+        assertFalse(storage.getRepoList().contains("fakeRepo"),
+                "getRepoList() should return a copy, not modify internal state");
+    }
+
 }
