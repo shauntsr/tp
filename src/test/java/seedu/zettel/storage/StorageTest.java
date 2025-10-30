@@ -141,17 +141,19 @@ public class StorageTest {
     }
 
     @Test
-    void testUpdateTagsWritesToConfig() throws ZettelException, Exception {
+    void testUpdateTagsWritesToTagsFile() throws ZettelException, IOException {
         List<String> tags = List.of("urgent", "work", "personal");
 
         storage.updateTags(tags);
 
-        Path configFile = tempDir.resolve(".zettelConfig");
-        List<String> lines = Files.readAllLines(configFile);
+        Path tagsFile = tempDir.resolve("tags.txt");
+        List<String> lines = Files.readAllLines(tagsFile);
 
-        assertTrue(lines.size() >= 3, "Config should have at least 3 lines");
-        assertEquals("main", lines.get(0).trim(), "First line should remain the default repo list");
-        assertEquals("main", lines.get(1).trim(), "Second line should remain the current repo");
-        assertEquals("urgent | work | personal", lines.get(2).trim(), "Third line should contain tags");
+        // Should contain exactly the tags, one per line (order doesn't matter)
+        assertEquals(tags.size(), lines.size(), "tags.txt should contain the same number of tags");
+
+        for (String tag : tags) {
+            assertTrue(lines.contains(tag), "tags.txt should contain tag: " + tag);
+        }
     }
 }
