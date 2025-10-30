@@ -2,7 +2,9 @@ package seedu.zettel;
 
 import java.util.Arrays;
 
+import seedu.zettel.commands.ChangeRepoCommand;
 import seedu.zettel.commands.Command;
+import seedu.zettel.commands.CurrentRepoCommand;
 import seedu.zettel.commands.DeleteNoteCommand;
 import seedu.zettel.commands.DeleteTagFromNoteCommand;
 import seedu.zettel.commands.DeleteTagGloballyCommand;
@@ -83,6 +85,9 @@ public class Parser {
         "List incoming links format should be: list-incoming-links <NOTE_ID>";
     private static final String LIST_OUTGOING_LINKS_FORMAT =
         "List outgoing links format should be: list-outgoing-links <NOTE_ID>";
+    private static final String CHANGE_REPO_FORMAT = "Change repo format should be: change-repo <REPO_NAME>";
+    private static final String CHANGE_REPO_EMPTY = "Please specify a repo name to change to!";
+    private static final String CURRENT_REPO_FORMAT = "Current repository format should be: current-repo\";";
 
     /**
      * Parses a user command string and returns the corresponding Command object.
@@ -119,6 +124,8 @@ public class Parser {
         case "delete-tag-globally" -> parseDeleteTagGloballyCommand(inputs);
         case "rename-tag" -> parseRenameTagCommand(inputs);
         case "help" -> parseHelpCommand(inputs);
+        case "change-repo", "change-repository" -> parseChangeRepoCommand(inputs);
+        case "current-repo", "current-repository"  -> parseCurrentRepoCommand(inputs);
         default -> throw new InvalidInputException(command);
         };
     }
@@ -644,5 +651,49 @@ public class Parser {
             throw new InvalidFormatException(HELP_FORMAT);
         }
         return new HelpCommand();
+    }
+    /**
+     * Parses a change-repo command to switch to a different repository.
+     * Expected format: change-repo REPO_NAME
+     *
+     * @param inputs The tokenized user input split by spaces
+     * @return A ChangeRepoCommand object with the specified repository name.
+     * @throws ZettelException If the repository name is empty or format is invalid.
+     */
+    private static Command parseChangeRepoCommand(String[] inputs) throws ZettelException {
+        if (inputs.length < 2) {
+            throw new EmptyDescriptionException(CHANGE_REPO_EMPTY);
+        }
+
+        if (inputs.length != 2) {
+            throw new InvalidFormatException(CHANGE_REPO_FORMAT);
+        }
+
+        String repoName = inputs[1].trim();
+        if (repoName.isEmpty()) {
+            throw new EmptyDescriptionException(CHANGE_REPO_EMPTY);
+        }
+
+        if (!repoName.matches("[a-zA-Z0-9_-]+")) {
+            throw new InvalidFormatException(
+                    "Repo name can only contain alphanumeric characters, hyphens and underscores.");
+        }
+
+        return new ChangeRepoCommand(repoName);
+    }
+
+    /**
+     * Parses a current-repo command to display the currently active repository.
+     * Expected format: current-repo
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return A CurrentRepoCommand object.
+     * @throws ZettelException If the format is invalid.
+     */
+    private static Command parseCurrentRepoCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 1) {
+            throw new InvalidFormatException(CURRENT_REPO_FORMAT);
+        }
+        return new CurrentRepoCommand();
     }
 }

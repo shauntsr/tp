@@ -370,4 +370,13 @@ public class Storage {
             throw new ZettelException("Error while deleting body file '" + filename + "': " + e.getMessage());
         }
     }
+
+    /**
+     * Gets the list of all available repositories.
+     *
+     * @return an ArrayList containing the names of all repositories
+     */
+    public ArrayList<String> getRepoList() {
+        return new ArrayList<>(repoList);
+    }
 }
