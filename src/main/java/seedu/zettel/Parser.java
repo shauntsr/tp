@@ -163,11 +163,15 @@ public class Parser {
             }
             switch (tok) {
             case "-p":
-                if (showPinned) throw new InvalidFormatException(LIST_FORMAT);
+                if (showPinned) {
+                    throw new InvalidFormatException(LIST_FORMAT);
+                }
                 showPinned = true;
                 break;
             case "-a":
-                if (showArchived) throw new InvalidFormatException(LIST_FORMAT);
+                if (showArchived) {
+                    throw new InvalidFormatException(LIST_FORMAT);
+                }
                 showArchived = true;
                 break;
             default:
@@ -506,7 +510,7 @@ public class Parser {
 
     /**
      * Parses an archive or unarchive command.
-     * Expected format: archive/unarchive <NOTE_ID>
+     * Expected format: archive/unarchive NOTE_ID
      *
      * @param inputs        The tokenized user input split by spaces
      * @param shouldArchive True for archive, false for unarchive
