@@ -5,9 +5,13 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import seedu.zettel.exceptions.FailedMoveNoteException;
 import seedu.zettel.exceptions.InvalidRepoException;
 import seedu.zettel.exceptions.ZettelException;
 
@@ -196,14 +200,15 @@ public class FileSystemManager {
         }
     }
 
+
     /**
      * Validates the structure of a repository and creates missing components.
      *
      * @param repoName the name of the repository to validate
-     * @param expectedFiles the list of expected note body files
+     * @param expectedFilesMap map of expected filenames -> isArchived flag
      * @throws ZettelException if the repository structure is invalid
      */
-    public void validateRepoStructure(String repoName, List<String> expectedFiles) throws ZettelException {
+    public void validateRepoStructure(String repoName, Map<String, Boolean> expectedFilesMap) throws ZettelException {
         Path repoPath = rootPath.resolve(repoName);
         Path notesDir = repoPath.resolve(REPO_NOTES);
         Path archiveDir = repoPath.resolve(REPO_ARCHIVE);
@@ -219,16 +224,32 @@ public class FileSystemManager {
         createIfMissing(archiveDir, "archive/ for repo: " + repoName, true);
         createIfMissing(indexFile, "index.txt for repo: " + repoName, false);
 
-        for (String fileName : expectedFiles) {
-            Path bodyFile = notesDir.resolve(fileName);
+        // Create missing body files in the correct directory (notes/ or archive/)
+        for (Map.Entry<String, Boolean> entry : expectedFilesMap.entrySet()) {
+            String fileName = entry.getKey();
+            boolean isArchived = entry.getValue();
+            Path bodyFile = isArchived ? archiveDir.resolve(fileName) : notesDir.resolve(fileName);
             try {
-                createIfMissing(bodyFile, "body file: " + fileName, false);
+                createIfMissing(bodyFile, (isArchived ? "archive body file: " : "body file: ") + fileName, false);
             } catch (ZettelException e) {
                 System.out.println("Warning: " + e.getMessage());
             }
         }
 
-        detectOrphans(notesDir, expectedFiles, repoName);
+        // Build expected lists per directory for orphan detection
+        List<String> expectedInNotes = expectedFilesMap.entrySet().stream()
+                .filter(e -> !e.getValue())
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        List<String> expectedInArchive = expectedFilesMap.entrySet().stream()
+                .filter(Map.Entry::getValue)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        // Detect orphans in both directories
+        detectOrphans(notesDir, expectedInNotes, repoName);
+        detectOrphans(archiveDir, expectedInArchive, repoName);
     }
 
     /**
@@ -321,11 +342,47 @@ public class FileSystemManager {
     }
 
     /**
+     * Gets the path to the archive directory for the specified repository.
+     *
+     * @param repoName the repository name
+     * @return the path to the repository's archive directory
+     */
+    public Path getArchivePath(String repoName) {
+        return rootPath.resolve(repoName).resolve(REPO_ARCHIVE);
+    }
+
+    /**
      * Gets the path to the configuration file.
      *
      * @return the path to the configuration file
      */
     public Path getConfigPath() {
         return rootPath.resolve(CONFIG_FILE);
+    }
+
+    /**
+     * Moves a note file between the notes and archive directories.
+     *
+     * @param filename the name of the note file to move
+     * @param repoName the name of the repository containing the note
+     * @param toArchive true to move to archive, false to move to notes
+     * @throws ZettelException if the file move operation fails
+     */
+    public void moveNoteBetweenDirectories(String filename, String repoName, boolean toArchive)
+            throws ZettelException {
+        Path sourcePath = toArchive
+                ? getNotesPath(repoName).resolve(filename)
+                : getArchivePath(repoName).resolve(filename);
+        Path destPath = toArchive
+                ? getArchivePath(repoName).resolve(filename)
+                : getNotesPath(repoName).resolve(filename);
+
+        try {
+            Files.move(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            String action = toArchive ? "archive" : "unarchive";
+            throw new FailedMoveNoteException("Failed to " + action + " note file '" + filename + "': "
+                    + e.getMessage());
+        }
     }
 }

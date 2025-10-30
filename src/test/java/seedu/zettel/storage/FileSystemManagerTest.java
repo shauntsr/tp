@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import seedu.zettel.exceptions.ZettelException;
 
@@ -83,9 +84,11 @@ public class FileSystemManagerTest {
         Path index = tempDir.resolve("main").resolve("index.txt");
         Files.writeString(index, "x | X | x.txt | 2025-10-24T00:00:00Z | 2025-10-24T00:00:00Z | 0 | 0 |  | \n");
 
-        fs.validateRepoStructure("main", List.of("x.txt"));
+        // NEW: expectedFilesMap: filename -> isArchived (false => expected in notes/)
+        Map<String, Boolean> expectedFilesMap = Map.of("x.txt", false);
+        fs.validateRepoStructure("main", expectedFilesMap);
 
-        // After validation, the body file should exist
+        // After validation, the body file should exist in notes/
         Path body = tempDir.resolve("main").resolve("notes").resolve("x.txt");
         assertTrue(Files.exists(body));
     }
