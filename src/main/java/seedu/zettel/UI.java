@@ -332,7 +332,11 @@ public class UI {
                 + "' across all notes. All affected notes have been updated.");
     }
 
+<<<<<<< HEAD
     public void showSucessfullyRepoChanged(String repoName) {
+=======
+    public void showSuccessfullyRepoChanged(String repoName) {
+>>>>>>> 1195700710e2539bf9d3f708f6c5bb6d4ccf26b8
         System.out.println("Successfully changed to repository: /" + repoName);
     }
 
