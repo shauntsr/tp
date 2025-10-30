@@ -7,10 +7,6 @@ import seedu.zettel.exceptions.NoNoteFoundException;
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.storage.Storage;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,45 +61,21 @@ public class ArchiveNoteCommand extends Command {
         }
 
         String filename = targetNote.getFilename();
-        Path sourcePath;
-        Path destPath;
 
+        // Move the physical file using Storage
+        storage.moveNoteBetweenDirectories(filename, shouldArchive);
+
+        // Update note metadata
+        targetNote.setArchived(shouldArchive);
+        targetNote.setArchiveName(shouldArchive ? storage.getArchiveFolderName() : null);
+
+        // Save changes and show feedback
+        storage.save(notes);
         if (shouldArchive) {
-            sourcePath = storage.getNotePath(filename);
-            destPath = storage.getArchivePath(filename);
-
-            try {
-                // Move the physical file
-                Files.move(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
-
-                // Update note metadata
-                targetNote.setArchived(true);
-                targetNote.setArchiveName(storage.getArchiveFolderName());
-
-                storage.save(notes);
-
-                ui.showArchivedNote(targetNote);
-            } catch (IOException e) {
-                throw new ZettelException("Failed to archive note file: " + e.getMessage());
-            }
+            ui.showArchivedNote(targetNote);
         } else {
-            sourcePath = storage.getArchivePath(filename);
-            destPath = storage.getNotePath(filename);
-
-            try {
-                // Move the physical file
-                Files.move(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
-
-                // Update note metadata
-                targetNote.setArchived(false);
-                targetNote.setArchiveName(null);
-
-                storage.save(notes);
-
-                ui.showUnarchivedNote(targetNote);
-            } catch (IOException e) {
-                throw new ZettelException("Failed to unarchive note file: " + e.getMessage());
-            }
+            ui.showUnarchivedNote(targetNote);
         }
     }
+
 }
