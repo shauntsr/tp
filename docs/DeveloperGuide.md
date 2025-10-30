@@ -678,3 +678,142 @@ Priorities: High (must have) - `***`, Medium (nice to have) - `**`, Low (unlikel
     - Run without input for 240 seconds
     - Expected: Application times out gracefully with message
 
+### Creating and editing notes
+
+1. **Create note with title and body**
+   - Command: `new -t "Test Note" -b "This is test content"`
+   - Expected: Note created with 8-char ID, confirmation message displayed
+
+2. **Create note with title only** (requires interactive editor)
+   - Command: `new -t hello`
+   - Expected: External editor opens, saving and closing editor saves note
+
+3. **Create duplicate filename**
+   - Create: `new -t "Same Title" -b "First"`
+   - Try: `new -t "Same Title" -b "Second"`
+   - Expected: Error message about existing note
+
+4. **Edit existing note**
+   - Edit: `edit <note-id>`
+   - Expected: External editor opens, saving and closing editor saves note
+
+### Listing and Searching
+
+1. **List all notes**
+   - Command: `list`
+   - Expected: All notes displayed with filename, date, and ID
+
+2. **List pinned only**
+   - Pin a note: `pin <note-id>`
+   - Command: `list -p`
+   - Expected: Only pinned notes shown
+
+3. **List archived only**
+   - Archive a note: `archive <note-id>`
+   - Command: `list -a`
+   - Expected: Only archived notes shown
+
+4. **Search notes**
+   - Command: `find test`
+   - Expected: All notes with body containing "test" (case-insensitive) displayed
+
+### Linking Notes
+
+1. **Create unidirectional link**
+   - Create two notes, get their IDs
+   - Command: `link <source-id> <target-id>`
+   - Expected: Confirmation message
+
+2. **Create bidirectional link**
+   - Command: `link-both <id1> <id2>`
+   - Expected: Both directions linked
+
+3. **List incoming links**
+   - Command: `list-incoming-links <note-id>`
+   - Expected: All notes linking to this note displayed
+
+4. **List outgoing links**
+   - Command: `list-outgoing-links <note-id>`
+   - Expected: All notes this note links to displayed
+
+5. **Delete note with links**
+   - Delete a linked note
+   - Check linked notes
+   - Expected: All links cleaned up automatically
+
+### Tag Management
+
+1. **Create global tag**
+   - Command: `new-tag project`
+   - Expected: Tag added to global list
+
+2. **Add tag to note**
+   - Command: `add-tag <note-id> project`
+   - Expected: Tag added to note
+
+3. **List all tags**
+   - Command: `list-tags-all`
+   - Expected: All global tags displayed
+
+4. **List tags for note**
+   - Command: `list-tags <note-id>`
+   - Expected: Tags for specific note displayed
+
+5. **Rename tag globally**
+   - Command: `rename-tag oldname newname`
+   - Expected: Tag renamed across all notes
+
+6. **Delete tag from note**
+   - Without force: `delete-tag <note-id> project`
+   - Expected: Confirmation prompt
+   - With force: `delete-tag -f <note-id> project`
+   - Expected: Immediate deletion
+
+7. **Delete tag globally**
+   - Command: `delete-tag-globally -f project`
+   - Expected: Tag removed from all notes and global list
+
+### Edge Cases and Error Handling
+
+1. **Invalid note ID format**
+   - Command: `delete 123` (too short)
+   - Expected: Error about ID format (must be 8 hex chars)
+
+2. **Non-existent note ID**
+   - Command: `delete ffffffff`
+   - Expected: Error about note not existing
+
+3. **Empty notes list**
+   - In new repository
+   - Command: `list`
+   - Expected: Message about no notes found
+
+4. **Link note to itself**
+   - Command: `link <id> <id>` (same ID twice)
+   - Expected: Error preventing self-linking
+
+5. **Archive already archived note**
+   - Archive note twice
+   - Expected: Error about note already archived
+
+### Storage and Recovery
+
+1. **Manually corrupt index.txt**
+   - Edit `data/main/index.txt`, remove a field from a line
+   - Restart application
+   - Expected: Warning about corrupted line and orphaned note, other notes load fine
+
+2. **Delete body file**
+   - Delete a `.txt` file from `notes/` directory
+   - Run: `list`
+   - Expected: File recreated as empty, warning displayed
+
+3. **Create orphan file**
+   - Add `orphan.txt` to `notes/` directory manually
+   - Restart application
+   - Expected: Warning about orphan file detected
+
+4. **Multiple repositories**
+   - Command: `init test-repo`
+   - Expected: New repository created
+   - Switch repos and verify notes are separate
