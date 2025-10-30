@@ -29,7 +29,7 @@ public class UI {
      */
     public String readCommand() {
         if (!scanner.hasNextLine()) {
-            return "bye";  // Auto-exit when no more input (prevents hanging in CI)
+            return "bye";
         }
         return scanner.nextLine();
     }
@@ -44,31 +44,40 @@ public class UI {
         System.out.println(" What can I do for you?");
         printLine();
         System.out.println();
-        System.out.println(" Available Commands:");
-        System.out.println("   init <repo-name>             - Initialize a new repository");
-        System.out.println("   new -t <title> [-b <body>]   - Create a new note");
-        System.out.println("   edit <note-id>               - Edit an existing note");
-        System.out.println("   list [-p]                    - List all notes (or pinned only)");
-        System.out.println("   delete [-f] <note-id>        - Delete a note by ID");
-        System.out.println("   pin <note-id>                - Pin a note");
-        System.out.println("   unpin <note-id>              - Unpin a note");
-        System.out.println("   new-tag <tag-name>           - Adds a tag");
-        System.out.println("   add-tag <note-id> <tag-name> - Tag a note");
-        System.out.println("   link <source-id> <target-id> - Link two notes");
-        System.out.println("   unlink <source-id> <target-id> - Unlink two notes");
-        System.out.println("   link-both <id1> <id2>        - Link two notes in both directions");
-        System.out.println("   unlink-both <id1> <id2>      - Unlink two notes in both directions");
-        System.out.println("   list-incoming-links <note-id> - Show incoming linked notes");
-        System.out.println("   list-outgoing-links <note-id> - Show outgoing linked notes");
-        System.out.println("   list-tags-all                - Lists all tags that exist globally");
-        System.out.println("   list-tags <note-id>          - List tags for an single note");
-        System.out.println("   delete-tag [-f] <note-id> <tag> - Delete a tag from a note");
-        System.out.println("   delete-tag-globally [-f] <tag> - Delete a tag from all notes");
-        System.out.println("   rename-tag <old-tag> <new-tag> - Rename a tag globally");
-        System.out.println("   find <text>                  - Search for notes");
-        System.out.println("   bye                          - Exit the application");
-        System.out.println();
+        showHelp();
         printLine();
+    }
+
+    /**
+     * Displays the list of all available commands and their formats.
+     * This method is called by HelpCommand and showWelcome.
+     */
+    public void showHelp() {
+        System.out.println(" Available Commands:");
+        System.out.println("   init <repo-name>                 - Initialize a new repository");
+        System.out.println("   new -t <title> [-b <body>]       - Create a new note");
+        System.out.println("   edit <note-id>                   - Edit an existing note");
+        System.out.println("   list [-p]                        - List all notes (or pinned only)");
+        System.out.println("   delete [-f] <note-id>            - Delete a note by ID");
+        System.out.println("   pin <note-id>                    - Pin a note");
+        System.out.println("   unpin <note-id>                  - Unpin a note");
+        System.out.println("   new-tag <tag-name>               - Adds a tag");
+        System.out.println("   add-tag <note-id> <tag-name>     - Tag a note");
+        System.out.println("   link <source-id> <target-id>     - Link two notes");
+        System.out.println("   unlink <source-id> <target-id>   - Unlink two notes");
+        System.out.println("   link-both <id1> <id2>            - Link two notes in both directions");
+        System.out.println("   unlink-both <id1> <id2>          - Unlink two notes in both directions");
+        System.out.println("   list-incoming-links <note-id>    - Show incoming linked notes");
+        System.out.println("   list-outgoing-links <note-id>    - Show outgoing linked notes");
+        System.out.println("   list-tags-all                    - Lists all tags that exist globally");
+        System.out.println("   list-tags <note-id>              - List tags for an single note");
+        System.out.println("   delete-tag [-f] <note-id> <tag>  - Delete a tag from a note");
+        System.out.println("   delete-tag-globally [-f] <tag>   - Delete a tag from all notes");
+        System.out.println("   rename-tag <old-tag> <new-tag>   - Rename a tag globally");
+        System.out.println("   find <text>                      - Search for notes");
+        System.out.println("   help                             - Show this list of commands");
+        System.out.println("   bye                              - Exit the application");
+        System.out.println();
     }
 
 

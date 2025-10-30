@@ -12,6 +12,7 @@ import seedu.zettel.commands.DeleteTagGloballyCommand;
 import seedu.zettel.commands.EditNoteCommand;
 import seedu.zettel.commands.ExitCommand;
 import seedu.zettel.commands.FindNoteCommand;
+import seedu.zettel.commands.HelpCommand; // Added import
 import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.LinkBothNotesCommand;
 import seedu.zettel.commands.LinkNotesCommand;
@@ -876,5 +877,18 @@ class ParserTest {
     void testParseRenameTagWhitespaceTagsThrowsException() {
         ZettelException ex = assertThrows(ZettelException.class, () -> Parser.parse("rename-tag   "));
         assertTrue(ex.getMessage().contains("format"));
+    }
+
+    // ==================== Help Command Tests ====================
+
+    @Test
+    void testParseHelpCommandReturnsHelpCommand() throws ZettelException {
+        Command command = Parser.parse("help");
+        assertInstanceOf(HelpCommand.class, command);
+    }
+
+    @Test
+    void testParseHelpWithArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("help me"));
     }
 }
