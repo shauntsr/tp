@@ -55,7 +55,8 @@ public class ListNoteCommandTest {
         notes.add(older);
         notes.add(newer);
 
-        ListNoteCommand cmd = new ListNoteCommand(false);
+        // default: not pinned-only, not archived-only
+        ListNoteCommand cmd = new ListNoteCommand(false, false);
         cmd.execute(notes, tags, ui, storage);
 
         String output = outputStream.toString();
@@ -72,7 +73,8 @@ public class ListNoteCommandTest {
     }
     @Test
     void testNoNotesFoundThrowsException() {
-        ListNoteCommand cmd = new ListNoteCommand(false);
+        // default: not pinned-only, not archived-only
+        ListNoteCommand cmd = new ListNoteCommand(false, false);
 
         NoNotesException ex = assertThrows(NoNotesException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
@@ -84,7 +86,8 @@ public class ListNoteCommandTest {
 
     @Test
     void testNoPinnedNotesFoundThrowsException() {
-        ListNoteCommand cmd = new ListNoteCommand(true);
+        // pinned-only, not archived
+        ListNoteCommand cmd = new ListNoteCommand(true, false);
 
         NoNotesException ex = assertThrows(NoNotesException.class, () -> {
             cmd.execute(notes, tags, ui, storage);
@@ -110,7 +113,8 @@ public class ListNoteCommandTest {
         notes.add(pinned);
         notes.add(unpinned);
 
-        ListNoteCommand cmd = new ListNoteCommand(true);
+        // pinned-only, not archived
+        ListNoteCommand cmd = new ListNoteCommand(true, false);
         cmd.execute(notes, tags, ui, storage);
 
         String output = outputStream.toString();
@@ -132,7 +136,8 @@ public class ListNoteCommandTest {
         notes.add(older);
         notes.add(newer);
 
-        ListNoteCommand cmd = new ListNoteCommand(false);
+        // default: not pinned-only, not archived-only
+        ListNoteCommand cmd = new ListNoteCommand(false, false);
         cmd.execute(notes, tags, ui, storage);
 
         String output = outputStream.toString();
