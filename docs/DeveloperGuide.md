@@ -558,3 +558,123 @@ int exitCode = process.waitFor();
     * Pros: Uniform behavior across systems.
     * Cons: Breaks minimalist philosophy; adds maintenance burden.
 
+--------------------------------------------------------------------------------------------------------------------
+
+## **Documentation, Testing, Configuration**
+
+### Documentation Guidelines
+
+* Use Javadoc for all public classes and methods
+* Include `@param`, `@return`, and `@throws` annotations
+* Document design decisions in class-level Javadoc
+* Keep comments concise and focused on "why" not "what"
+
+### Testing Recommendations
+
+**Unit Tests:**
+* Test individual Command classes with mock data
+* Test Parser validation logic extensively
+* Test ID generation for deterministic behavior
+* Test serialization/deserialization round-trips
+
+**Integration Tests:**
+* Test command execution with real Storage
+* Test file system operations
+* Test link cleanup on note deletion
+* Test tag rename propagation
+
+**System Tests:**
+* Test full user workflows (create → edit → link → delete)
+* Test repository switching
+* Test archive operations
+* Test error recovery scenarios
+
+### Configuration
+
+The application uses minimal configuration:
+* `.zettelConfig` - Stores repository list and current repository
+* `tags.txt` - Global tag list
+* Environment variables: `$VISUAL`, `$EDITOR` for editor selection
+
+--------------------------------------------------------------------------------------------------------------------
+
+## **Appendix: Requirements**
+
+### Product Scope
+
+**Target user profile:**
+* Students, researchers, or knowledge workers who need to manage interconnected notes
+* Users comfortable with command-line interfaces
+* Users who prefer keyboard-driven workflows
+* Users who want a lightweight, portable note-taking system
+* Users familiar with Zettelkasten methodology
+
+**Value proposition:**
+* Fast, keyboard-driven note creation and navigation
+* Bidirectional linking for creating knowledge graphs
+* Deterministic IDs for reproducible note references
+* File-based storage (no lock-in, easy backup)
+* Multiple repositories for organizing different projects
+* Archive system for managing completed work
+
+### User Stories
+
+Priorities: High (must have) - `***`, Medium (nice to have) - `**`, Low (unlikely to have) - `*`
+
+| Priority  | As a...              | I want to...                                   | So that I can...                                         |
+|-----------|----------------------|------------------------------------------------|----------------------------------------------------------|
+| `***`     | impatient user       | create notes quickly from the CLI              | capture ideas instantly without relying on external apps |
+| `***`     | hurried user         | create a note with only a title                | jot down ideas and fill in details later                 |
+| `***`     | disorganised person  | list and review all my notes                   | have a single, searchable place for all my thoughts      |
+| `***`     | cautious user        | confirm before deleting a note                 | avoid accidentally losing important information          |
+| `***`     | user                 | search notes by title or keyword               | find specific ideas or topics quickly                    |
+| `**`      | minimalist user      | keep all notes in a flat directory structure   | avoid unnecessary complexity or folder clutter           |
+| `**`      | user                 | tag notes with multiple categories             | organise and filter my notes by topic or theme           |
+| `**`      | user                 | link notes together                            | build a network of related ideas                         |
+| `**`      | user                 | view linked notes from both directions         | understand the relationships between connected notes     |
+| `**`      | power user           | edit note bodies using my preferred editor     | stay productive using familiar text-editing tools        |
+| `*`       | heavy user           | archive old or inactive notes                  | keep my active workspace clean and focused               |
+| `*`       | nostalgic user       | view each note’s creation date                 | trace when and how my ideas evolved over time            |
+
+### Non-Functional Requirements
+
+1. **Portability**: Should work on any mainstream OS (Windows, macOS, Linux) with Java 17+
+2. **Performance**: Should handle up to 10,000 notes without noticeable lag
+3. **Reliability**: Should never lose data even if application crashes
+4. **Usability**: Command syntax should be memorable and consistent
+5. **Maintainability**: Code should follow object-oriented principles with clear separation of concerns
+6. **Data Integrity**: Should detect and warn about orphaned files or missing body files
+7. **Recoverability**: Should automatically repair common storage issues
+8. **Testability**: Should support timeout-based testing for CI environments
+
+### Glossary
+
+* **Zettelkasten**: A method of note-taking and knowledge management based on linking atomic notes
+* **Note ID**: An 8-character hexadecimal identifier generated from note title and creation time
+* **Repository**: A collection of notes stored in a single directory (can have multiple repositories)
+* **Index file**: `index.txt` containing metadata for all notes in pipe-delimited format
+* **Body file**: Separate `.txt` file containing the actual content of a note
+* **Outgoing link**: A link from the current note to another note
+* **Incoming link**: A link from another note to the current note
+* **Orphan file**: A body file that exists in notes/ or archive/ but isn't referenced in index.txt
+* **Force flag** (`-f`): Skips confirmation prompts for destructive operations
+
+--------------------------------------------------------------------------------------------------------------------
+
+## **Appendix: Instructions for Manual Testing**
+
+### Launch and Shutdown
+
+1. **Initial launch**
+    - Ensure Java 17+ is installed
+    - Run: `java -jar zettel.jar`
+    - Expected: Welcome message displays with command list, `data/main/` directory created
+
+2. **Graceful shutdown**
+    - Execute: `bye`
+    - Expected: Application exits, all data saved
+
+3. **Timeout handling** (CI environments)
+    - Run without input for 240 seconds
+    - Expected: Application times out gracefully with message
+
