@@ -71,11 +71,10 @@ init My_New_Repo
 
 ---
 
-<<<<<<< HEAD
-=======
 ### Changing Repository: `change-repo`
 
 Switches to another existing repository. The repository must have been previously created using the `init` command.
+If already in the existing repository, no switching occurs.
 
 **Format:**
 ```
@@ -94,6 +93,16 @@ change-repo My_New_Repo
 **Expected Output:**
 ```
  Successfully changed to repository: /My_New_Repo
+```
+
+**Example (Already in Repository):**
+```
+change-repo main
+```
+
+**Expected Output:**
+```
+ Already on main!
 ```
 
 ---
@@ -118,7 +127,6 @@ current-repository
 
 ---
 
->>>>>>> 90768e7b75279506ea2d88b4b5bdcd6045f66c60
 ### Adding a New Note: `new`
 
 Creates a new note in the Zettelkasten repository. Notes can be created with only a title, or with both a title and a 
