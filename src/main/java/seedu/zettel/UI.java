@@ -79,7 +79,8 @@ public class UI {
         System.out.println("   archive <note-id>                 - Moves note to archive folder");
         System.out.println("   unarchive <note-id>               - Moves note out of archive folder");
         System.out.println("   print-body <note-id>              - Print the body of a note");
-        System.out.println("   find-note-with-body <search-terms> - Search for notes by body content");
+        System.out.println("   find-note-by-body <search-terms>  - Search for notes by body content");
+        System.out.println("   find-note-by-title <search-terms> - Search for notes by title");
         System.out.println("   help                              - Show this list of commands");
         System.out.println("   bye                               - Exit the application");
         System.out.println();
@@ -241,8 +242,20 @@ public class UI {
     public void showFoundNotesByBody(ArrayList<Note> matchedNotes, String searchTerms) {
         System.out.println(" Here are the notes with bodies matching the above:");
         for (int i = 0; i < matchedNotes.size(); i++) {
-            Note note = matchedNotes.get(i);
-            System.out.println(" " + (i + 1) + ". " + note.getTitle() + " #" + note.getId());
+            System.out.println(" " + (i + 1) + ". " + matchedNotes.get(i));
+        }
+    }
+
+    /**
+     * Displays a list of notes that match title search terms.
+     *
+     * @param matchedNotes The list of notes matching the search.
+     * @param searchTerms The search terms used for the query.
+     */
+    public void showFoundNotesByTitle(ArrayList<Note> matchedNotes, String searchTerms) {
+        System.out.println(" Here are the notes with titles matching the above:");
+        for (int i = 0; i < matchedNotes.size(); i++) {
+            System.out.println(" " + (i + 1) + ". " + matchedNotes.get(i));
         }
     }
 
