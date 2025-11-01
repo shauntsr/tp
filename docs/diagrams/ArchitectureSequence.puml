@@ -4,22 +4,22 @@ hide footbox
 actor User
 participant ":Zettel"
 participant ":UI"
-participant ":Parser"
+participant "<<class>> Parser" as Parser
 participant ":Command"
 participant ":Storage"
 
-activate ":Zettel"
 
 User -> ":Zettel": input "new -t MyNote -b Content"
+activate ":Zettel"
 ":Zettel" -> ":UI": readCommand()
 activate ":UI"
 ":UI" --> ":Zettel": "new -t MyNote -b Content"
 deactivate ":UI"
 
-":Zettel" -> ":Parser": parse(userInput)
-activate ":Parser"
-":Parser" --> ":Zettel": NewNoteCommand
-deactivate ":Parser"
+":Zettel" -> "Parser": parse(userInput)
+activate "Parser"
+"Parser" --> ":Zettel": NewNoteCommand
+deactivate "Parser"
 
 ":Zettel" -> ":Command": execute(notes, tags, ui, storage)
 activate ":Command"
@@ -35,6 +35,7 @@ activate ":UI"
 deactivate ":UI"
 
 ":Command" --> ":Zettel": execution complete
+":Zettel" --> "User"
 deactivate ":Command"
-
+deactivate ":Zettel"
 @enduml
