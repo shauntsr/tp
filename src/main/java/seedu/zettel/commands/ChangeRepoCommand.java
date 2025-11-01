@@ -47,8 +47,7 @@ public class ChangeRepoCommand extends Command {
         List<String> availableRepos = storage.getRepoList();
         if (!availableRepos.contains(repoName)) {
             throw new InvalidRepoException(
-                    "Repository '" + repoName + "' does not exist. " +
-                            "Use 'init " + repoName + "' to create it first."
+                    "Repository '" + repoName + "' does not exist. " + "Use 'init " + repoName + "' to create it first."
             );
         }
 
