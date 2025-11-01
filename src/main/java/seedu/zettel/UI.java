@@ -76,9 +76,9 @@ public class UI {
         System.out.println("   delete-tag [-f] <note-id> <tag>   - Delete a tag from a note");
         System.out.println("   delete-tag-globally [-f] <tag>    - Delete a tag from all notes");
         System.out.println("   rename-tag <old-tag> <new-tag>    - Rename a tag globally");
-        System.out.println("   archive <note-id>               - Moves note to archive folder");
-        System.out.println("   unarchive <note-id>             - Moves note out of archive folder");
-        System.out.println("   print-body <note-id>            - Print the body of a note");
+        System.out.println("   archive <note-id>                 - Moves note to archive folder");
+        System.out.println("   unarchive <note-id>               - Moves note out of archive folder");
+        System.out.println("   print-body <note-id>              - Print the body of a note");
         System.out.println("   find <text>                       - Search for notes");
         System.out.println("   help                              - Show this list of commands");
         System.out.println("   bye                               - Exit the application");
