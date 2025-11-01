@@ -16,7 +16,7 @@ activate Notes
 Notes --> Command: return (false)
 deactivate Notes
 
-alt Notes empty
+opt Notes empty
     Command -> UI: show error "No notes to link"
     Command --> User: throw NoNotesException
 end
@@ -31,12 +31,12 @@ activate Notes
 Notes --> Command: return TargetNote
 deactivate Notes
 
-alt Either note missing
+opt Either note missing
     Command --> User: throw InvalidNoteIdException
 end
 
 Command -> Command: check if same ID
-alt Same note
+opt Same note
     Command --> User: throw NoteSelfLinkException
 end
 
@@ -45,7 +45,7 @@ activate SourceNote
 SourceNote --> Command: return false
 deactivate SourceNote
 
-alt Already linked
+opt Already linked
     Command --> User: throw NotesAlreadyLinkedException
 end
 
