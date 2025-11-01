@@ -1,4 +1,4 @@
-@startuml NewNote
+@startuml ArchitectureSequence
 hide footbox
 
 actor User
