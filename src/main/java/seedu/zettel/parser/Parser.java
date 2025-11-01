@@ -40,7 +40,8 @@ import seedu.zettel.exceptions.ZettelException;
 public class Parser {
     // Error messages to be printed when encountering errors
     // Categorised between empty, format and invalid
-    private static final String LIST_FORMAT = "List format should be: list [-p]";
+    private static final String LIST_FORMAT = "List format should be: list [-p] [-a], where -p and -a can be"
+            + " in any order";
     private static final String PIN_FORMAT = "Pin format should be: pin/unpin <NOTE_ID>";
     private static final String INIT_FORMAT = "Init format should be: init <REPO_NAME>";
     private static final String DELETE_FORMAT = "Delete format should be: delete [-f] <NOTE_ID>";
