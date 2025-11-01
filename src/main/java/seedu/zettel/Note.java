@@ -35,7 +35,6 @@ public class Note {
     private boolean pinned; // Whether the note is pinned
     private boolean archived; // Whether the note has been archived
     private String archiveName; // Name of the archive the note belongs to
-    private List<String> logs; // History/log data of that individual note
     private List<String> tags; // Tags for the note
     private HashSet<String> outgoingLinks; // note IDs that this note links to
     private HashSet<String> incomingLinks; // note IDs of notes that is linked by this note
