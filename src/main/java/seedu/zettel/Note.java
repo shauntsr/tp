@@ -41,7 +41,7 @@ public class Note {
 
     /**
      * Constructor for creating a new note by the user.
-     * Initializes with default values for pinned, archived, and logs.
+     * Initializes with default values for pinned and archived.
      *
      * @param id The unique 8-character hash-based ID
      * @param title The title of the note
@@ -205,9 +205,9 @@ public class Note {
     }
 
     /**
-     * Gets a defensive copy of the logs list for this note.
+     * Gets a tag list for this note.
      *
-     * @return A new ArrayList containing the log entries
+     * @return A new ArrayList containing the tag entries
      */
 
     public List<String> getTags() {
