@@ -1,990 +1,819 @@
-# Developer Guide
+---
+layout: page
+title: Developer Guide
+---
+* Table of Contents
+{:toc}
 
-## Acknowledgements
+--------------------------------------------------------------------------------------------------------------------
 
-* **Zettelkasten Method** - Note-taking methodology inspired by Niklas Luhmann's slip-box system
-  * [Zettelkasten.de](https://zettelkasten.de/) - Introduction to the Zettelkasten method
-* **Java NIO File API** - Used for file system operations and storage management
-  * [Oracle Java Documentation](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/nio/file/package-summary.html)
-* **Instant class (java.time)** - Used for timestamp management
-  * [Oracle Java Time API](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/Instant.html)
+## **Acknowledgements**
 
-## Design & implementation
+* [Niklas Luhmann’s Zettelkasten note-taking method](https://www.cliffguren.com/articles/organic-notes-and-zettelkasten)
+* Java NIO for file system operations
+* SHA-256 hashing algorithm for deterministic ID generation
+* Java ExecutorService for timeout handling in CI environments
 
-### Architecture Overview
+--------------------------------------------------------------------------------------------------------------------
 
-ZettelCLI follows a layered architecture with clear separation of concerns:
-```
-┌─────────────────┐
-│  CLI Interface  │  (User interaction layer - UI)
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│     Parser      │  (Input parsing layer)
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│    Commands     │  (Business logic layer)
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│     Storage     │  (Data persistence layer)
-└─────────────────┘
-         │
-┌────────▼────────┐
-│      Notes      │  (Data model layer)
-└─────────────────┘
-```
+## **Setting up, getting started**
 
-### Main Application Component (Zettel)
+Refer to the guide [_Setting up and getting started_](SettingUp.md).
 
-The `Zettel` class serves as the main entry point and orchestrator for the entire application.
+--------------------------------------------------------------------------------------------------------------------
 
-**Key Responsibilities:**
-- Initialize all components (UI, Storage, Parser)
-- Load existing notes from disk on startup
-- Run the main command loop
-- Handle graceful shutdown and error recovery
-- Auto-save notes after each command
+## **Design**
 
-**Main Application Flow:**
-```
-Start → Initialize Storage → Load Notes → Show Welcome
-  ↓
-Enter Command Loop:
-  ├─ Read User Input (with timeout)
-  ├─ Parse Command
-  ├─ Execute Command
-  ├─ Auto-save Notes
-  └─ Loop until Exit
-  ↓
-Cleanup → Shutdown → Exit
-```
+<div markdown="span" class="alert alert-primary">
 
-**Class Diagram:**
-```
-┌─────────────────────────┐
-│        Zettel           │
-├─────────────────────────┤
-│ - storage: Storage      │
-│ - notes: ArrayList      │
-│ - ui: UI                │
-│ - isRunning: boolean    │
-├─────────────────────────┤
-│ + run(): void           │
-│ + main(String[]): void  │
-└─────────────────────────┘
-```
+:bulb: **Tip:** The `.puml` files used to create diagrams are in this document `docs/diagrams` folder. Refer to the [_PlantUML Tutorial_ at se-edu/guides](https://se-education.org/guides/tutorials/plantUml.html) to learn how to create and edit diagrams.
+</div>
 
-**Key Implementation Details:**
+### Architecture
 
-The application uses an ExecutorService with timeout handling to prevent hanging in CI environments:
-```java
-Future<String> future = executor.submit(() -> ui.readCommand());
-String userInput = future.get(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-```
+<img src="images/Architecture.png" width="321" />
 
-Auto-save is implemented after every successful command execution:
-```java
-command.execute(notes, ui, storage);
-storage.save(notes);  // Auto-save after each operation
-```
+The ***Architecture Diagram*** given above explains the high-level design of Zettel.
+
+The architecture of Zettel follows a command-pattern design with clear separation of concerns:
+
+**Main components of the architecture:**
+
+**`Zettel`** is the main entry point and orchestrator of the application.
+* At app launch, it initializes UI, Storage, and loads existing notes from disk
+* Manages the main application loop, reading user input and executing commands via Parser
+* Implements timeout handling for CI/testing environments
+* Handles graceful shutdown and resource cleanup
+
+The bulk of the app's work is done by the following components:
+
+* [**`UI`**](#ui-component): Handles all user interface interactions
+* [**`Parser`**](#parser-component): Parses user input and creates Command objects
+* [**`Command`**](#command-component): Executes specific operations on notes
+* [**`Storage`**](#storage-component): Manages file system operations and persistence
+* [**`Note`**](#note-component): Represents individual notes with metadata
+
+**How the architecture components interact with each other:**
+
+<img src="images/ArchitectureSequence.png" width="782" />
+
+1. User enters command in terminal
+2. `Zettel` reads input via `UI`
+3. `Parser` parses the input and creates appropriate `Command` object
+4. `Command` executes operation on `notes` list
+5. `Storage` persists changes to disk
+6. `UI` displays feedback to user
+
+The sections below give more details of each component.
+
+### UI component
+
+**API**: `UI.java`
+
+<img src="images/UIClass.png" width="600" />
+
+The `UI` component:
+* Uses `Scanner` to read user input from the console
+* Provides methods to display various types of feedback:
+  - Welcome and help messages
+  - Note lists (with filtering for pinned/archived notes)
+  - Confirmation prompts for destructive operations
+  - Error messages
+  - Success messages for operations
+* Formats output with consistent styling using line separators
+* Manages the lifecycle of the Scanner resource
+
+Key responsibilities:
+* `readCommand()` - Reads user input from console
+* `showWelcome()` - Displays welcome message and command list
+* `showHelp()` - Lists all available commands
+* `showNoteList()` - Displays notes with appropriate labels
+* `showError()` - Displays error messages
+* Various confirmation and success message methods
 
 ### Parser Component
 
-The `Parser` class converts raw user input strings into executable `Command` objects.
+**API**: `Parser.java`
 
-**Key Responsibilities:**
-- Tokenize and validate user input
-- Extract command parameters
-- Validate parameter formats (note IDs, repo names, etc.)
-- Create appropriate Command objects
-- Throw descriptive exceptions for invalid input
+The `Parser` component:
+* Takes raw user input strings and converts them into executable `Command` objects
+* Validates input format and parameters
+* Extracts flags and arguments from commands
+* Performs validation on note IDs (8-character hexadecimal format)
+* Throws appropriate `ZettelException` subclasses for invalid input
 
-**Supported Commands:**
-- `bye` - Exit the application
-- `list [-p]` - List all notes or pinned notes only
-- `new -t <TITLE> [-b <BODY>]` - Create a new note
-- `delete [-f] <NOTE_ID>` - Delete a note with optional force flag
-- `pin <NOTE_ID>` - Pin a note
-- `unpin <NOTE_ID>` - Unpin a note
-- `init <REPO_NAME>` - Initialize a new repository
-- `find <SEARCH_TERM>` - Search for notes
+Parsing workflow:
+1. Split input by whitespace
+2. Extract command keyword (first word)
+3. Route to appropriate parse method via switch statement
+4. Extract and validate parameters (flags, IDs, text)
+5. Create and return specific Command object
+6. Throw exception if validation fails
 
-**Validation Rules:**
+Key validation patterns:
+* Note ID validation: Exactly 8 hexadecimal characters (a-f, 0-9)
+* Flag validation: Recognizes `-f` (force), `-t` (title), `-b` (body), `-p` (pinned), `-a` (archived)
+* Repository name validation: Alphanumeric, hyphens, and underscores only
 
-Note ID validation:
-- Must be exactly 8 characters long
-- Must contain only lowercase hexadecimal characters (0-9, a-f)
-- Regex pattern: `^[a-f0-9]{8}$`
-
-Repository name validation:
-- Must contain only alphanumeric characters, hyphens, and underscores
-- Regex pattern: `[a-zA-Z0-9_-]+`
-
-**Parsing Flow Example (New Note Command):**
-```
-Input: "new -t My Note -b Some content"
-  ↓
-Split by spaces: ["new", "-t", "My", "Note", "-b", "Some", "content"]
-  ↓
-Find -t flag index → Extract title: "My Note"
-Find -b flag index → Extract body: "Some content"
-  ↓
-Validate title not empty
-  ↓
-Create NewNoteCommand(title, body)
-```
-
-**Error Handling Strategy:**
-
-The Parser throws three types of exceptions:
-- `EmptyDescriptionException` - Required parameters are missing
-- `InvalidFormatException` - Command format is incorrect
-- `InvalidInputException` - Unrecognized command or invalid values
-
-### UI Component
-
-The `UI` class handles all user interaction, including input reading and output display.
-
-**Key Responsibilities:**
-- Display welcome message and command help
-- Read user commands from standard input
-- Display note lists and search results
-- Show confirmation prompts
-- Display error messages
-- Handle graceful shutdown
-
-**Key Methods:**
-
-Input Methods:
-- `readCommand()` - Reads a line of user input with EOF handling
-
-Output Methods:
-- `showWelcome()` - Displays greeting and available commands
-- `showNoteList(List<Note>, boolean)` - Displays formatted note list
-- `showAddedNote(Note)` - Confirms note creation
-- `showDeleteConfirmation(String, String)` - Prompts for delete confirmation
-- `showError(String)` - Displays error messages
-- `showBye()` - Displays farewell message
-
-**Display Formats:**
-
-Note list format:
-```
-You have 3 notes: 
-    1. my_note.txt 2025-10-14 a1b2c3d4
-    2. ideas.txt 2025-10-13 b2c3d4e5
-    3. todo.txt 2025-10-12 c3d4e5f6
-```
-
-Welcome message includes command reference for easy access.
+<img src="images/ParserSequence.png" width="977" />
 
 ### Command Component
 
-The `Command` abstract class defines the interface for all executable commands using the Command Pattern.
+**API**: `Command.java`
 
-**Class Hierarchy:**
-```
-                          Command
-                         (abstract)
-                             │
-     ┌───────┬───────┬───────┬───────┬───────┬───────┐
-     │       │       │       │       │       │       │
-    New    List   Delete    Pin     Find    Init    Exit
-                         (concrete)
-```
+<img src="images/CommandAbstractClass.png" width="603" />
 
-**Available Commands:**
+The `Command` component uses the Command Pattern where each command is an object that encapsulates:
+* The action to perform
+* The parameters needed
+* The execution logic
 
-1. **NewNoteCommand** - Creates a new note
-   - Generates 8-character hash-based ID from title + timestamp
-   - Validates filename uniqueness
-   - Supports title and optional body
+All commands inherit from the abstract `Command` class and implement:
+* `execute(ArrayList<Note> notes, List<String> tags, UI ui, Storage storage)` - Performs the command operation
+* `isExit()` - Returns true only for ExitCommand
 
-2. **ListNoteCommand** - Lists notes
-   - Sorts by creation date (newest first)
-   - Optional filter for pinned notes only
-   - Handles empty list scenarios
+**Command Categories:**
 
-3. **DeleteNoteCommand** - Deletes a note
-   - Validates note existence
-   - Optional force flag to skip confirmation
-   - Prompts user for confirmation by default
+1. **Note Management:**
+   - `NewNoteCommand` - Creates new notes with hash-based IDs
+   - `EditNoteCommand` - Opens notes in external editor
+   - `DeleteNoteCommand` - Deletes notes with optional confirmation
+   - `ArchiveNoteCommand` - Moves notes to/from archive folder
+   - `PrintNoteBodyCommand` - Prints body of note to stdout
 
-4. **PinNoteCommand** - Pins or unpins a note
-   - Validates note ID format
-   - Updates pinned status
-   - Supports both pin and unpin operations
+    <img src="images/NoteManagementCommands.png" width="628" />
 
-5. **FindNoteCommand** - Searches notes
-   - Case-insensitive search
-   - Searches in note body content
-   - Returns all matching notes
+2. **Note Organization:**
+   - `ListNoteCommand` - Lists notes with filtering options
+   - `PinNoteCommand` - Pins/unpins notes for quick access
+   - `FindNoteCommand` - Searches notes by keyword
 
-6. **AddTagCommand** - Adds a tag
-    - Validates that tag does not already exist in `.zettelConfig`
-    - Update `.zettelConfig` with added tag
-    - Displays tag added message
-   
-7. **TagNoteCommand** - Adds a tag
-    - Validates that the note does not already have the tag
-    - Update `.zettelConfig` with added tag if it does not exist
-    - Displays tag added message
+    <img src="images/NoteOrganisationCommands.png" width="596" />
 
-8. **InitCommand** - Initializes a repository
-   - Validates repository name format
-   - Creates repository structure
-   - Displays confirmation message
+3. **Linking System:**
+   - `LinkNotesCommand` - Creates unidirectional links
+   - `UnlinkNotesCommand` - Removes unidirectional links
+   - `LinkBothNotesCommand` - Creates bidirectional links
+   - `UnlinkBothNotesCommand` - Removes bidirectional links
+   - `ListLinkedNotesCommand` - Shows incoming/outgoing links
 
-9. **ExitCommand** - Exits the application
-   - Displays farewell message
-   - Returns true for `isExit()` check
+    <img src="images/LinkCommands.png" width="636" />
 
-### PinNoteCommand Implementation
+4. **Tagging System:**
+   - `NewTagCommand` - Creates global tags
+   - `TagNoteCommand` - Adds tag to note
+   - `DeleteTagFromNoteCommand` - Removes tag from note
+   - `DeleteTagGloballyCommand` - Removes tag from all notes
+   - `RenameTagCommand` - Renames tag globally
+   - `ListTagsGlobalCommand` - Lists all tags
+   - `ListTagsSingleNoteCommand` - Lists tags for specific note
 
-**Overview:**
+    <img src="images/TagCommands.png" width="885" />
 
-`PinNoteCommand` provides the ability to mark notes as "pinned" for quick access. Pinned notes appear at the top of list views, making them easily accessible for frequently referenced information. The command supports both pinning (`pin <NOTE_ID>`) and unpinning (`unpin <NOTE_ID>`) operations.
+5. **System Commands:**
+   - `InitCommand` - Initializes new repository
+   - `ChangeRepoCommand` - Changes current note repo to another repo
+   - `HelpCommand` - Displays help information
+   - `ExitCommand` - Terminates application
 
-**Design Rationale:**
-
-The implementation uses a four-tier validation strategy to provide clear, specific error messages at each failure point:
-
-1. **Format Validation** - Validates the note ID format before any business logic
-2. **Empty List Check** - Ensures there are notes to operate on
-3. **Existence Check** - Confirms the specific note exists
-4. **State Check** - Prevents redundant operations (pinning already pinned notes, etc.)
-
-This layered approach provides users with precise feedback about what went wrong, rather than generic error messages.
-
-**Class Structure:**
-
-```
-┌─────────────────────────────────┐
-│      PinNoteCommand             │
-├─────────────────────────────────┤
-│ - noteId: String                │
-│ - isPin: boolean                │
-│ - VALID_NOTE_ID_LENGTH: int     │
-│ - VALID_NOTE_ID_REGEX: String   │
-│ - logger: Logger                │
-├─────────────────────────────────┤
-│ + PinNoteCommand(String, bool)  │
-│ + execute(ArrayList, UI, ...)   │
-│ - validateNoteIdFormat(String)  │
-└─────────────────────────────────┘
-```
-
-**Key Implementation Details:**
-
-**1. Note ID Format Validation:**
-
-The command enforces strict note ID format requirements to maintain data integrity:
-- Must be exactly 8 characters long
-- Must contain only lowercase hexadecimal characters (0-9, a-f)
-- Uses regex pattern: `^[a-f0-9]{8}$`
-
-This validation is performed in the private `validateNoteIdFormat()` method:
-
-```java
-private void validateNoteIdFormat(String noteId) throws InvalidFormatException {
-    if (noteId == null || noteId.length() != VALID_NOTE_ID_LENGTH) {
-        throw new InvalidFormatException(
-                "Note ID must be exactly " + VALID_NOTE_ID_LENGTH + " characters long.");
-    }
-    if (!noteId.matches(VALID_NOTE_ID_REGEX)) {
-        throw new InvalidFormatException(
-                "Note ID must contain only lowercase hexadecimal characters (0-9, a-f).");
-    }
-}
-```
-
-**Why this validation exists:**
-- Prevents invalid IDs from reaching the search logic
-- Provides immediate feedback for typos or formatting errors
-- Maintains consistency with the Note ID generation scheme
-- Separates format validation from business logic
-
-**2. Four-Tier Validation Strategy:**
-
-The `execute()` method implements validation in a specific order:
-
-```
-Input: pin a1b2c3d4
-  ↓
-[Validation 1] Format Check
-  ├─ Length = 8? ✓
-  ├─ Matches [a-f0-9]? ✓
-  └─ Pass → Continue
-  ↓
-[Validation 2] Empty List Check
-  ├─ notes.isEmpty()? 
-  ├─ If true → throw NoNotesException
-  └─ If false → Continue
-  ↓
-[Validation 3] Note Existence Check
-  ├─ Find note with ID
-  ├─ If not found → throw InvalidNoteIdException
-  └─ If found → Continue
-  ↓
-[Validation 4] State Check
-  ├─ Is note.isPinned() == isPin?
-  ├─ If true → throw AlreadyPinnedException
-  └─ If false → Continue
-  ↓
-[Happy Path] Execute Operation
-  ├─ Get note from Optional
-  ├─ Set pinned status
-  ├─ Display confirmation
-  └─ Save to storage
-```
-
-**Why this order:**
-1. **Format first** - Fastest check, catches obvious user errors immediately
-2. **Empty list second** - Provides context-specific error ("no notes to pin/unpin")
-3. **Existence third** - Only performs expensive stream search after other validations pass
-4. **State last** - Prevents redundant operations after confirming the note exists
-
-This ordering optimizes for both performance and user experience.
-
-**3. Dual-Purpose Design:**
-
-The command handles both pin and unpin operations through a single boolean flag:
-
-```java
-public PinNoteCommand(String noteId, boolean isPin) {
-    this.noteId = noteId;
-    this.isPin = isPin;  // true = pin, false = unpin
-}
-```
-
-**Why a single command class:**
-- Reduces code duplication (validation logic identical for both operations)
-- Simplifies testing (test both states in one test suite)
-- Makes the codebase more maintainable (single source of truth for pin logic)
-- The Parser creates the appropriate instance based on the command keyword
-
-**4. Stream-Based Note Lookup:**
-
-The command uses Java Streams API for note lookup:
-
-```java
-Optional<Note> maybe = notes.stream()
-    .filter(n -> n.getId().equals(noteId))
-    .findFirst();
-```
-
-**5. Automatic Timestamp Management:**
-
-The `Note.setPinned()` method automatically updates the `modifiedAt` timestamp:
-
-```java
-note.setPinned(isPin);  // Automatically calls updateModifiedAt() internally
-```
-
-This design ensures modification timestamps are always accurate without requiring explicit calls, maintaining data integrity through encapsulation.
-
-**Sequence Diagram - Pin Note Operation:**
-
-```
-User → Parser → PinNoteCommand → Notes → Note → UI → Storage
- |       |            |            |      |     |       |
- | pin a1b2c3d4       |            |      |     |       |
- |------>|            |            |      |     |       |
- |       | new PinNoteCommand      |      |     |       |
- |       |----------->|            |      |     |       |
- |       |            |            |      |     |       |
- |       |   execute()|            |      |     |       |
- |       |----------->|            |      |     |       |
- |       |            | validateFormat()  |     |       |
- |       |            |----        |      |     |       |
- |       |            |    |       |      |     |       |
- |       |            |<----       |      |     |       |
- |       |            | isEmpty()? |      |     |       |
- |       |            |----------->|      |     |       |
- |       |            |<-----------|      |     |       |
- |       |            | stream()   |      |     |       |
- |       |            | filter()   |      |     |       |
- |       |            | findFirst()|      |     |       |
- |       |            |----------->|      |     |       |
- |       |            |<-----------|      |     |       |
- |       |            |                   |     |       |
- |       |            | get()             |     |       |
- |       |            |------------------>|     |       |
- |       |            |                   |     |       |
- |       |            | isPinned()        |     |       |
- |       |            |------------------>|     |       |
- |       |            |<------------------|     |       |
- |       |            | (check if already pinned)       |
- |       |            |----        |      |     |       |
- |       |            |    |       |      |     |       |
- |       |            |<----       |      |     |       |
- |       |            |                   |     |       |
- |       |            | setPinned(true)   |     |       |
- |       |            |------------------>|     |       |
- |       |            |                   | updateModifiedAt()
- |       |            |                   |---  |       |
- |       |            |                   |  |  |       |
- |       |            |                   |<--  |       |
- |       |            |<------------------|     |       |
- |       |            |                   |     |       |
- |       |            | showJustPinnedNote()    |       |
- |       |            |------------------------>|       |
- |       |            |                   |     |       |
- |       |            | save(notes)             |       |
- |       |            |------------------------------->|
-```
-
-**Error Handling Examples:**
-
-```
-Scenario 1: Invalid Format (too short)
-Input: pin abc
-  → InvalidFormatException: "Note ID must be exactly 8 characters long."
-
-Scenario 2: Invalid Format (special characters)
-Input: pin a1b2-3d4
-  → InvalidFormatException: "Note ID must contain only lowercase hexadecimal 
-                             characters (0-9, a-f)."
-
-Scenario 3: Empty Notes List
-Input: pin a1b2c3d4 (with empty list)
-  → NoNotesException: "You have no notes to pin/unpin."
-
-Scenario 4: Note Not Found
-Input: pin 99999999 (valid format, but doesn't exist)
-  → InvalidNoteIdException: "Note with ID '99999999' does not exist."
-
-Scenario 5: Already Pinned
-Input: pin a1b2c3d4 (note is already pinned)
-  → AlreadyPinnedException: "Note with ID 'a1b2c3d4' is already pinned."
-
-Scenario 6: Already Unpinned
-Input: unpin a1b2c3d4 (note is already unpinned)
-  → AlreadyPinnedException: "Note with ID 'a1b2c3d4' is already unpinned."
-
-Scenario 7: Success (Pin)
-Input: pin a1b2c3d4
-  → UI displays: "Pinned note: a1b2c3d4"
-  → Note's pinned status updated to true
-  → Modified timestamp updated automatically
-  → Changes saved to storage
-
-Scenario 8: Success (Unpin)
-Input: unpin a1b2c3d4
-  → UI displays: "Unpinned note: a1b2c3d4"
-  → Note's pinned status updated to false
-  → Modified timestamp updated automatically
-  → Changes saved to storage
-```
-
-**Testing Considerations:**
-
-The implementation is designed for comprehensive testing:
-
-1. **Format Validation Tests** - Handled in `ParserTest` (format validation happens in Parser)
-2. **Empty List Tests** - Handled in `PinNoteCommandTest`
-3. **Note Not Found Tests** - Handled in `PinNoteCommandTest`
-4. **Already Pinned/Unpinned Tests** - Handled in `PinNoteCommandTest`
-5. **Happy Path Tests** - Pin/unpin operations, state changes, timestamp updates
-
-This separation of concerns allows each layer to be tested independently.
-
-**Test Coverage:**
-
-The `PinNoteCommandTest` class includes:
-- `testInvalidFormatTooShortException()` - Tests ID too short
-- `testInvalidFormatTooLongException()` - Tests ID too long
-- `testInvalidFormatSpecialCharactersException()` - Tests invalid characters
-- `testInvalidFormatNullThrowsException()` - Tests null ID
-- `testEmptyNotesListException()` - Tests empty notes list
-- `testNoteIdNotFoundException()` - Tests non-existent note ID
-- `testPinAlreadyPinnedNoteThrowsException()` - Tests pinning an already pinned note
-- `testUnpinAlreadyUnpinnedNoteThrowsException()` - Tests unpinning an already unpinned note
-- `testValidPinNoteCommandNoteIsPinned()` - Tests successful pin operation
-- `testUnpinsNoteAtValidIndexUpdatesPinnedAndModifiedAt()` - Tests successful unpin operation
-
-
-**Command Execution Pattern:**
-
-Each command follows this pattern:
-1. **Validation** - Check preconditions (empty list, invalid IDs, etc.)
-2. **Business Logic** - Perform the actual operation
-3. **UI Feedback** - Display success/failure messages
-4. **Persistence** - Save is handled by Zettel class after execution
-
-**Sequence Diagram - Execute Command:**
-```
-User → Zettel → Parser → Command → Notes/Storage → UI
- |       |        |         |           |          |
- | input |        |         |           |          |
- |------>|        |         |           |          |
- |       | parse()|         |           |          |
- |       |------->|         |           |          |
- |       |<-------|         |           |          |
- |       |                  |           |          |
- |       |  cmd execute()   |           |          |
- |       |----------------->|           |          |
- |       |                  |  modify   |          |
- |       |                  |---------->|          |
- |       |                  |           |   show   |
- |       |                  |--------------------->|
- |       |      save()      |           |          |
- |       |----------------------------->|          |
-```
+    <img src="images/SystemCommands.png" width="612" />
 
 ### Note Component
 
-The `Note` class represents a single note entity with all its metadata and content.
+<img src="images/NoteClass.png" width="654" />
+
+**API**: `Note.java`
+
+The `Note` class represents a single note in the Zettel system:
 
 **Key Fields:**
-- `id` (String) - Unique 8-character hash-based identifier
-- `title` (String) - Note title
-- `filename` (String) - Associated file name for storage
-- `body` (String) - Note content
-- `createdAt` (Instant) - Creation timestamp
-- `modifiedAt` (Instant) - Last modification timestamp
-- `pinned` (boolean) - Flag for quick access
-- `archived` (boolean) - Flag for archival status
-- `archiveName` (String) - Archive location (if archived)
-- `logs` (List<String>) - List of timestamped log entries
+* `id` - 8-character hash-based unique identifier (immutable)
+* `title` - Note title
+* `filename` - Actual filename on disk (derived from title)
+* `body` - Note content (stored separately in file system)
+* `createdAt` - Creation timestamp (Instant)
+* `modifiedAt` - Last modification timestamp (Instant)
+* `pinned` - Boolean flag for pinned status
+* `archived` - Boolean flag for archived status
+* `archiveName` - Archive folder name (null if not archived)
+* `tags` - List of tag strings
+* `outgoingLinks` - HashSet of note IDs this note links to
+* `incomingLinks` - HashSet of note IDs that link to this note
 
-**Class Diagram:**
-```
-┌─────────────────────────────────┐
-│            Note                 │
-├─────────────────────────────────┤
-│ - id: String (8 chars)          │
-│ - title: String                 │
-│ - filename: String              │
-│ - body: String                  │
-│ - createdAt: Instant            │
-│ - modifiedAt: Instant           │
-│ - pinned: boolean               │
-│ - archived: boolean             │
-│ - archiveName: String           │
-│ - logs: List<String>            │
-│ - numberOfNotes: int (static)   │
-├─────────────────────────────────┤
-│ + Note(id, title, ...)          │
-│ + getId(): String               │
-│ + getTitle(): String            │
-│ + setTitle(String): void        │
-│ + setPinned(boolean): void      │
-│ + addLog(String): void          │
-│ + updateModifiedAt(): void      │
-│ + toString(): String            │
-└─────────────────────────────────┘
-```
+**Design Decisions:**
 
-**Constructor Overloading:**
+1. **Hash-based IDs**: IDs are generated deterministically using SHA-256 hash of (title + timestamp), ensuring uniqueness and reproducibility
 
-Two constructors support different use cases:
+2. **Separate body storage**: Note bodies are stored in separate `.txt` files rather than in the index file, allowing:
+    - Efficient loading of note metadata without reading full bodies
+    - Easy editing with external text editors
+    - Better handling of large note contents
 
-1. **User Creation Constructor** - For new notes created by users
-```java
-   Note(id, title, filename, body, createdAt, modifiedAt)
-   // Defaults: pinned=false, archived=false, logs=[]
-```
+3. **Bidirectional linking**: Both incoming and outgoing links are tracked to enable:
+    - Fast reverse link lookups
+    - Efficient link cleanup when deleting notes
+    - Graph-like navigation through notes
 
-2. **Storage Loading Constructor** - For loading notes from disk
-```java
-   Note(id, title, filename, body, createdAt, modifiedAt, 
-        pinned, archived, archiveName, logs)
-   // Includes all fields for complete restoration
-```
-
-**ID Generation:**
-
-Note IDs are deterministic hash-based identifiers:
-- Generated from: `title + createdAt timestamp`
-- Hashed to produce 8-character hexadecimal string
-- Ensures uniqueness while being reproducible
-
-**Automatic Timestamp Management:**
-
-The `updateModifiedAt()` method is automatically called by setters that modify content:
-- `setTitle()`
-- `setBody()`
-- `setPinned()`
-- `setArchived()`
-- `setArchiveName()`
-
-This ensures modification timestamps are always accurate without manual tracking.
-
-**Display Format:**
-
-The `toString()` method provides a formatted display for note lists:
-```
-Format: FILENAME yyyy-MM-dd NOTEID
-Example: my_note.txt 2025-10-14 a1b2c3d4
-```
-
-**Defensive Copying:**
-
-The `getLogs()` method returns a defensive copy to maintain encapsulation:
-```java
-public List<String> getLogs() {
-    return new ArrayList<>(logs);
-}
-```
-
-**Static Counter:**
-
-A static `numberOfNotes` counter tracks total notes created during application runtime for statistics.
+4. **Defensive copying**: Getter methods return defensive copies of mutable collections (tags, links) to prevent external modification
 
 ### Storage Component
 
-The `Storage` class is responsible for all file I/O and repository management in Zettel.
-It provides a persistent filesystem-based backend that stores note metadata, bodies, and repository configurations.
+**API**: `Storage.java`, `FileSystemManager.java`, `NoteSerializer.java`
 
-**Key Responsibilities:**
+<img src="images/StoragePackage.png" width="1006" />
 
-- Initialize and validate repository structures
-- Create, load, and save individual note files
-- Maintain `.zettelConfig`
-- Support creating and switching repositories
-- Detect and repair missing or orphaned files
+The Storage component is divided into three classes with distinct responsibilities:
+
+#### Storage (Orchestrator)
+
+Manages high-level storage operations and repository state:
+* Maintains current repository name
+* Coordinates file system and serialization operations
+* Manages repository configuration
+* Handles global tags file
+* Provides paths to note files
+
+#### FileSystemManager
+
+Handles all file system operations:
+* Creates and validates directory structure integrity
+* Manages repository folders: `notes/`, `archive/`, `index.txt`
+* Detects orphan files (files not referenced in index)
+* Moves files between notes and archive directories
 
 **Repository Structure:**
 ```
-<root>/data/
-├── main/                    # Default repository
-│   ├── notes/               # Folder containing individual note .txt files
-│   ├── archive/             # Folder containing archived notes
-│   └── index.txt            # Metadata for all notes in this repository
-├── otherRepo/               # Additional repositories
-│   ├── notes/
-│   ├── archive/
-│   └── index.txt
-└── .zettelConfig            # Global config file
+data/
+├── .zettelConfig          # Repository list and current repo
+├── tags.txt               # Global tags (one per line)
+├── main/                  # Default repository
+│   ├── index.txt          # Note metadata
+│   ├── notes/             # Note body files
+│   │   └── *.txt
+│   └── archive/           # Archived note files
+│       └── *.txt
+└── [other-repos]/         # Additional repositories
 ```
 
-**Configuration File:**
+#### NoteSerializer
 
-Zettel tracks available repositories and the currently active one through `.zettelConfig`.
+Handles serialization/deserialization of Note objects:
+* Converts Note objects to index file format (pipe-delimited)
+* Parses index file lines back into Note objects
+* Loads note bodies from separate text files
+* Saves note metadata to index.txt
 
-Format:
+**Index File Format:**
 ```
-main | repo2 | repo3
-main
-```
-- Line 1 — List of all repository names (pipe | separated)
-- Line 2 — Name of the currently active repository
-- The file is automatically created and updated as repositories are added or switched.
-- If malformed, Zettel gracefully defaults to main.
-
-**Class Diagram:**
-```
-┌─────────────────────────────────┐
-│             Storage             │
-├─────────────────────────────────┤
-│ - rootPath: Path                │
-│ - repoName: String              │
-│ - repoList: ArrayList<String>   │
-├─────────────────────────────────┤
-│ + init(): void                  │
-│ + load(): ArrayList<Note>       │
-│ + save(List<Note>): void        │
-│ + createRepo(String): void      │
-│ + changeRepo(String): void      │
-│ + createStorageFile(Note): void │
-│ + validateRepo(String): void    │
-└─────────────────────────────────┘
+ID | Title | Filename | CreatedAt | ModifiedAt | Pinned | Archived | ArchiveName | Tags | OutgoingLinks | IncomingLinks
 ```
 
-**Data Persistence Model:**
+Where:
+* Pinned/Archived are `1` or `0`
+* Tags and links are delimited by `;;`
+* All fields are separated by ` | ` (space-pipe-space)
 
-Each note’s data is split into metadata (stored in `index.txt`) and content (stored in its own .txt file).
+<img src="images/StorageSaveSequence.png" width="776" />
 
-Each line in `index.txt` represents a note entry with pipe-delimited fields:
+### Utility Components
+
+#### IdGenerator
+
+**API**: `IdGenerator.java`
+
+Generates deterministic 8-character hexadecimal IDs:
+* Uses SHA-256 hash of input string (title + timestamp)
+* Takes first 4 bytes (8 hex characters) of hash
+* Provides fallback method if SHA-256 unavailable
+* Ensures all IDs are lowercase hex characters
+
+#### EditorUtil
+
+**API**: `EditorUtil.java`
+
+Opens note files in external text editor:
+* Checks for `$VISUAL` or `$EDITOR` environment variables
+* Falls back to common CLI editors (vim, nano, vi)
+* On Windows, tries notepad.exe
+* Validates interactive console availability
+* Waits for editor process to complete
+
+--------------------------------------------------------------------------------------------------------------------
+
+## **Implementation**
+
+This section describes noteworthy implementation details for key features.
+
+### Note Creation with Hash-Based IDs
+
+**Design Choice: Deterministic ID Generation**
+
+Unlike traditional incremental IDs or UUIDs, Zettel uses hash-based IDs generated from the note's title and creation timestamp. This is inspired from Git's commit hash.
+
+**Implementation:**
+
 ```
-id | title | filename | createdAt | modifiedAt | pinned | archived | archiveName | logs
-```
-Field Details:
-
-
-## Note Field Details
-
-| **Field**       | **Description** |
-|-----------------|-----------------|
-| `id`            | Unique note ID |
-| `title`         | Note title |
-| `filename`      | Corresponding `.txt` filename |
-| `createdAt` / `modifiedAt` | ISO-8601 timestamps |
-| `pinned`        | `1` if pinned, else `0` |
-| `archived`      | `1` if archived, else `0` |
-| `archiveName`   | Name of archive folder (empty if not archived) |
-| `logs`          | Concatenated note history entries, separated by `;;` |
-
-Each note’s text content is stored separately in:
-```
-data/<repoName>/notes/<filename>.txt
+ID = SHA-256(title + createdAt)[0:4] → 8 hex characters
 ```
 
-Special handling:
-- Multiple logs are separated by `;;`
-- Multiple tags are separated by `;;`
-- Empty archiveName stored as empty string
+**Rationale:**
+* **Uniqueness**: SHA-256 collision probability is negligible for our use case
+* **User-friendly**: 8 characters is short enough to type manually
+* **No central counter**: No need to maintain global state across repositories
 
-### Repository Management
+#### Design Considerations
 
-**Creating a Repository:**
-1. Check if repository already exists
-2. Create directory structure (`notes/`, `archive/`)
-3. Create `index.txt` file
-4. Handle errors gracefully
+**Aspect: How to assign unique note identifiers**
 
-**Switching Repositories:**
-1. Update internal `repoName` state
-2. Write new repository name to `.zettelConfig`
-3. Subsequent operations use new repository
+* **Alternative 1: (rejected)** Incremental integer IDs.
+    * Pros: Simple, human-readable, easy to reference in commands.
+    * Cons: Possible conflicts if multiple repositories are merged manually.
 
-**Code Snippet:**
+* **Alternative 2: (rejected)** Timestamp-based UUIDs.
+    * Pros: Globally unique across repositories, supports synchronization.
+    * Cons: Less readable and harder to manually type or recall.
+
+<img src="images/NoteCreationActivity.png" width="464" />
+
+**Sequence:**
+1. User provides title (and optional body)
+2. `NewNoteCommand` captures current timestamp
+3. `IdGenerator` hashes title+timestamp → 8-char ID
+4. Filename derived from title (spaces substituted with underscores, append .txt)
+5. Check for duplicate filename in existing notes
+6. If body is null (no -b flag passed), open external editor for body input
+7. Create `Note` object
+8. Save to storage (both index.txt and body file)
+
+### Linking System
+
+**Design Choice: Bidirectional Link Tracking**
+
+Notes maintain both outgoing and incoming link sets to enable efficient graph operations.
+
+**Data Structure:**
 ```java
-public void changeRepo(String newRepo) {
-    if (!repoList.contains(newRepo)) {
-        System.out.println("Repo '" + newRepo + "' does not exist. Falling back to 'main'.");
-        newRepo = "main";
-    }
-
-    this.repoName = newRepo;
-
-    try {
-        updateConfig(newRepo);
-    } catch (ZettelException e) {
-        System.out.println("Error switching repo: " + e.getMessage());
-    }
-}
+private HashSet<String> outgoingLinks;  // IDs this note links to
+private HashSet<String> incomingLinks;  // IDs that link to this note
 ```
 
-### Error Handling Strategy
+**Operations:**
 
-Zettel follows a fail-safe approach:
-- All I/O operations wrapped in try–catch
-- On failure: print readable warning (no crash)
-- Missing folders/files are auto-created
-- Corrupted index entries are skipped (with console notice)
-- Repository validation runs after every save to maintain consistency
-- Fallbacks to default repository if `.zettelConfig` is missing or broken
+1. **Link (Unidirectional):**
+   - `sourceNote.addOutgoingLink(targetId)`
+   - `targetNote.addIncomingLink(sourceId)`
 
-### Data Persistence Flow
+2. **Link-Both (Bidirectional):**
+   - Performs Link operation in both directions
 
-**Loading Notes:**
+3. **Unlink:**
+   - Removes link from both source's outgoing and target's incoming
 
-Purpose: Construct ArrayList<Note> from repository contents.
-1. Resolve repository path
-2. Validate repository layout
-3. Read each line from `index.txt`
-4. Parse metadata via `parseSaveFile()`
-5. Read corresponding .txt file in `/notes/`
-6. Combine metadata + body into Note object
-7. Skip corrupted or missing entries gracefully
-8. Collect into ArrayList
+4. **Delete Note Cleanup:**
+   - For each outgoing link: remove from target's incoming links
+   - For each incoming link: remove from source's outgoing links
 
-**Saving Notes:**
+<img src="images/LinkCreationSequence.png" width="893" />
 
-Purpose: Persist all notes to disk.
-1. Ensure repository directory exists
-2. Write metadata to index.txt (one line per note)
-3. Write note body to individual .txt file (createStorageFile())
-4. Validate repository structure post-save
+**Rationale:**
+* O(1) lookup for "does note A link to note B?"
+* O(1) retrieval of all incoming or outgoing links
+* Automatic cleanup prevents dangling links
+* Supports graph algorithms (BFS, DFS) for future features
 
-***Sequence Diagram - Saving Notes:***
+#### Design Considerations
+
+**Aspect: How note linking is represented**
+
+* **Alternative 1 (current choice):** Use text-based note IDs stored in metadata.
+    * Pros: Minimal overhead, links remain functional even if filenames change.
+    * Cons: Broken links possible if IDs are deleted or recycled.
+
+* **Alternative 2:** Use filename-based linking.
+    * Pros: Intuitive for users browsing directly in the file system.
+    * Cons: Breaks easily if note titles are renamed.
+
+### Tag Management System
+
+**Design Choice: Global Tag List + Note-Level Tags**
+
+Tags are stored both globally (in `tags.txt`) and per-note (in `index.txt`).
+
+**Architecture:**
+* `tags.txt` - Master list of all existing tags (one per line)
+* Each `Note` has a `List<String> tags` field
+* Tags in note metadata are serialized as `tag1;;tag2;;tag3`
+
+**Operations:**
+
+1. **new-tag**: Adds tag to global list
+2. **add-tag**: Adds existing global tag to specific note
+3. **delete-tag**: Removes tag from specific note
+4. **delete-tag-globally**: Removes tag from global list AND all notes
+5. **rename-tag**: Renames tag globally across all notes
+
+<img src="images/RenameTagSequence.png" width="908" />
+
+**Why Global Tag List?**
+* Ensures consistency (no typos creating new tags)
+* Enables tag autocomplete (future feature)
+* Provides single source of truth for valid tags
+* Simplifies tag management and cleanup
+
+#### Design Considerations
+
+**Aspect: How tags are stored and referenced**
+
+* **Alternative 1 (current choice):** Store tags directly in each note file.
+    * Pros: Simpler to parse, avoids dependency on central tag index.
+    * Cons: Harder to rename or update tags globally across all notes.
+
+* **Alternative 2:** Maintain a global tag registry containing all references.
+    * Pros: Easier to enforce consistency and support global renaming.
+    * Cons: Adds complexity and potential desync issues if index is corrupted.
+
+### Archive System
+
+**Design Choice: Separate Archive Directory**
+
+Archived notes are physically moved to `archive/` subdirectory rather than just flagged.
+
+**Structure:**
 ```
-Zettel → Storage
-  |         |
-  | save()  |
-  |-------->|
-  |         | toSaveFormat()
-  |         | write index.txt
-  |         | write note bodies
-  |         | validateRepo()
-  |<--------|
+repo/
+├── notes/          # Active notes
+│   └── note1.txt
+└── archive/        # Archived notes
+    └── note2.txt
 ```
 
-### Tag Persistence Flow
+**Implementation:**
 
-**Loading Tags:**
-1. Read `.zettelConfig` from root directory
-2. Extract third line (if it exists) as the line of tags
-3. Split the line using " | " as the delimiter
-4. Trim and collect non-empty tags into a `List<String>`
+1. **Archive Operation:**
+   - Set `note.archived = true`
+   - Move file from `notes/` to `archive/`
+   - Update index.txt with archived flag
 
-**Saving Tags:**
-1. Ensure `.zettelConfig` exists
-2. Join all tags using " | "
-3. Insert or update the third line of `.zettelConfig`
-4. Overwrite the previous content completely
+2. **Unarchive Operation:**
+   - Set `note.archived = false`
+   - Move file from `archive/` back to `notes/`
+   - Update index.txt
 
-### Component Interaction Diagram
+<img src="images/ArchiveFlowActivity.png" width="727" />
+
+**Advantages:**
+* Clear visual separation in file system
+* Easy backup of active vs archived notes
+* Reduces clutter in notes directory
+* Metadata (index.txt) still tracks all notes
+
+#### Design Considerations
+
+**Aspect: How archived notes are handled**
+
+* **Alternative 1 (current choice):** Move notes to a dedicated `/archive` directory.
+    * Pros: Keeps active directory uncluttered, simple to restore.
+    * Cons: Requires file I/O each time and can cause path issues if linked notes are moved.
+
+* **Alternative 2:** Use only an “archived” flag in metadata instead of physical move.
+    * Pros: Keeps links intact, avoids file system changes.
+    * Cons: Requires more parsing logic and filtering in commands.
+
+### Storage Validation and Recovery
+
+**Design Choice: Robust Validation with Auto-Recovery**
+
+Storage performs validation on every save and automatically repairs common issues.
+
+**Validation Checks:**
+
+1. **Directory Structure:**
+   - Ensures `notes/`, `archive/`, `index.txt` exist
+   - Creates missing directories/files
+
+2. **Body File Validation:**
+   - Checks each note listed in index.txt has corresponding body file
+   - Creates empty body files for missing entries
+
+3. **Orphan Detection:**
+   - Identifies `.txt` files in notes/archive not referenced in index
+   - Warns user but doesn't auto-delete
+
+4. **Config File Validation:**
+   - Ensures `.zettelConfig` exists
+   - Validates current repository exists
+   - Note: if `.zettelConfig` is forcibly removed by user, on validation a new default `.zettelConfig` is created; as such previously created repos are lost to the program.
+
+<img src="images/StorageValidationFlow.png" width="479" />
+
+**Recovery Strategy:**
+* Non-destructive: Never deletes data automatically
+* Creates missing files with safe defaults (empty content)
+* Warns about inconsistencies without blocking operations
+* Allows manual intervention for orphaned files
+
+### Editor Integration
+
+**Design Choice: External Editor for Note Bodies**
+
+Rather than implementing a built-in editor, Zettel opens notes in the user's preferred text editor.
+
+**Editor Selection Priority:**
+1. `$VISUAL` environment variable
+2. `$EDITOR` environment variable
+3. Common CLI editors: vim, nano, vi
+4. Platform-specific: notepad.exe (Windows)
+
+**Implementation:**
+
+```java
+Process process = new ProcessBuilder(editor, filepath)
+    .inheritIO()
+    .start();
+int exitCode = process.waitFor();
 ```
-┌────────────────────────────────────────────────────┐
-│                      ZettelCLI                     │ 
-│                                                    │
-│  ┌──────┐  ┌──────┐  ┌───────┐  ┌───────┐  ┌────┐  │
-│  │Zettel│  │Parser│  │Command│  │Storage│  │ UI │  │
-│  └──┬───┘  └──┬───┘  └───┬───┘  └───┬───┘  └─┬──┘  │
-│     │         │          │   load   │        │     │
-│     │<──────────────────────────────│        │     │
-│     │         │          │          │  scan  │     │
-│     │<───────────────────────────────────────│     │
-│     │  parse  │          │          │        │     │
-│     │─────────>          │          │        │     │
-│     │<────────│          │          │        │     │
-│     │    cmd execute     │          │        │     │
-│     │────────────────────>          │        │     │
-│     │         │  modify  │          │        │     │
-│     │         │  notes   │          │        │     │
-│     │<───────────────────│          │        │     │
-│     │         │          │          │  show  │     │
-│     │         │          │──────────────────>│     │
-│     │         │   save   │          │        │     │
-│     │───────────────────────────────>        │     │
-│     │         │          │          │        │     │
-└────────────────────────────────────────────────────┘
-```
 
-## Product scope
+<img src="images/EditorIntegrationSequence.png" width="812" />
 
-### Target user profile
+**Advantages:**
+* Leverages user's existing editor preferences
+* No need to implement complex text editing UI
+* Supports advanced editing features (syntax highlighting, etc.)
+* Works seamlessly in terminal environments
 
-**Primary User:** Students, researchers, knowledge workers, and lifelong learners who:
-- Work primarily in terminal/command-line environments
-- Value speed and efficiency over graphical interfaces
-- Need to capture ideas quickly without context-switching
-- Want an offline-first solution without cloud dependencies
-- Prefer minimalist, keyboard-driven workflows
-- Work on systems with limited resources (old computers, minimal setups)
-- Need to take notes in low-connectivity environments (rural areas, during commutes)
-- Follow or want to adopt the Zettelkasten note-taking methodology
+**Challenges:**
+* Requires interactive console (doesn't work in IDE run mode)
+* Must validate editor availability
+* Need to handle editor process lifecycle
 
-**Technical Profile:**
-- Comfortable with CLI applications
-- Basic understanding of file systems
-- May have older hardware or limited system resources
+#### Design Considerations
 
-### Value proposition
+**Aspect: How users edit notes**
 
-ZettelCLI solves the problem of **slow, bloated, cloud-dependent note-taking applications** by providing:
+* **Alternative 1 (current choice):** Invoke system default editor via environment variables (e.g. `$EDITOR`).
+    * Pros: Respects user preferences, no external UI dependencies.
+    * Cons: Dependent on correct environment configuration.
 
-1. **Speed & Efficiency**: Capture notes instantly from the command line without launching heavy applications
-2. **Offline-First**: No internet required - all notes stored locally
-3. **Resource-Light**: Runs on old computers and minimal systems
-4. **Zero Lock-In**: Plain text storage means your notes are never trapped
-5. **Zettelkasten Support**: Built-in features for linking notes and building knowledge networks
-6. **Privacy**: Your notes never leave your machine
-7. **Distraction-Free**: No ads, notifications, or unnecessary features
-8. **Always Accessible**: Available wherever you have a terminal
+* **Alternative 2:** Embed a simple text editor inside the CLI.
+    * Pros: Uniform behavior across systems.
+    * Cons: Breaks minimalist philosophy; adds maintenance burden.
 
-**Core Value Statements:**
-- "Take notes as fast as you can think"
-- "Your notes, your computer, no internet required"
-- "Zettelkasten for the terminal generation"
+--------------------------------------------------------------------------------------------------------------------
 
-## User Stories
+## **Documentation, Testing, Configuration**
 
-| Version | As a ...                  | I want to ...                                              | So that I can ...                                          |
-|---------|---------------------------|------------------------------------------------------------|------------------------------------------------------------|
-| v1.0    | impatient user            | take notes from my local CLI                               | have an offline and quick note-taking experience           |
-| v1.0    | hurried user              | create a note with only a title                            | flesh it out later                                         |
-| v1.0    | minimalist user           | create notes without specifying a directory                | keep my note tree flat and uncluttered                     |
-| v1.0    | distracted user           | save a half-written note as a draft                        | not lose it                                                |
-| v1.0    | nostalgic user            | view the creation date of notes                            | trace when an idea originated                              |
-| v1.0    | cautious user             | view a confirmation before deleting a note                 | not lose information accidentally                          |
-| v1.0    | user                      | search notes by title                                      | find them quickly                                          |
-| v1.0    | time-tracker              | add a timestamped log entry to a note                      | see when I last thought about it                           |
-| v1.0    | new user                  | initialize a Zettelkasten repo                             | start with a clean slate                                   |
-| v1.0    | returning user            | import a repo into my new computer                         | not lose momentum                                          |
-| v1.0    | heavy user                | archive old notes                                          | they don't clutter my active space                         |
-| v1.0    | forgetful user            | mark notes as "pinned"                                     | always find them                                           |
-| v1.0    | busy student              | create a short note quickly                                | keep up with notetaking during lectures                    |
-| v2.0    | lazy user                 | tag notes under categories                                 | retrieve them easily                                       |
-| v2.0    | multi-disciplinary user   | assign multiple tags to a note                             | it appears under different contexts                        |
-| v2.0    | tidy user                 | see a list of all my tags                                  | spot duplicates or overlaps                                |
-| v2.0    | user                      | sort results by creation date                              | trace my thought evolution                                 |
-| v2.0    | forgetful user            | search notes case-insensitively                            | not have to remember names perfectly                       |
-| v2.0    | user                      | edit existing notes                                        | update and refine my thoughts                              |
-| v2.0    | user                      | link one note to another                                   | build a web of ideas                                       |
-| v2.0    | user revising connections | unlink notes                                               | correct outdated associations                              |
-| v2.0    | busy student              | access linked notes                                        | study immediately related notes                            |
-| v2.0    | organised student         | link notes together                                        | not require much effort to organise them                   |
-| v2.0    | tag-oriented user         | filter search results by tag                               | narrow scope                                               |
-| v2.0    | speed-focused user        | navigate search results with keyboard shortcuts            | stay efficient                                             |
-| v2.0    | pragmatic user            | rename a tag globally                                      | all affected notes update consistently                     |
-| v2.0    | careless typist           | be warned if I create two tags with similar spellings      | not fragment my notes                                      |
-| v2.1    | visual learner            | generate a graph of linked notes                           | visualise the relationships                                |
+### Documentation Guidelines
 
-## Non-Functional Requirements
+* Use Javadoc for all public classes and methods
+* Include `@param`, `@return`, and `@throws` annotations
+* Document design decisions in class-level Javadoc
+* Keep comments concise and focused on "why" not "what"
 
-### Performance
-1. **Response Time**: Commands should execute in under 200ms for typical operations
-2. **Startup Time**: Application should initialize in under 1 second
-3. **Search Speed**: Search through 1000+ notes should complete within 500ms
-4. **File Size**: Should handle repositories with 10,000+ notes efficiently
+### Testing Recommendations
 
-### Usability
-1. **Learning Curve**: New users should be able to create their first note within 2 minutes
-2. **Error Messages**: All error messages should be clear and actionable
-3. **Command Format**: Commands should follow consistent CLI conventions
-4. **Help Documentation**: Built-in help should be available for all commands
+**Unit Tests:**
+* Test individual Command classes with mock data
+* Test Parser validation logic extensively
+* Test ID generation for deterministic behavior
+* Test serialization/deserialization round-trips
 
-### Reliability
-1. **Data Integrity**: No data loss should occur during normal operations
-2. **Graceful Degradation**: Corrupted notes should be skipped, not crash the application
-3. **Atomic Operations**: Save operations should be atomic to prevent partial writes
-4. **Backup Safety**: Original data should never be corrupted during updates
+**Integration Tests:**
+* Test command execution with real Storage
+* Test file system operations
+* Test link cleanup on note deletion
+* Test tag rename propagation
 
-### Portability
-1. **Cross-Platform**: Should run on Windows, macOS, and Linux
-2. **Java Version**: Compatible with Java 17 and above
-3. **File Format**: Use platform-independent text encoding (UTF-8)
-4. **Path Handling**: Use platform-independent path separators
+**System Tests:**
+* Test full user workflows (create → edit → link → delete)
+* Test repository switching
+* Test archive operations
+* Test error recovery scenarios
 
-### Security
-1. **Local Storage**: All data stored locally, no network transmission
-2. **File Permissions**: Respect system file permissions
-3. **Input Validation**: Sanitize user input to prevent file system exploits
+### Configuration
 
-### Maintainability
-1. **Code Style**: Follow Java coding conventions
-2. **Documentation**: All public methods should have Javadoc comments
-3. **Modularity**: Clear separation between UI, logic, and storage layers
-4. **Testability**: Code should be designed for unit testing
+The application uses minimal configuration:
+* `.zettelConfig` - Stores repository list and current repository
+* `tags.txt` - Global tag list
+* Environment variables: `$VISUAL`, `$EDITOR` for editor selection
 
-### Scalability
-1. **Storage**: Should handle repositories up to 100MB efficiently
-2. **Memory**: Should run with JVM heap size under 512MB
-3. **Concurrent Use**: Support multiple repository instances (different directories)
+--------------------------------------------------------------------------------------------------------------------
 
-### Resource Constraints
-1. **Disk Space**: Minimal installation footprint (< 10MB)
-2. **CPU Usage**: Low CPU usage during idle state
-3. **Memory**: Should run on systems with 2GB RAM
-4. **Old Hardware**: Must be usable on 5+ year old computers
+## **Appendix: Requirements**
 
-## Glossary
+### Product Scope
 
-* **Zettelkasten** - A German term meaning "slip box"; a knowledge management and note-taking method based on creating atomic notes and linking them together
-* **Repository (Repo)** - A collection of notes stored in a dedicated folder structure with its own notes, archive, and index
-* **Note** - A single unit of information with a title, body, metadata, and optional tags/links
-* **Note ID** - An 8-character hexadecimal identifier uniquely identifying a note, generated deterministically from title and timestamp
-* **Pinned Note** - A note marked for quick access that appears at the top of lists
-* **Archived Note** - A note moved to the archive folder to reduce clutter in the active workspace
-* **Draft** - A partially written note that has been saved for later completion
-* **Log Entry** - A timestamped record added to a note to track when it was viewed or modified
-* **Atomic Note** - A note that captures a single idea or concept (Zettelkasten principle)
-* **Backlink** - A reverse link showing which notes link to the current note
-* **Note Link** - A connection between two notes that represents a relationship or reference
-* **Placeholder Link** - A link to a note that doesn't exist yet, indicating future content to create
-* **CLI** - Command Line Interface; a text-based interface for interacting with the application
-* **Root Path** - The base directory where all ZettelCLI repositories are stored (default: `data/`)
-* **Config File** - `.zettelConfig` file that stores the current active repository name
-* **Index File** - `index.txt` file within each repository for maintaining note metadata
-* **Save Format** - The pipe-delimited text format used to persist notes to disk
-* **Force Delete** - Deleting a note without confirmation prompt using the `-f` flag
-* **Parser** - The component responsible for converting raw user input into Command objects
-* **Command Pattern** - A design pattern that encapsulates requests as objects, used for all user actions
-* **Auto-save** - Automatic saving of notes after every successful command execution
-* **Defensive Copy** - Returning a copy of internal data structures to prevent external modification
+**Target user profile:**
+* Students, researchers, or knowledge workers who need to manage interconnected notes
+* Users comfortable with command-line interfaces
+* Users who prefer keyboard-driven workflows
+* Users who want a lightweight, portable note-taking system
+* Users familiar with Zettelkasten methodology
+
+**Value proposition:**
+* Fast, keyboard-driven note creation and navigation
+* Bidirectional linking for creating knowledge graphs
+* Deterministic IDs for reproducible note references
+* File-based storage (no lock-in, easy backup)
+* Multiple repositories for organizing different projects
+* Archive system for managing completed work
+
+### User Stories
+
+Priorities: High (must have) - `***`, Medium (nice to have) - `**`, Low (unlikely to have) - `*`
+
+| Priority  | As a...              | I want to...                                   | So that I can...                                         |
+|-----------|----------------------|------------------------------------------------|----------------------------------------------------------|
+| `***`     | impatient user       | create notes quickly from the CLI              | capture ideas instantly without relying on external apps |
+| `***`     | hurried user         | create a note with only a title                | jot down ideas and fill in details later                 |
+| `***`     | disorganised person  | list and review all my notes                   | have a single, searchable place for all my thoughts      |
+| `***`     | cautious user        | confirm before deleting a note                 | avoid accidentally losing important information          |
+| `***`     | user                 | search notes by title or keyword               | find specific ideas or topics quickly                    |
+| `**`      | minimalist user      | keep all notes in a flat directory structure   | avoid unnecessary complexity or folder clutter           |
+| `**`      | user                 | tag notes with multiple categories             | organise and filter my notes by topic or theme           |
+| `**`      | user                 | link notes together                            | build a network of related ideas                         |
+| `**`      | user                 | view linked notes from both directions         | understand the relationships between connected notes     |
+| `**`      | power user           | edit note bodies using my preferred editor     | stay productive using familiar text-editing tools        |
+| `*`       | heavy user           | archive old or inactive notes                  | keep my active workspace clean and focused               |
+| `*`       | nostalgic user       | view each note’s creation date                 | trace when and how my ideas evolved over time            |
+
+### Non-Functional Requirements
+
+1. **Portability**: Should work on any mainstream OS (Windows, macOS, Linux) with Java 17+
+2. **Performance**: Should handle up to 10,000 notes without noticeable lag
+3. **Reliability**: Should never lose data even if application crashes
+4. **Usability**: Command syntax should be memorable and consistent
+5. **Maintainability**: Code should follow object-oriented principles with clear separation of concerns
+6. **Data Integrity**: Should detect and warn about orphaned files or missing body files
+7. **Recoverability**: Should automatically repair common storage issues
+8. **Testability**: Should support timeout-based testing for CI environments
+
+### Glossary
+
+* **Zettelkasten**: A method of note-taking and knowledge management based on linking atomic notes
+* **Note ID**: An 8-character hexadecimal identifier generated from note title and creation time
+* **Repository**: A collection of notes stored in a single directory (can have multiple repositories)
+* **Index file**: `index.txt` containing metadata for all notes in pipe-delimited format
+* **Body file**: Separate `.txt` file containing the actual content of a note
+* **Outgoing link**: A link from the current note to another note
+* **Incoming link**: A link from another note to the current note
+* **Orphan file**: A body file that exists in notes/ or archive/ but isn't referenced in index.txt
+* **Force flag** (`-f`): Skips confirmation prompts for destructive operations
+
+--------------------------------------------------------------------------------------------------------------------
+
+## **Appendix: Instructions for Manual Testing**
+
+### Launch and Shutdown
+
+1. **Initial launch**
+    - Ensure Java 17+ is installed
+    - Run: `java -jar zettel.jar`
+    - Expected: Welcome message displays with command list, `data/main/` directory created
+
+2. **Graceful shutdown**
+    - Execute: `bye`
+    - Expected: Application exits, all data saved
+
+3. **Timeout handling** (CI environments)
+    - Run without input for 240 seconds
+    - Expected: Application times out gracefully with message
+
+### Creating and editing notes
+
+1. **Create note with title and body**
+   - Command: `new -t "Test Note" -b "This is test content"`
+   - Expected: Note created with 8-char ID, confirmation message displayed
+
+2. **Create note with title only** (requires interactive editor)
+   - Command: `new -t hello`
+   - Expected: External editor opens, saving and closing editor saves note
+
+3. **Create duplicate filename**
+   - Create: `new -t "Same Title" -b "First"`
+   - Try: `new -t "Same Title" -b "Second"`
+   - Expected: Error message about existing note
+
+4. **Edit existing note**
+   - Edit: `edit <note-id>`
+   - Expected: External editor opens, saving and closing editor saves note
+
+### Listing and Searching
+
+1. **List all notes**
+   - Command: `list`
+   - Expected: All notes displayed with filename, date, and ID
+
+2. **List pinned only**
+   - Pin a note: `pin <note-id>`
+   - Command: `list -p`
+   - Expected: Only pinned notes shown
+
+3. **List archived only**
+   - Archive a note: `archive <note-id>`
+   - Command: `list -a`
+   - Expected: Only archived notes shown
+
+4. **Search notes**
+   - Command: `find test`
+   - Expected: All notes with body containing "test" (case-insensitive) displayed
+
+### Linking Notes
+
+1. **Create unidirectional link**
+   - Create two notes, get their IDs
+   - Command: `link <source-id> <target-id>`
+   - Expected: Confirmation message
+
+2. **Create bidirectional link**
+   - Command: `link-both <id1> <id2>`
+   - Expected: Both directions linked
+
+3. **List incoming links**
+   - Command: `list-incoming-links <note-id>`
+   - Expected: All notes linking to this note displayed
+
+4. **List outgoing links**
+   - Command: `list-outgoing-links <note-id>`
+   - Expected: All notes this note links to displayed
+
+5. **Delete note with links**
+   - Delete a linked note
+   - Check linked notes
+   - Expected: All links cleaned up automatically
+
+### Tag Management
+
+1. **Create global tag**
+   - Command: `new-tag project`
+   - Expected: Tag added to global list
+
+2. **Add tag to note**
+   - Command: `add-tag <note-id> project`
+   - Expected: Tag added to note
+
+3. **List all tags**
+   - Command: `list-tags-all`
+   - Expected: All global tags displayed
+
+4. **List tags for note**
+   - Command: `list-tags <note-id>`
+   - Expected: Tags for specific note displayed
+
+5. **Rename tag globally**
+   - Command: `rename-tag oldname newname`
+   - Expected: Tag renamed across all notes
+
+6. **Delete tag from note**
+   - Without force: `delete-tag <note-id> project`
+   - Expected: Confirmation prompt
+   - With force: `delete-tag -f <note-id> project`
+   - Expected: Immediate deletion
+
+7. **Delete tag globally**
+   - Command: `delete-tag-globally -f project`
+   - Expected: Tag removed from all notes and global list
+
+### Edge Cases and Error Handling
+
+1. **Invalid note ID format**
+   - Command: `delete 123` (too short)
+   - Expected: Error about ID format (must be 8 hex chars)
+
+2. **Non-existent note ID**
+   - Command: `delete ffffffff`
+   - Expected: Error about note not existing
+
+3. **Empty notes list**
+   - In new repository
+   - Command: `list`
+   - Expected: Message about no notes found
+
+4. **Link note to itself**
+   - Command: `link <id> <id>` (same ID twice)
+   - Expected: Error preventing self-linking
+
+5. **Archive already archived note**
+   - Archive note twice
+   - Expected: Error about note already archived
+
+### Storage and Recovery
+
+1. **Manually corrupt index.txt**
+   - Edit `data/main/index.txt`, remove a field from a line
+   - Restart application
+   - Expected: Warning about corrupted line and orphaned note, other notes load fine
+
+2. **Delete body file**
+   - Delete a `.txt` file from `notes/` directory
+   - Run: `list`
+   - Expected: File recreated as empty, warning displayed
+
+3. **Create orphan file**
+   - Add `orphan.txt` to `notes/` directory manually
+   - Restart application
+   - Expected: Warning about orphan file detected
+
+4. **Multiple repositories**
+   - Command: `init test-repo`
+   - Expected: New repository created
+   - Switch repos and verify notes are separate

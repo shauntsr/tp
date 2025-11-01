@@ -18,9 +18,13 @@ import seedu.zettel.commands.LinkBothNotesCommand;
 import seedu.zettel.commands.LinkNotesCommand;
 import seedu.zettel.commands.ListLinkedNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
+import seedu.zettel.commands.ListTagsGlobalCommand;
 import seedu.zettel.commands.ListTagsSingleNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
+import seedu.zettel.commands.NewTagCommand;
 import seedu.zettel.commands.PinNoteCommand;
+import seedu.zettel.commands.RenameTagCommand;
+import seedu.zettel.commands.PrintNoteBodyCommand;
 import seedu.zettel.commands.TagNoteCommand;
 import seedu.zettel.commands.UnlinkBothNotesCommand;
 import seedu.zettel.commands.UnlinkNotesCommand;
@@ -586,6 +590,36 @@ class ParserTest {
         assertThrows(InvalidFormatException.class, () -> Parser.parse("unlink-both abcd1234 ghijk890"));
     }
 
+    @Test
+    void testParseNewTagWithValidTagReturnsNewTagCommand() throws ZettelException {
+        Command command = Parser.parse("new-tag urgent");
+        assertInstanceOf(NewTagCommand.class, command);
+    }
+
+    @Test
+    void testParseNewTagWithoutTagThrowsInvalidFormatException() {
+        ZettelException ex = assertThrows(ZettelException.class, () -> Parser.parse("new-tag"));
+        assertTrue(ex.getMessage().contains("new-tag"));
+    }
+
+    @Test
+    void testParseNewTagWithEmptyTagThrowsEmptyDescriptionException() {
+        ZettelException ex = assertThrows(ZettelException.class, () -> Parser.parse("new-tag "));
+        assertTrue(ex.getMessage().contains("tag"));
+    }
+
+    @Test
+    void testParseListTagsGlobalWithValidCommandReturnsListTagsGlobalCommand() throws ZettelException {
+        Command command = Parser.parse("list-tags-all");
+        assertInstanceOf(ListTagsGlobalCommand.class, command);
+    }
+
+    @Test
+    void testParseListTagsGlobalWithExtraArgumentsThrowsInvalidFormatException() {
+        ZettelException ex = assertThrows(ZettelException.class, () -> Parser.parse("list-tags-all extra"));
+        assertTrue(ex.getMessage().contains("list-tags-all"));
+    }
+
     //@@author danielkwan2004-reused
     //Reused from testParseUnlinkBoth tests above with modifications
     //list-tags command parser tests
@@ -822,6 +856,29 @@ class ParserTest {
         assertThrows(InvalidFormatException.class, () -> Parser.parse("list-outgoing-links abc"));
     }
     //@@author
+    @Test
+    void testParseRenameTagValid() throws ZettelException {
+        Command command = Parser.parse("rename-tag oldTag newTag");
+        assertInstanceOf(RenameTagCommand.class, command);
+    }
+
+    @Test
+    void testParseRenameTagMissingArgumentsThrowsException() {
+        ZettelException ex = assertThrows(ZettelException.class, () -> Parser.parse("rename-tag oldTag"));
+        assertTrue(ex.getMessage().contains("format"));
+    }
+
+    @Test
+    void testParseRenameTagTooManyArgumentsThrowsException() {
+        ZettelException ex = assertThrows(ZettelException.class, () -> Parser.parse("rename-tag oldTag newTag extra"));
+        assertTrue(ex.getMessage().contains("format"));
+    }
+
+    @Test
+    void testParseRenameTagWhitespaceTagsThrowsException() {
+        ZettelException ex = assertThrows(ZettelException.class, () -> Parser.parse("rename-tag   "));
+        assertTrue(ex.getMessage().contains("format"));
+    }
 
     // ==================== Help Command Tests ====================
 
@@ -834,5 +891,28 @@ class ParserTest {
     @Test
     void testParseHelpWithArgumentsThrowsInvalidFormatException() {
         assertThrows(InvalidFormatException.class, () -> Parser.parse("help me"));
+    }
+
+
+
+    // ==================== Print Body Command Tests ====================
+
+    @Test
+    void testParsePrintBodyWithValidIdReturnsPrintNoteBodyCommand() throws ZettelException {
+        Command command = Parser.parse("print-body abcd1234");
+        assertInstanceOf(PrintNoteBodyCommand.class, command);
+    }
+
+    @Test
+    void testParsePrintBodyWithoutArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("print-body"));
+    }
+
+    @Test
+    void testParsePrintBodyWithInvalidIdThrowsInvalidFormatException() {
+        // uppercase hex should fail
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("print-body ABCD1234"));
+        // too short should fail
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("print-body abc"));
     }
 }

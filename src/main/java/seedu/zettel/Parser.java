@@ -2,7 +2,10 @@ package seedu.zettel;
 
 import java.util.Arrays;
 
+import seedu.zettel.commands.ArchiveNoteCommand;
+import seedu.zettel.commands.ChangeRepoCommand;
 import seedu.zettel.commands.Command;
+import seedu.zettel.commands.CurrentRepoCommand;
 import seedu.zettel.commands.DeleteNoteCommand;
 import seedu.zettel.commands.DeleteTagFromNoteCommand;
 import seedu.zettel.commands.DeleteTagGloballyCommand;
@@ -20,6 +23,7 @@ import seedu.zettel.commands.ListTagsSingleNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
 import seedu.zettel.commands.NewTagCommand;
 import seedu.zettel.commands.PinNoteCommand;
+import seedu.zettel.commands.PrintNoteBodyCommand;
 import seedu.zettel.commands.RenameTagCommand;
 import seedu.zettel.commands.TagNoteCommand;
 import seedu.zettel.commands.UnlinkBothNotesCommand;
@@ -79,10 +83,19 @@ public class Parser {
                     " 'incoming-links' or 'outgoing-links'.";
     private static final String LIST_LINKED_FORMAT = "List linked notes format should be: list "
                     + "<incoming-links/outgoing-links> <NOTE_ID>";
+    private static final String ARCHIVE_NOTES_FORMAT = "Archive notes format should be: " +
+                    "archive <NOTE_ID>";
+    private static final String UNARCHIVE_NOTES_FORMAT = "Unarchive notes format should be: " +
+                    "unarchive <NOTE_ID>";
     private static final String LIST_INCOMING_LINKS_FORMAT =
         "List incoming links format should be: list-incoming-links <NOTE_ID>";
     private static final String LIST_OUTGOING_LINKS_FORMAT =
         "List outgoing links format should be: list-outgoing-links <NOTE_ID>";
+    private static final String CHANGE_REPO_FORMAT = "Change repo format should be: change-repo <REPO_NAME>";
+    private static final String CHANGE_REPO_EMPTY = "Please specify a repo name to change to!";
+    private static final String CURRENT_REPO_FORMAT = "Current repository format should be: current-repo\";";
+    private static final String PRINT_NOTE_BODY_FORMAT =
+        "Print note body format should be: print-body <NOTE_ID>";
 
     /**
      * Parses a user command string and returns the corresponding Command object.
@@ -93,6 +106,9 @@ public class Parser {
      * @throws ZettelException If the command format is invalid or parameters are missing.
      */
     public static Command parse(String input) throws ZettelException {
+        if (input.contains("|")) {
+            throw new InvalidFormatException("Invalid character '|' detected in command input!");
+        }
         String[] inputs = input.trim().split("\\s+"); //split input based on spaces in between
         String command = inputs[0].toLowerCase(); //first word of user input
         return switch (command) {
@@ -111,6 +127,8 @@ public class Parser {
         case "unlink" -> parseUnlinkNotesCommand(inputs);
         case "link-both" -> parseLinkBothNotesCommand(inputs);
         case "unlink-both" -> parseUnlinkBothNotesCommand(inputs);
+        case "archive" -> parseArchiveNoteCommand(inputs, true);
+        case "unarchive" -> parseArchiveNoteCommand(inputs, false);
         case "list-incoming-links" -> parseListIncomingLinksCommand(inputs);
         case "list-outgoing-links" -> parseListOutgoingLinksCommand(inputs);
         case "list-tags-all" -> parseListTagsGlobalCommand(inputs);
@@ -118,7 +136,10 @@ public class Parser {
         case "delete-tag" -> parseDeleteTagFromNoteCommand(inputs);
         case "delete-tag-globally" -> parseDeleteTagGloballyCommand(inputs);
         case "rename-tag" -> parseRenameTagCommand(inputs);
+        case "print-body" -> parsePrintNoteBodyCommand(inputs);
         case "help" -> parseHelpCommand(inputs);
+        case "change-repo", "change-repository" -> parseChangeRepoCommand(inputs);
+        case "current-repo", "current-repository"  -> parseCurrentRepoCommand(inputs);
         default -> throw new InvalidInputException(command);
         };
     }
@@ -151,28 +172,52 @@ public class Parser {
         return idString;
     }
 
+
     /**
      * Parses a list command to display notes.
-     * Accepts an optional -p flag to show only pinned notes.
-     * Routes to parseListLinkedNotesCommand if the format matches listing linked notes.
+     * Accepts optional flags:
+     *   -p  show only pinned notes
+     *   -a  show only archived notes
+     * Flags can be combined in any order (e.g. "list -a -p" or "list -p -a").
+     * Routes to parseListLinkedNotesCommand only when the second token is NOT a flag.
      *
      * @param inputs The tokenized user input split by spaces
      * @return A ListNoteCommand or ListLinkedNotesCommand object with the appropriate parameters.
      * @throws ZettelException If the command format is invalid.
      */
     private static Command parseListNoteCommand(String[] inputs) throws ZettelException {
-        // Only handle generic list and pinned flag here.
-        // Regular list command
-        if (inputs.length != 1 && inputs.length != 2) {
+
+        if (inputs.length < 1) {
             throw new InvalidFormatException(LIST_FORMAT);
         }
-        // command is for sure either "list" or "list <something>"
-        if (inputs.length == 1) {
-            return new ListNoteCommand(false);
-        } else if (!inputs[1].equals("-p")) {
-            throw new InvalidFormatException(LIST_FORMAT);
+
+        boolean showPinned = false;
+        boolean showArchived = false;
+
+        // parse flags if present (flags must start with '-' and be known)
+        for (int i = 1; i < inputs.length; i++) {
+            String tok = inputs[i].trim();
+            if (!tok.startsWith("-")) {
+                throw new InvalidFormatException(LIST_FORMAT);
+            }
+            switch (tok) {
+            case "-p" -> {
+                if (showPinned) {
+                    throw new InvalidFormatException(LIST_FORMAT);
+                }
+                showPinned = true;
+            }
+            case "-a" -> {
+                if (showArchived) {
+                    throw new InvalidFormatException(LIST_FORMAT);
+                }
+                showArchived = true;
+            }
+            default -> throw new InvalidFormatException(LIST_FORMAT);
+            }
         }
-        return new ListNoteCommand(true);
+
+        return new ListNoteCommand(showPinned, showArchived);
     }
 
     /**
@@ -411,34 +456,6 @@ public class Parser {
     }
 
     /**
-     * Parses a list linked notes command to display incoming or outgoing links for a specific note.
-     * Expected format: list incoming-links NOTE_ID or list outgoing-links NOTE_ID
-     *
-     * @param inputs The tokenized user input split by spaces.
-     * @return A ListLinkedNotesCommand object with the link type and note ID.
-     * @throws ZettelException If the format is invalid, link type is invalid, or note ID is malformed.
-     */
-    private static Command parseListLinkedNotesCommand(String[] inputs) throws ZettelException {
-        // Expected format: list <incoming-links/outgoing-links> <NOTE_ID>
-        if (inputs.length != 3) {
-            throw new InvalidFormatException(LIST_LINKED_FORMAT);
-        }
-
-        String linkType = inputs[1].toLowerCase();
-        String noteId = parseNoteId(inputs[2], "list linked notes");
-        
-        // Convert "incoming-links" to "incoming" and "outgoing-links" to "outgoing"
-        String listToShow;
-        switch (linkType) {
-        case "incoming-links" -> listToShow = "incoming";
-        case "outgoing-links" -> listToShow = "outgoing";
-        default -> throw new InvalidFormatException(LIST_LINKED_TYPE_FORMAT);
-        }
-
-        return new ListLinkedNotesCommand(listToShow, noteId);
-    }
-
-    /**
      * Parses a list-incoming-links command to display incoming links for a specific note.
      * Expected format: list-incoming-links NOTE_ID
      * 
@@ -524,6 +541,25 @@ public class Parser {
         String noteId2 = parseNoteId(inputs[2], "unlink in both directions");
 
         return new UnlinkBothNotesCommand(noteId1, noteId2);
+    }
+
+    /**
+     * Parses an archive or unarchive command.
+     * Expected format: archive/unarchive NOTE_ID
+     *
+     * @param inputs        The tokenized user input split by spaces
+     * @param shouldArchive True for archive, false for unarchive
+     * @return              An ArchiveNoteCommand object with the note ID and action
+     * @throws ZettelException If the format is invalid or note ID is missing/malformed
+     */
+    private static Command parseArchiveNoteCommand(String[] inputs, boolean shouldArchive)
+            throws ZettelException {
+        if (inputs.length != 2) {
+            throw (shouldArchive) ? new InvalidFormatException(ARCHIVE_NOTES_FORMAT)
+                    : new InvalidFormatException(UNARCHIVE_NOTES_FORMAT);
+        }
+        String noteId = parseNoteId(inputs[1], shouldArchive ? "archive" : "unarchive");
+        return new ArchiveNoteCommand(noteId, shouldArchive);
     }
 
     /**
@@ -644,5 +680,65 @@ public class Parser {
             throw new InvalidFormatException(HELP_FORMAT);
         }
         return new HelpCommand();
+    }
+    /**
+     * Parses a change-repo command to switch to a different repository.
+     * Expected format: change-repo REPO_NAME
+     *
+     * @param inputs The tokenized user input split by spaces
+     * @return A ChangeRepoCommand object with the specified repository name.
+     * @throws ZettelException If the repository name is empty or format is invalid.
+     */
+    private static Command parseChangeRepoCommand(String[] inputs) throws ZettelException {
+        if (inputs.length < 2) {
+            throw new EmptyDescriptionException(CHANGE_REPO_EMPTY);
+        }
+
+        if (inputs.length != 2) {
+            throw new InvalidFormatException(CHANGE_REPO_FORMAT);
+        }
+
+        String repoName = inputs[1].trim();
+        if (repoName.isEmpty()) {
+            throw new EmptyDescriptionException(CHANGE_REPO_EMPTY);
+        }
+
+        if (!repoName.matches("[a-zA-Z0-9_-]+")) {
+            throw new InvalidFormatException(
+                    "Repo name can only contain alphanumeric characters, hyphens and underscores.");
+        }
+
+        return new ChangeRepoCommand(repoName);
+    }
+
+    /**
+     * Parses a current-repo command to display the currently active repository.
+     * Expected format: current-repo
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return A CurrentRepoCommand object.
+     * @throws ZettelException If the format is invalid.
+     */
+    private static Command parseCurrentRepoCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 1) {
+            throw new InvalidFormatException(CURRENT_REPO_FORMAT);
+        }
+        return new CurrentRepoCommand();
+    }
+
+    /**
+     * Parses a print-body command to display the body of a specific note.
+     * Expected format: print-body NOTE_ID
+     * 
+     * @param inputs The tokenized user input split by spaces.
+     * @return A Command object to print the note body.
+     * @throws ZettelException If the format is invalid or note ID is malformed.
+     */
+    private static Command parsePrintNoteBodyCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 2) {
+            throw new InvalidFormatException(PRINT_NOTE_BODY_FORMAT);
+        }
+        String noteId = parseNoteId(inputs[1], "print-body");
+        return new PrintNoteBodyCommand(noteId);
     }
 }

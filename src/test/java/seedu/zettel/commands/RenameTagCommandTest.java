@@ -84,7 +84,7 @@ public class RenameTagCommandTest {
         assertTrue(notes.get(1).getTags().contains("shared"));
 
         String out = outputStream.toString();
-        assertTrue(out.contains(" Tag 'common' has been renamed to 'shared'" 
+        assertTrue(out.contains("Tag 'common' has been renamed to 'shared'"
                 + " across all notes. All affected notes have been updated."));
     }
 
