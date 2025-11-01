@@ -139,6 +139,37 @@ body. The ID generated is randomised.
 new -t <TITLE> [-b <BODY>]
 ```
 
+#### Creating a note with title only (opens text editor)
+When you create a note with just a title and no `-b` flag, your **default text editor will open automatically**. The application will be blocked in the background until you close the editor (whether you save changes or not).
+
+**Example:**
+```
+new -t New_Note
+```
+
+**Expected Output:**
+```
+ Opening editor for note body...
+ Note body saved from editor.
+ Note created: New_Note.txt #e0e7b989
+```
+
+#### Creating a note with an empty body (no editor)
+When you use the `-b` flag **without providing a body argument**, the note is created with an empty body. The text editor will **NOT** open.
+
+**Example:**
+```
+new -t New_Note -b
+```
+
+**Expected Output:**
+```
+ Note created: New_Note.txt #e0e7b989
+```
+
+#### Creating a note with title and body (no editor)
+When you provide both a title and a body argument, the note is created immediately with the specified body. The text editor will **NOT** open.
+
 **Example:**
 ```
 new -t New_Note -b "This is a new note"
