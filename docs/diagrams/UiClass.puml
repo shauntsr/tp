@@ -1,6 +1,6 @@
 @startuml UIClass
 skinparam classAttributeIconSize 0
-
+hide circle
 class UI {
     - static final String LINE
     - static final String LIST_INCOMING

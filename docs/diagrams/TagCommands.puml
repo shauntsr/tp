@@ -1,9 +1,9 @@
 @startuml TagCommands
 skinparam classAttributeIconSize 0
-
+hide circle
 abstract class Command {
-    + abstract void execute(ArrayList<Note> notes, List<String> tags, UI ui, Storage storage) 
-    + boolean isExit()
+    + {abstract} execute(notes : ArrayList<Note>, tags : List<String>, ui : UI, storage : Storage) : void
+    + isExit() : boolean
 }
 
 class DeleteTagFromNoteCommand
@@ -14,11 +14,11 @@ class NewTagCommand
 class RenameTagCommand
 class TagNoteCommand
 
-DeleteTagFromNoteCommand -down-> Command
-DeleteTagGloballyCommand -down-> Command
-ListTagsSingleNoteCommand -up-> Command
-NewTagCommand -down-> Command
-RenameTagCommand -up-> Command
-TagNoteCommand -down-> Command
-ListTagsGlobalCommand -up-> Command
+DeleteTagFromNoteCommand -down-|> Command
+DeleteTagGloballyCommand -down-|> Command
+ListTagsSingleNoteCommand -up-|> Command
+NewTagCommand -down-|> Command
+RenameTagCommand -up-|> Command
+TagNoteCommand -down-|> Command
+ListTagsGlobalCommand -up-|> Command
 @enduml

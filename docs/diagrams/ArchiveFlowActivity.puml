@@ -1,6 +1,6 @@
 @startuml ArchiveFlow
 start
-
+skinparam ConditionEndStyle hline
 :Receive noteId and shouldArchive;
 
 :Find note in notes list by ID;
