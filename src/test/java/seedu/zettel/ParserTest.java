@@ -1,4 +1,4 @@
-package parser;
+package seedu.zettel;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -32,7 +32,6 @@ import seedu.zettel.exceptions.EmptyDescriptionException;
 import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.InvalidInputException;
 import seedu.zettel.exceptions.ZettelException;
-import seedu.zettel.parser.Parser;
 
 /**
  * Unit tests for the Parser class.
@@ -598,15 +597,15 @@ class ParserTest {
     }
 
     @Test
-    void testParseNewTagWithoutTagThrowsEmptyDescriptionException() {
+    void testParseNewTagWithoutTagThrowsInvalidFormatException() {
         ZettelException ex = assertThrows(ZettelException.class, () -> Parser.parse("new-tag"));
-        assertTrue(ex.getMessage().contains("Tag"));
+        assertTrue(ex.getMessage().contains("new-tag"));
     }
 
     @Test
     void testParseNewTagWithEmptyTagThrowsEmptyDescriptionException() {
         ZettelException ex = assertThrows(ZettelException.class, () -> Parser.parse("new-tag "));
-        assertTrue(ex.getMessage().contains("Tag"));
+        assertTrue(ex.getMessage().contains("tag"));
     }
 
     @Test
