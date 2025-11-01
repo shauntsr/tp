@@ -28,7 +28,7 @@ java -jar zettel.jar
 | [Archive Note](#archiving-a-note-archive) | `archive <note-id>` | Move note to archive folder |
 | [Unarchive Note](#unarchiving-a-note-unarchive) | `unarchive <note-id>` | Move note out of archive folder |
 | [Print Note Body](#printing-a-note-body-print-body) | `print-body <note-id>` | Display the full body of a note |
-| [Find Notes](#finding-notes-find) | `find <text>` | Search for notes by text |
+| [Find Notes](#finding-notes-find-note-with-body) | `find-note-with-body <search-terms>` | Search for notes by body content |
 | [Create Tag](#creating-a-tag-new-tag) | `new-tag <tag-name>` | Create a new global tag |
 | [Add Tag to Note](#adding-a-tag-to-a-note-add-tag) | `add-tag <note-id> <tag-name>` | Tag a note with an existing or new tag |
 | [List All Tags](#listing-all-tags-list-tags-all) | `list-tags-all` | List all global tags |
@@ -404,25 +404,25 @@ print-body abcd1234
 
 ---
 
-### Finding Notes: `find`
+### Finding Notes: `find-note-with-body`
 
-Searches for notes that contain the specified text in their body.
+Searches for notes that contain the specified search terms in their body. You can provide multiple space-separated search terms, and the command will find notes whose body contains all of the specified terms.
 
 **Format:**
 ```
-find <text>
+find-note-with-body <search-terms>
 ```
 
 **Example:**
 ```
-find "Zettelkasten"
+find-note-with-body Zettelkasten system
 ```
 
 **Expected Output:**
 ```
- Here are the matching notes in your list:
- 1. New_Note.txt 2025-10-17 e0e7b989
- 2. Research.txt 2025-10-15 a1b2c3d4
+ Here are the notes with bodies matching the above:
+ 1. New_Note #e0e7b989
+ 2. Research #a1b2c3d4
 ```
 
 ---

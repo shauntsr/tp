@@ -11,7 +11,7 @@ import seedu.zettel.commands.DeleteTagFromNoteCommand;
 import seedu.zettel.commands.DeleteTagGloballyCommand;
 import seedu.zettel.commands.EditNoteCommand;
 import seedu.zettel.commands.ExitCommand;
-import seedu.zettel.commands.FindNoteCommand;
+import seedu.zettel.commands.FindNoteByBodyCommand;
 import seedu.zettel.commands.HelpCommand; // Added import
 import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.LinkBothNotesCommand;
@@ -184,13 +184,13 @@ class ParserTest {
 
     @Test
     void testParseFindWithSearchTermReturnsFindNoteCommand() throws ZettelException {
-        Command command = Parser.parse("find test");
-        assertInstanceOf(FindNoteCommand.class, command);
+        Command command = Parser.parse("find-note-with-body test");
+        assertInstanceOf(FindNoteByBodyCommand.class, command);
     }
 
     @Test
     void testParseFindWithoutSearchTermThrowsEmptyDescriptionException() {
-        assertThrows(EmptyDescriptionException.class, () -> Parser.parse("find"));
+        assertThrows(EmptyDescriptionException.class, () -> Parser.parse("find-note-with-body"));
     }
 
     // ==================== Link Command Tests ====================
