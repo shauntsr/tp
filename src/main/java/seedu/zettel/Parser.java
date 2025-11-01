@@ -11,7 +11,8 @@ import seedu.zettel.commands.DeleteTagFromNoteCommand;
 import seedu.zettel.commands.DeleteTagGloballyCommand;
 import seedu.zettel.commands.EditNoteCommand;
 import seedu.zettel.commands.ExitCommand;
-import seedu.zettel.commands.FindNoteCommand;
+import seedu.zettel.commands.FindNoteByBodyCommand;
+import seedu.zettel.commands.FindNoteByTitleCommand;
 import seedu.zettel.commands.HelpCommand;
 import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.LinkBothNotesCommand;
@@ -45,7 +46,9 @@ public class Parser {
     private static final String PIN_FORMAT = "Pin format should be: pin/unpin <NOTE_ID>";
     private static final String INIT_FORMAT = "Init format should be: init <REPO_NAME>";
     private static final String DELETE_FORMAT = "Delete format should be: delete [-f] <NOTE_ID>";
-    private static final String FIND_FORMAT = "Find format should be: find <SEARCH_TERM>";
+    private static final String FIND_FORMAT = "Find format should be: find-note-by-body <SEARCH_TERMS>";
+    private static final String FIND_BY_TITLE_FORMAT = 
+            "Find by title format should be: find-note-by-title <SEARCH_TERMS>";
     private static final String NOTE_FORMAT = "New note format should be: new -t <TITLE> [-b <BODY>]";
     private static final String ADD_TAG_FORMAT = "Add tag command format should be: add-tag <NOTE_ID> <TAG>";
     private static final String NEW_TAG_FORMAT = "New tag command format should be: new-tag <TAG>";
@@ -121,7 +124,8 @@ public class Parser {
         case "pin" -> parsePinNoteCommand(inputs, true);
         case "unpin" -> parsePinNoteCommand(inputs, false);
         case "init" -> parseInitCommand(inputs);
-        case "find" -> parseFindNoteCommand(inputs);
+        case "find-note-by-body" -> parseFindNoteByBodyCommand(inputs);
+        case "find-note-by-title" -> parseFindNoteByTitleCommand(inputs);
         case "new-tag" -> parseNewTagCommand(inputs);
         case "add-tag" -> parseAddTagCommand(inputs);
         case "link" -> parseLinkNotesCommand(inputs);
@@ -306,23 +310,45 @@ public class Parser {
     }
 
     /**
-     * Parses a find command to search for notes.
-     * Expected format: find SEARCH_TERM
+     * Parses a find-note-by-body command to search for notes by body content.
+     * Expected format: find-note-by-body SEARCH_TERMS
      *
      * @param inputs The tokenized user input split by spaces
-     * @return A FindNoteCommand object with the search query.
+     * @return A FindNoteByBodyCommand object with the search query.
      * @throws ZettelException If the search query is empty.
      */
-    private static Command parseFindNoteCommand(String[] inputs) throws ZettelException {
+    private static Command parseFindNoteByBodyCommand(String[] inputs) throws ZettelException {
         if (inputs.length < 2) {
             throw new EmptyDescriptionException(FIND_FORMAT);
         }
 
-        String content = inputs[1].trim();
-        if (content.isEmpty()) {
+        // Combine all search terms from index 1 onwards
+        String searchTerms = String.join(" ", Arrays.copyOfRange(inputs, 1, inputs.length)).trim();
+        if (searchTerms.isEmpty()) {
             throw new EmptyDescriptionException(FIND_FORMAT);
         }
-        return new FindNoteCommand(content);
+        return new FindNoteByBodyCommand(searchTerms);
+    }
+
+    /**
+     * Parses a find-note-by-title command to search for notes by title.
+     * Expected format: find-note-by-title SEARCH_TERMS
+     *
+     * @param inputs The tokenized user input split by spaces
+     * @return A FindNoteByTitleCommand object with the search query.
+     * @throws ZettelException If the search query is empty.
+     */
+    private static Command parseFindNoteByTitleCommand(String[] inputs) throws ZettelException {
+        if (inputs.length < 2) {
+            throw new EmptyDescriptionException(FIND_BY_TITLE_FORMAT);
+        }
+
+        // Combine all search terms from index 1 onwards
+        String searchTerms = String.join(" ", Arrays.copyOfRange(inputs, 1, inputs.length)).trim();
+        if (searchTerms.isEmpty()) {
+            throw new EmptyDescriptionException(FIND_BY_TITLE_FORMAT);
+        }
+        return new FindNoteByTitleCommand(searchTerms);
     }
 
     /**

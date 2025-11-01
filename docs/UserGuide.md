@@ -28,7 +28,8 @@ java -jar zettel.jar
 | [Archive Note](#archiving-a-note-archive) | `archive <note-id>` | Move note to archive folder |
 | [Unarchive Note](#unarchiving-a-note-unarchive) | `unarchive <note-id>` | Move note out of archive folder |
 | [Print Note Body](#printing-a-note-body-print-body) | `print-body <note-id>` | Display the full body of a note |
-| [Find Notes](#finding-notes-find) | `find <text>` | Search for notes by text |
+| [Find Notes by Body](#finding-notes-by-body-find-note-by-body) | `find-note-by-body <search-terms>` | Search for notes by body content |
+| [Find Notes by Title](#finding-notes-by-title-find-note-by-title) | `find-note-by-title <search-terms>` | Search for notes by title |
 | [Create Tag](#creating-a-tag-new-tag) | `new-tag <tag-name>` | Create a new global tag |
 | [Add Tag to Note](#adding-a-tag-to-a-note-add-tag) | `add-tag <note-id> <tag-name>` | Tag a note with an existing or new tag |
 | [List All Tags](#listing-all-tags-list-tags-all) | `list-tags-all` | List all global tags |
@@ -218,6 +219,7 @@ You can combine flags in any order; behavior is defined by this matrix:
 - `list -a` → pinned = X, archived = 1 (all archived notes)
 - `list -p` → pinned = 1, archived = 0 (pinned and unarchived)
 - `list -p -a` → pinned = 1, archived = 1 (pinned and archived)
+  - Note: X means both 1 and 0 are shown.
 
 **Format:**
 ```
@@ -435,25 +437,48 @@ print-body abcd1234
 
 ---
 
-### Finding Notes: `find`
+### Finding Notes by Body: `find-note-by-body`
 
-Searches for notes that contain the specified text in their body.
+Searches for notes that contain the specified search terms in their body. You can provide multiple space-separated search terms, and the command will find notes whose body contains all of the specified terms.
 
 **Format:**
 ```
-find <text>
+find-note-by-body <search-terms>
 ```
 
 **Example:**
 ```
-find "Zettelkasten"
+find-note-by-body Zettelkasten system
 ```
 
 **Expected Output:**
 ```
- Here are the matching notes in your list:
- 1. New_Note.txt 2025-10-17 e0e7b989
- 2. Research.txt 2025-10-15 a1b2c3d4
+ Here are the notes with bodies matching the above:
+ 1. New_Note #e0e7b989
+ 2. Research #a1b2c3d4
+```
+
+---
+
+### Finding Notes by Title: `find-note-by-title`
+
+Searches for notes that contain the specified search terms in their title. You can provide multiple space-separated search terms, and the command will find notes whose title contains all of the specified terms.
+
+**Format:**
+```
+find-note-by-title <search-terms>
+```
+
+**Example:**
+```
+find-note-by-title New Note
+```
+
+**Expected Output:**
+```
+ Here are the notes with titles matching the above:
+ 1. New_Note #e0e7b989
+ 2. New_Research #ccfd2e51
 ```
 
 ---
