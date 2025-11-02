@@ -1,9 +1,9 @@
 @startuml EditorIntegrationSequence
 actor User
 participant CLI
-participant EditorUtil
-participant System
-participant Process
+participant "<<class>>\nEditorUtil" as EditorUtil
+participant ":System" as System
+participant ":Process" as Process
 
 hide footbox
 

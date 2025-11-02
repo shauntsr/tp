@@ -1,4 +1,4 @@
-@startuml DeleteParserSequence
+@startuml ParserSequence
 hide footbox
 
 actor User
