@@ -54,6 +54,7 @@ public class Storage {
         Path defaultRepoPath = fileSystemManager.getRootPath().resolve(DEFAULT_REPO);
         if (Files.notExists(defaultRepoPath)) {
             createRepo(DEFAULT_REPO);
+            System.out.println("Initialising default repo: " + DEFAULT_REPO);
         }
 
         try {

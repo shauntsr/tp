@@ -1,3 +1,4 @@
+Initialising default repo: main
 ____________________________________________________________
  Hello! I'm Zettel
  What can I do for you?
@@ -35,19 +36,19 @@ ____________________________________________________________
    bye                               - Exit the application
 
 ____________________________________________________________
-Note created: test1.txt #35413cb9
+Note created: test1.txt #eddf825b
 ____________________________________________________________
-Note created: test2.txt #3fc6da0d
+Note created: test2.txt #8d33a8a5
 ____________________________________________________________
-Note created: test3.txt #b09d6cd3
+Note created: test3.txt #6751e833
 ____________________________________________________________
 You have 3 notes:
-    1. test3.txt 2025-10-30 b09d6cd3
-    2. test2.txt 2025-10-30 3fc6da0d
-    3. test1.txt 2025-10-30 35413cb9
+    1. test3.txt 2025-11-02 6751e833
+    2. test2.txt 2025-11-02 8d33a8a5
+    3. test1.txt 2025-11-02 eddf825b
 ____________________________________________________________
  Here are the notes with bodies matching the above:
- 1. test3.txt 2025-10-30 b09d6cd3
- 2. test2.txt 2025-10-30 3fc6da0d
- 3. test1.txt 2025-10-30 35413cb9
+ 1. test3.txt 2025-11-02 6751e833
+ 2. test2.txt 2025-11-02 8d33a8a5
+ 3. test1.txt 2025-11-02 eddf825b
 ____________________________________________________________
