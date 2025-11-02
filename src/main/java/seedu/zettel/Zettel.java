@@ -86,8 +86,11 @@ public class Zettel {
                 // Save notes after each command (auto-save)
                 storage.save(notes);
 
+                ui.printLine();
+
             } catch (ZettelException e) {
                 ui.showError(e.getMessage());
+                ui.printLine();
             } catch (Exception e) {
                 ui.showError("An unexpected error occurred: " + e.getMessage());
                 break;
