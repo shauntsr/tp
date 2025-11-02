@@ -37,37 +37,19 @@ ____________________________________________________________
    bye                               - Exit the application
 
 ____________________________________________________________
-<<<<<<< HEAD
-Note created: test1.txt #7f210b98
+Note created: test1.txt #50722821
 ____________________________________________________________
-Note created: test2.txt #5a5c80d9
+Note created: test2.txt #58bd564b
 ____________________________________________________________
-Note created: test3.txt #be0c48ad
-____________________________________________________________
-You have 3 notes:
-    1. test3.txt 2025-11-02 be0c48ad
-    2. test2.txt 2025-11-02 5a5c80d9
-    3. test1.txt 2025-11-02 7f210b98
-____________________________________________________________
- Here are the notes with bodies matching the above:
- 1. test3.txt 2025-11-02 be0c48ad
- 2. test2.txt 2025-11-02 5a5c80d9
- 3. test1.txt 2025-11-02 7f210b98
-=======
-Note created: test1.txt #eddf825b
-____________________________________________________________
-Note created: test2.txt #8d33a8a5
-____________________________________________________________
-Note created: test3.txt #6751e833
+Note created: test3.txt #fb9de1cf
 ____________________________________________________________
 You have 3 notes:
-    1. test3.txt 2025-11-02 6751e833
-    2. test2.txt 2025-11-02 8d33a8a5
-    3. test1.txt 2025-11-02 eddf825b
+    1. test3.txt 2025-11-02 fb9de1cf
+    2. test2.txt 2025-11-02 58bd564b
+    3. test1.txt 2025-11-02 50722821
 ____________________________________________________________
  Here are the notes with bodies matching the above:
- 1. test3.txt 2025-11-02 6751e833
- 2. test2.txt 2025-11-02 8d33a8a5
- 3. test1.txt 2025-11-02 eddf825b
->>>>>>> de902bfc0fc1c106992fe19481c5beca0ac986fa
+ 1. test3.txt 2025-11-02 fb9de1cf
+ 2. test2.txt 2025-11-02 58bd564b
+ 3. test1.txt 2025-11-02 50722821
 ____________________________________________________________
