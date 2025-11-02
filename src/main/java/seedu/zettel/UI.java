@@ -377,4 +377,11 @@ public class UI {
     public void showCurrentRepo(String repoName) {
         System.out.println("Current repository: /" + repoName);
     }
+
+    public void showRepoList(ArrayList<String> repos) {
+        System.out.println("You have " + repos.size() + " repositories:");
+        for (int idx = 0; idx < repos.size(); idx++) {
+            System.out.println("    " + (idx + 1) + ". /" + repos.get(idx));
+        }
+    }
 }

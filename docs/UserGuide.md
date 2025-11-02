@@ -128,6 +128,27 @@ current-repository
 
 ---
 
+### Listing Repositories: `list-repos`
+
+Displays list of repositories initialized.
+
+**Format:**
+```
+list-repos
+```
+or
+```
+list-repositories
+```
+
+**Expected Output:**
+```
+ You have 2 repositories:
+    1. /main
+    2. /My_New_Repo
+```
+
+---
 ### Adding a New Note: `new`
 
 Creates a new note in the Zettelkasten repository. Notes can be created with only a title, or with both a title and a 

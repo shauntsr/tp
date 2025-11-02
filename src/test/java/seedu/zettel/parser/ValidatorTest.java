@@ -1,4 +1,4 @@
-package parser;
+package seedu.zettel.parser;
 
 import org.junit.jupiter.api.Test;
 import seedu.zettel.exceptions.EmptyDescriptionException;
@@ -6,7 +6,6 @@ import seedu.zettel.exceptions.ForbiddenCharacterFoundException;
 import seedu.zettel.exceptions.InvalidFormatException;
 import seedu.zettel.exceptions.LengthExceedException;
 import seedu.zettel.exceptions.ZettelException;
-import seedu.zettel.parser.Validator;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -166,110 +165,126 @@ class ValidatorTest {
     // ==================== Title/Tag Validation Tests ====================
 
     @Test
-    void validateTitleTag_nullInput_doesNotThrow() {
-        assertDoesNotThrow(() -> Validator.validateTitleTag(null, "Title"));
+    void validateRepoTitleTag_nullInput_doesNotThrow() {
+        assertDoesNotThrow(() -> Validator.validateRepoTitleTag(null, "Title"));
     }
 
     @Test
-    void validateTitleTag_validAlphanumeric_doesNotThrow() {
-        assertDoesNotThrow(() -> Validator.validateTitleTag("Test Title 123", "Title"));
+    void validateRepoTitleTag_validAlphanumeric_doesNotThrow() {
+        assertDoesNotThrow(() -> Validator.validateRepoTitleTag("Test Title 123", "Title"));
     }
 
     @Test
-    void validateTitleTag_onlyLetters_doesNotThrow() {
-        assertDoesNotThrow(() -> Validator.validateTitleTag("TestTitle", "Title"));
+    void validateRepoTitleTag_onlyLetters_doesNotThrow() {
+        assertDoesNotThrow(() -> Validator.validateRepoTitleTag("TestTitle", "Title"));
     }
 
     @Test
-    void validateTitleTag_onlyNumbers_doesNotThrow() {
-        assertDoesNotThrow(() -> Validator.validateTitleTag("12345", "Title"));
+    void validateRepoTitleTag_onlyNumbers_doesNotThrow() {
+        assertDoesNotThrow(() -> Validator.validateRepoTitleTag("12345", "Title"));
     }
 
     @Test
-    void validateTitleTag_withSpaces_doesNotThrow() {
-        assertDoesNotThrow(() -> Validator.validateTitleTag("Test   Title   123", "Title"));
+    void validateRepoTitleTag_withSpaces_doesNotThrow() {
+        assertDoesNotThrow(() -> Validator.validateRepoTitleTag("Test   Title   123", "Title"));
     }
 
     @Test
-    void validateTitleTag_exceedsMaxLength_throwsLengthExceedException() {
+    void validateRepoTitleTag_exceedsMaxLength_throwsLengthExceedException() {
         String longInput = "a".repeat(201);
         Exception exception = assertThrows(LengthExceedException.class, () -> {
-            Validator.validateTitleTag(longInput, "Title");
+            Validator.validateRepoTitleTag(longInput, "Title");
         });
         assertTrue(exception.getMessage().contains("Title must be less than 200 characters"));
     }
 
     @Test
-    void validateTitleTag_exactlyMaxLength_doesNotThrow() {
+    void validateRepoTitleTag_exactlyMaxLength_doesNotThrow() {
         String exactMaxInput = "a".repeat(200);
-        assertDoesNotThrow(() -> Validator.validateTitleTag(exactMaxInput, "Title"));
+        assertDoesNotThrow(() -> Validator.validateRepoTitleTag(exactMaxInput, "Title"));
     }
 
     @Test
-    void validateTitleTag_withSpecialCharacters_throwsInvalidFormatException() {
+    void validateRepoTitleTag_withSpecialCharacters_throwsInvalidFormatException() {
         Exception exception = assertThrows(InvalidFormatException.class, () -> {
-            Validator.validateTitleTag("Test-Title", "Title");
+            Validator.validateRepoTitleTag("Test-Title", "Title");
         });
         assertTrue(exception.getMessage().contains("Title contains invalid characters"));
     }
 
     @Test
-    void validateTitleTag_withUnderscores_throwsInvalidFormatException() {
+    void validateRepoTitleTag_withUnderscores_throwsInvalidFormatException() {
         assertThrows(InvalidFormatException.class, () -> {
-            Validator.validateTitleTag("Test_Title", "Title");
+            Validator.validateRepoTitleTag("Test_Title", "Title");
         });
     }
 
     @Test
-    void validateTitleTag_withPunctuation_throwsInvalidFormatException() {
+    void validateRepoTitleTag_withPunctuation_throwsInvalidFormatException() {
         assertThrows(InvalidFormatException.class, () -> {
-            Validator.validateTitleTag("Test! Title?", "Title");
+            Validator.validateRepoTitleTag("Test! Title?", "Title");
         });
     }
 
     @Test
-    void validateTitleTag_withDots_throwsInvalidFormatException() {
+    void validateRepoTitleTag_withDots_throwsInvalidFormatException() {
         assertThrows(InvalidFormatException.class, () -> {
-            Validator.validateTitleTag("Test.Title", "Title");
+            Validator.validateRepoTitleTag("Test.Title", "Title");
         });
     }
 
     @Test
-    void validateTitleTag_withCommas_throwsInvalidFormatException() {
+    void validateRepoTitleTag_withCommas_throwsInvalidFormatException() {
         assertThrows(InvalidFormatException.class, () -> {
-            Validator.validateTitleTag("Test, Title", "Title");
+            Validator.validateRepoTitleTag("Test, Title", "Title");
         });
     }
 
     @Test
-    void validateTitleTag_withEmoji_throwsInvalidFormatException() {
+    void validateRepoTitleTag_withEmoji_throwsInvalidFormatException() {
         assertThrows(InvalidFormatException.class, () -> {
-            Validator.validateTitleTag("Test 😀 Title", "Title");
+            Validator.validateRepoTitleTag("Test 😀 Title", "Title");
         });
     }
 
     @Test
-    void validateTitleTag_withPipe_throwsInvalidFormatException() {
+    void validateRepoTitleTag_withPipe_throwsInvalidFormatException() {
         assertThrows(InvalidFormatException.class, () -> {
-            Validator.validateTitleTag("Test|Title", "Title");
+            Validator.validateRepoTitleTag("Test|Title", "Title");
         });
     }
 
     @Test
-    void validateTitleTag_tagActionName_includesCorrectName() {
+    void validateRepoTitleTag_tagActionName_includesCorrectName() {
         Exception exception = assertThrows(LengthExceedException.class, () -> {
-            Validator.validateTitleTag("a".repeat(201), "Tag");
+            Validator.validateRepoTitleTag("a".repeat(201), "Tag");
         });
         assertTrue(exception.getMessage().contains("Tag must be less than 200 characters"));
     }
 
     @Test
-    void validateTitleTag_emptyString_doesNotThrowButAllowsEmpty() {
+    void validateRepoTitleTag_emptyString_doesNotThrowButAllowsEmpty() {
         // Based on the implementation, empty strings don't explicitly fail length check
         // but will fail the regex check since empty doesn't match ^[a-zA-Z0-9 ]+$
         assertThrows(InvalidFormatException.class, () -> {
-            Validator.validateTitleTag("", "Title");
+            Validator.validateRepoTitleTag("", "Title");
         });
+    }
+
+    @Test
+    void validateRepoTitleTag_repoActionName_includesCorrectName() {
+        Exception exception = assertThrows(LengthExceedException.class, () ->
+                Validator.validateRepoTitleTag("a".repeat(201), "Repo name")
+        );
+        assertTrue(exception.getMessage().contains("Repo name"));
+        assertTrue(exception.getMessage().contains("200 characters"));
+    }
+
+    @Test
+    void validateRepoTitleTag_emptyString_throwsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () ->
+                Validator.validateRepoTitleTag("", "Repo name")
+        );
     }
 
     // ==================== Edge Cases ====================
@@ -300,9 +315,9 @@ class ValidatorTest {
     }
 
     @Test
-    void validateTitleTag_mixedCaseAlphanumeric_doesNotThrow() {
+    void validateRepoTitleTag_mixedCaseAlphanumeric_doesNotThrow() {
         assertDoesNotThrow(() ->
-                Validator.validateTitleTag("TeSt TiTlE 123 ABC xyz", "Title")
+                Validator.validateRepoTitleTag("TeSt TiTlE 123 ABC xyz", "Title")
         );
     }
 
@@ -313,8 +328,8 @@ class ValidatorTest {
     }
 
     @Test
-    void validateTitleTag_exactlyAtBoundary200_doesNotThrow() {
+    void validateRepoTitleTag_exactlyAtBoundary200_doesNotThrow() {
         String boundaryInput = "x".repeat(199) + "y";
-        assertDoesNotThrow(() -> Validator.validateTitleTag(boundaryInput, "Title"));
+        assertDoesNotThrow(() -> Validator.validateRepoTitleTag(boundaryInput, "Title"));
     }
 }
