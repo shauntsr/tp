@@ -14,10 +14,10 @@ class UnlinkBothNotesCommand
 class ListLinkedNotesCommand
 
 ' Inheritance
-ListLinkedNotesCommand --> Command
-LinkNotesCommand --> Command
-UnlinkNotesCommand --> Command
-LinkBothNotesCommand -up-> Command
-UnlinkBothNotesCommand -up-> Command
+ListLinkedNotesCommand --|> Command
+LinkNotesCommand --|> Command
+UnlinkNotesCommand --|> Command
+LinkBothNotesCommand -up-|> Command
+UnlinkBothNotesCommand -up-|> Command
 
 @enduml
