@@ -88,7 +88,7 @@ public class Validator {
 
         // Check for valid characters (alphanumeric and spaces only)
         if (!input.matches("^[a-zA-Z0-9 ]+$")) {
-            throw new InvalidFormatException(actionName +REPO_TITLE_TAG_INVALID_CHARS_FORMAT);
+            throw new InvalidFormatException(actionName + REPO_TITLE_TAG_INVALID_CHARS_FORMAT);
         }
 
     }

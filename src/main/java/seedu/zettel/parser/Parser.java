@@ -66,7 +66,7 @@ public class Parser {
             + " <NOTE_ID_1> <NOTE_ID_2>";
     private static final String LIST_TAGS_SINGLE_NOTE_FORMAT = "List tags for single note command format "
             + "should be: list-tags <NOTE_ID>";
-    private static final String LIST_REPO_FORMAT = "List repository command format should be: list-repos";
+    private static final String LIST_REPO_FORMAT = "List repository command format should be: list-repo[sitorie]s";
     private static final String DELETE_TAG_FORMAT = "Delete tag command format should be: delete-tag [-f] "
             + "<NOTE_ID> <TAG>";
     private static final String DELETE_TAG_GLOBALLY_FORMAT = "Delete tag globally format should be: "
@@ -88,7 +88,7 @@ public class Parser {
         "List incoming links format should be: list-incoming-links <NOTE_ID>";
     private static final String LIST_OUTGOING_LINKS_FORMAT =
         "List outgoing links format should be: list-outgoing-links <NOTE_ID>";
-    private static final String CHANGE_REPO_FORMAT = "Change repository format should be: change-repo <REPO_NAME>";
+    private static final String CHANGE_REPO_FORMAT = "Change repository format should be: change-repo[sitory] <REPO_NAME>";
     private static final String CHANGE_REPO_EMPTY = "Please specify a repo name to change to!";
     private static final String CURRENT_REPO_FORMAT = "Current repository format should be: current-repo\";";
     private static final String PRINT_NOTE_BODY_FORMAT =

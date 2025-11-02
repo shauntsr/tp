@@ -60,7 +60,7 @@ public class UI {
         System.out.println("   list-repos                        - Lists all repositories initialized");
         System.out.println("   new -t <title> [-b <body>]        - Create a new note");
         System.out.println("   edit <note-id>                    - Edit an existing note");
-        System.out.println("   list [-p] [-a]                    - List all notes (or pinned only)");
+        System.out.println("   list [-p] [-a]                    - List notes (pinned and/or archived filters)");
         System.out.println("   delete [-f] <note-id>             - Delete a note by ID");
         System.out.println("   pin <note-id>                     - Pin a note");
         System.out.println("   unpin <note-id>                   - Unpin a note");

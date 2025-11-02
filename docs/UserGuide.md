@@ -856,7 +856,7 @@ help
    list-repos                        - Lists all repositories initialized
    new -t <title> [-b <body>]        - Create a new note
    edit <note-id>                    - Edit an existing note
-   list [-p] [-a]                    - List all notes (or pinned only)
+   list [-p] [-a]                    - List notes (pinned and/or archived filters)
    delete [-f] <note-id>             - Delete a note by ID
    pin <note-id>                     - Pin a note
    unpin <note-id>                   - Unpin a note

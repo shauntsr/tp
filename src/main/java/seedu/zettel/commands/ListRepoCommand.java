@@ -14,8 +14,6 @@ import java.util.List;
  */
 public class ListRepoCommand extends Command {
 
-    public static final String COMMAND_WORD = "list-repos";
-
     /**
      * Executes the list repositories command by displaying the available repositories. to the user.
      *
