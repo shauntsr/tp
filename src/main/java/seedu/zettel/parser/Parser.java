@@ -88,7 +88,8 @@ public class Parser {
         "List incoming links format should be: list-incoming-links <NOTE_ID>";
     private static final String LIST_OUTGOING_LINKS_FORMAT =
         "List outgoing links format should be: list-outgoing-links <NOTE_ID>";
-    private static final String CHANGE_REPO_FORMAT = "Change repository format should be: change-repo[sitory] <REPO_NAME>";
+    private static final String CHANGE_REPO_FORMAT = "Change repository format should be: change-repo[sitory]"+
+            "<REPO_NAME>";
     private static final String CHANGE_REPO_EMPTY = "Please specify a repo name to change to!";
     private static final String CURRENT_REPO_FORMAT = "Current repository format should be: current-repo\";";
     private static final String PRINT_NOTE_BODY_FORMAT =
