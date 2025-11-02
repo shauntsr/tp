@@ -55,7 +55,6 @@ public class Storage {
         if (Files.notExists(defaultRepoPath)) {
             createRepo(DEFAULT_REPO);
             System.out.println("Initialising default repo: " + DEFAULT_REPO);
-            System.out.println("Default repo initialised at: " + defaultRepoPath);
         }
 
         try {

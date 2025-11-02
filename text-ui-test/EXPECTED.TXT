@@ -1,5 +1,4 @@
 Initialising default repo: main
-Default repo initialised at: data\main
 ____________________________________________________________
  Hello! I'm Zettel
  What can I do for you?
