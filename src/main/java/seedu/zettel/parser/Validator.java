@@ -10,7 +10,7 @@ import seedu.zettel.exceptions.ZettelException;
  * Utility class for validating inputs.
  */
 public class Validator {
-    private static final int MAX_TITLE_TAG_LENGTH = 200;
+    private static final int MAX_REPO_TITLE_TAG_LENGTH = 200;
     private static final int MAX_LENGTH = 3000;
 
     private static final int VALID_NOTE_ID_LENGTH = 8;
@@ -21,11 +21,11 @@ public class Validator {
             "Note ID must be exactly " + VALID_NOTE_ID_LENGTH + " characters long.";
     private static final String INVALID_CHARS_FORMAT =
             "Input contains invalid characters. Only ASCII characters are allowed;";
-    private static final String TITLE_TAG_INVALID_CHARS_FORMAT =
+    private static final String REPO_TITLE_TAG_INVALID_CHARS_FORMAT =
             " contains invalid characters. Only alphanumeric characters and space are allowed;";
     private static final String PIPE_CHAR_ERROR = "Invalid character '|' detected in input!";
-    private static final String TITLE_TAG_TOO_LONG =
-            " must be less than " + MAX_TITLE_TAG_LENGTH + " characters.";
+    private static final String REPO_TITLE_TAG_TOO_LONG =
+            " must be less than " + MAX_REPO_TITLE_TAG_LENGTH + " characters.";
     private static final String INPUT_TOO_LONG =
             "Input must be less than " + MAX_LENGTH + " characters.";
     /**
@@ -77,18 +77,18 @@ public class Validator {
         }
     }
 
-    public static void validateTitleTag(String input, String actionName) throws ZettelException {
+    public static void validateRepoTitleTag(String input, String actionName) throws ZettelException {
         if (input == null) {
             return;
         }
 
-        if (input.length() > MAX_TITLE_TAG_LENGTH) {
-            throw new LengthExceedException(actionName + TITLE_TAG_TOO_LONG);
+        if (input.length() > MAX_REPO_TITLE_TAG_LENGTH) {
+            throw new LengthExceedException(actionName + REPO_TITLE_TAG_TOO_LONG);
         }
 
         // Check for valid characters (alphanumeric and spaces only)
         if (!input.matches("^[a-zA-Z0-9 ]+$")) {
-            throw new InvalidFormatException(actionName +TITLE_TAG_INVALID_CHARS_FORMAT);
+            throw new InvalidFormatException(actionName + REPO_TITLE_TAG_INVALID_CHARS_FORMAT);
         }
 
     }

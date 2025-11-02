@@ -57,9 +57,10 @@ public class UI {
         System.out.println("   init <repo-name>                  - Initialize a new repository");
         System.out.println("   change-repo[pository] <repo-name> - Switch to another existing repository");
         System.out.println("   current-repo[pository]            - Show the name of the current repository");
+        System.out.println("   list-repos                        - Lists all repositories initialized");
         System.out.println("   new -t <title> [-b <body>]        - Create a new note");
         System.out.println("   edit <note-id>                    - Edit an existing note");
-        System.out.println("   list [-p] [-a]                    - List all notes (or pinned only)");
+        System.out.println("   list [-p] [-a]                    - List notes (pinned and/or archived filters)");
         System.out.println("   delete [-f] <note-id>             - Delete a note by ID");
         System.out.println("   pin <note-id>                     - Pin a note");
         System.out.println("   unpin <note-id>                   - Unpin a note");
@@ -376,5 +377,12 @@ public class UI {
 
     public void showCurrentRepo(String repoName) {
         System.out.println("Current repository: /" + repoName);
+    }
+
+    public void showRepoList(ArrayList<String> repos) {
+        System.out.println("You have " + repos.size() + " repositories:");
+        for (int idx = 0; idx < repos.size(); idx++) {
+            System.out.println("    " + (idx + 1) + ". /" + repos.get(idx));
+        }
     }
 }

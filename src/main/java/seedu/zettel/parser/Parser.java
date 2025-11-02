@@ -19,6 +19,7 @@ import seedu.zettel.commands.LinkBothNotesCommand;
 import seedu.zettel.commands.LinkNotesCommand;
 import seedu.zettel.commands.ListLinkedNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
+import seedu.zettel.commands.ListRepoCommand;
 import seedu.zettel.commands.ListTagsGlobalCommand;
 import seedu.zettel.commands.ListTagsSingleNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
@@ -65,6 +66,7 @@ public class Parser {
             + " <NOTE_ID_1> <NOTE_ID_2>";
     private static final String LIST_TAGS_SINGLE_NOTE_FORMAT = "List tags for single note command format "
             + "should be: list-tags <NOTE_ID>";
+    private static final String LIST_REPO_FORMAT = "List repository command format should be: list-repo[sitorie]s";
     private static final String DELETE_TAG_FORMAT = "Delete tag command format should be: delete-tag [-f] "
             + "<NOTE_ID> <TAG>";
     private static final String DELETE_TAG_GLOBALLY_FORMAT = "Delete tag globally format should be: "
@@ -78,15 +80,6 @@ public class Parser {
     private static final String INIT_INVALID =
             "Repo name can only contain alphanumeric characters, "
                     + "hyphens and underscores.";
-    // Note ID validation constants
-    private static final int VALID_NOTE_ID_LENGTH = 8;
-    private static final String VALID_NOTE_ID_REGEX = "^[a-f0-9]{" + VALID_NOTE_ID_LENGTH + "}$";
-    private static final String INVALID_ID_LENGTH_FORMAT =
-            "Note ID must be exactly " + VALID_NOTE_ID_LENGTH + " characters long.";
-    private static final String LIST_LINKED_TYPE_FORMAT = "Link type must be either" +
-                    " 'incoming-links' or 'outgoing-links'.";
-    private static final String LIST_LINKED_FORMAT = "List linked notes format should be: list "
-                    + "<incoming-links/outgoing-links> <NOTE_ID>";
     private static final String ARCHIVE_NOTES_FORMAT = "Archive notes format should be: " +
                     "archive <NOTE_ID>";
     private static final String UNARCHIVE_NOTES_FORMAT = "Unarchive notes format should be: " +
@@ -95,7 +88,8 @@ public class Parser {
         "List incoming links format should be: list-incoming-links <NOTE_ID>";
     private static final String LIST_OUTGOING_LINKS_FORMAT =
         "List outgoing links format should be: list-outgoing-links <NOTE_ID>";
-    private static final String CHANGE_REPO_FORMAT = "Change repo format should be: change-repo <REPO_NAME>";
+    private static final String CHANGE_REPO_FORMAT = "Change repository format should be: change-repo[sitory]"+
+            "<REPO_NAME>";
     private static final String CHANGE_REPO_EMPTY = "Please specify a repo name to change to!";
     private static final String CURRENT_REPO_FORMAT = "Current repository format should be: current-repo\";";
     private static final String PRINT_NOTE_BODY_FORMAT =
@@ -137,6 +131,7 @@ public class Parser {
         case "list-outgoing-links" -> parseListOutgoingLinksCommand(inputs);
         case "list-tags-all" -> parseListTagsGlobalCommand(inputs);
         case "list-tags" -> parseListTagsSingleNoteCommand(inputs);
+        case "list-repos", "list-repositories" -> parseListRepoCommand(inputs);
         case "delete-tag" -> parseDeleteTagFromNoteCommand(inputs);
         case "delete-tag-globally" -> parseDeleteTagGloballyCommand(inputs);
         case "rename-tag" -> parseRenameTagCommand(inputs);
@@ -147,7 +142,6 @@ public class Parser {
         default -> throw new InvalidInputException(command);
         };
     }
-
 
     /**
      * Parses a list command to display notes.
@@ -218,10 +212,7 @@ public class Parser {
             throw new EmptyDescriptionException(INIT_EMPTY);
         }
 
-        // Validate input - only alphanumeric, hyphens, and underscores
-        if (!content.matches("[a-zA-Z0-9_-]+")) {
-            throw new InvalidFormatException(INIT_INVALID);
-        }
+        Validator.validateRepoTitleTag(content,"Repo name");
         return new InitCommand(content);
     }
 
@@ -258,7 +249,7 @@ public class Parser {
                 throw new EmptyDescriptionException(NOTE_EMPTY);
             }
 
-            Validator.validateTitleTag(title,"Title");
+            Validator.validateRepoTitleTag(title,"Title");
 
             return new NewNoteCommand(title, body);
 
@@ -419,7 +410,7 @@ public class Parser {
         }
 
         String tag = inputs[1];
-        Validator.validateTitleTag(tag,"Tag");
+        Validator.validateRepoTitleTag(tag,"Tag");
         return new NewTagCommand(tag);
     }
 
@@ -741,5 +732,20 @@ public class Parser {
         }
         String noteId = Validator.validateNoteId(inputs[1], "print-body");
         return new PrintNoteBodyCommand(noteId);
+    }
+
+    /**
+     * Parses a command to list all tags globally across all notes.
+     * Expected format: list-tags-all
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return A ListTagsGlobalCommand object.
+     * @throws ZettelException If the format is invalid.
+     */
+    private static Command parseListRepoCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 1) {
+            throw new InvalidFormatException(LIST_REPO_FORMAT);
+        }
+        return new ListRepoCommand();
     }
 }
