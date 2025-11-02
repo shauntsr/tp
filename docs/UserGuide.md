@@ -19,6 +19,7 @@ java -jar zettel.jar
 | [Initialize Repository](#starting-a-zettelkasten-repository-init) | `init <repository-name>` | Create a new Zettelkasten repository |
 | [Change Repository](#changing-repository-change-repo) | `change-repo <repository-name>` | Switch to another existing repository |
 | [Current Repository](#viewing-current-repository-current-repo) | `current-repo` | Display the name of the current repository |
+| [List Repositories](#listing-repositories) | `list-repos` | Lists all repositories initialized |
 | [Add Note](#adding-a-new-note-new) | `new -t <TITLE> [-b <BODY>]` | Create a new note with optional body |
 | [Edit Note](#editing-a-note-edit) | `edit <note-id>` | Edit an existing note |
 | [List Notes](#listing-notes-with-filters-list) | `list [-p] [-a]` | List notes (with optional filters) |
@@ -852,9 +853,10 @@ help
    init <repo-name>                  - Initialize a new repository
    change-repo[pository] <repo-name> - Switch to another existing repository
    current-repo[pository]            - Show the name of the current repository
+   list-repos                        - Lists all repositories initialized
    new -t <title> [-b <body>]        - Create a new note
    edit <note-id>                    - Edit an existing note
-   list [-p] [-a]                    - List notes (pinned and/or archived filters)
+   list [-p] [-a]                    - List all notes (or pinned only)
    delete [-f] <note-id>             - Delete a note by ID
    pin <note-id>                     - Pin a note
    unpin <note-id>                   - Unpin a note
@@ -874,7 +876,8 @@ help
    archive <note-id>                 - Moves note to archive folder
    unarchive <note-id>               - Moves note out of archive folder
    print-body <note-id>              - Print the body of a note
-   find <text>                       - Search for notes
+   find-note-by-body <search-terms>  - Search for notes by body content
+   find-note-by-title <search-terms> - Search for notes by title
    help                              - Show this list of commands
    bye                               - Exit the application
 ```

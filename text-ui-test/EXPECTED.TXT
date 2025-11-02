@@ -7,6 +7,7 @@ ____________________________________________________________
    init <repo-name>                  - Initialize a new repository
    change-repo[pository] <repo-name> - Switch to another existing repository
    current-repo[pository]            - Show the name of the current repository
+   list-repos                        - Lists all repositories initialized
    new -t <title> [-b <body>]        - Create a new note
    edit <note-id>                    - Edit an existing note
    list [-p] [-a]                    - List all notes (or pinned only)
@@ -35,19 +36,19 @@ ____________________________________________________________
    bye                               - Exit the application
 
 ____________________________________________________________
-Note created: test1.txt #35413cb9
+Note created: test1.txt #7f210b98
 ____________________________________________________________
-Note created: test2.txt #3fc6da0d
+Note created: test2.txt #5a5c80d9
 ____________________________________________________________
-Note created: test3.txt #b09d6cd3
+Note created: test3.txt #be0c48ad
 ____________________________________________________________
 You have 3 notes:
-    1. test3.txt 2025-10-30 b09d6cd3
-    2. test2.txt 2025-10-30 3fc6da0d
-    3. test1.txt 2025-10-30 35413cb9
+    1. test3.txt 2025-11-02 be0c48ad
+    2. test2.txt 2025-11-02 5a5c80d9
+    3. test1.txt 2025-11-02 7f210b98
 ____________________________________________________________
  Here are the notes with bodies matching the above:
- 1. test3.txt 2025-10-30 b09d6cd3
- 2. test2.txt 2025-10-30 3fc6da0d
- 3. test1.txt 2025-10-30 35413cb9
+ 1. test3.txt 2025-11-02 be0c48ad
+ 2. test2.txt 2025-11-02 5a5c80d9
+ 3. test1.txt 2025-11-02 7f210b98
 ____________________________________________________________
