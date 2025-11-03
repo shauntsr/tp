@@ -47,7 +47,7 @@ public class InitCommand extends Command {
         if (duplicateExists) {
             throw new InvalidRepoException("This repo already exists.");
         }
-        storage.createRepo(repoName);
+        storage.createRepo(repoName.toLowerCase());
         ui.showRepoInit(repoName);
     }
 }
