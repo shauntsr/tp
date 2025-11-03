@@ -1,13 +1,14 @@
+
 @startuml ArchitectureSequence
 hide footbox
 
 actor User
 participant ":Zettel"
 participant ":UI"
-participant "<<class>> Parser" as Parser
+participant ":Parser"
+participant ":Validator"
 participant ":Command"
 participant ":Storage"
-
 
 User -> ":Zettel": input "new -t MyNote -b Content"
 activate ":Zettel"
@@ -16,26 +17,34 @@ activate ":UI"
 ":UI" --> ":Zettel": "new -t MyNote -b Content"
 deactivate ":UI"
 
-":Zettel" -> "Parser": parse(userInput)
-activate "Parser"
-"Parser" --> ":Zettel": NewNoteCommand
-deactivate "Parser"
+":Zettel" -> ":Parser": parse(userInput)
+activate ":Parser"
 
-":Zettel" -> ":Command": execute(notes, tags, ui, storage)
-activate ":Command"
+":Parser" -> ":Validator": validateCommandInput(userInput)
+alt Validation fails
+    ":Validator" --> ":Zettel": throws ZettelException
+    ":Zettel" -> ":UI": showError()
+else Validation passes
+    ":Parser" --> ":Zettel": NewNoteCommand
 
-":Command" -> ":Storage": add note
-activate ":Storage"
-":Storage" --> ":Command": modification done
-deactivate ":Storage"
+    ":Zettel" -> ":Command": execute(notes, tags, ui, storage)
+    activate ":Command"
 
-":Command" -> ":UI": showAddedNote()
-activate ":UI"
-":UI" --> ":Command": done
-deactivate ":UI"
+    ":Command" -> ":Storage": add note
+    activate ":Storage"
+    ":Storage" --> ":Command": modification done
+    deactivate ":Storage"
 
-":Command" --> ":Zettel": execution complete
-deactivate ":Command"
+    ":Command" -> ":UI": showAddedNote()
+    activate ":UI"
+    ":UI" --> ":Command": done
+    deactivate ":UI"
+
+    ":Command" --> ":Zettel": execution complete
+    deactivate ":Command"
+end
+deactivate ":Parser"
+
 ":Zettel" --> "User"
 deactivate ":Zettel"
 @enduml

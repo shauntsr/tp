@@ -1,0 +1,23 @@
+@startuml ValidatorClass
+skinparam classAttributeIconSize 0
+hide circle
+
+class Validator {
+    - {static} MAX_REPO_TITLE_TAG_LENGTH : int = 200
+    - {static} MAX_LENGTH : int = 3000
+    - {static} VALID_NOTE_ID_LENGTH : int = 8
+    - {static} VALID_NOTE_ID_REGEX : String
+    - {static} ID_EMPTY : String
+    - {static} ID_INVALID : String
+    - {static} INVALID_ID_LENGTH_FORMAT : String
+    - {static} INVALID_CHARS_FORMAT : String
+    - {static} REPO_TITLE_TAG_INVALID_CHARS_FORMAT : String
+    - {static} PIPE_CHAR_ERROR : String
+    - {static} REPO_TITLE_TAG_TOO_LONG : String
+    - {static} INPUT_TOO_LONG : String
+
+    + {static} validateNoteId(noteId: String, actionName: String) : String
+    + {static} validateCommandInput(input: String) : void
+    + {static} validateRepoTitleTag(input: String, actionName: String) : void
+}
+@enduml

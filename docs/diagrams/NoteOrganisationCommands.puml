@@ -6,12 +6,14 @@ abstract class Command {
     + isExit() : boolean
 }
 
-class FindNoteCommand
+class FindNoteByBodyCommand
+class FindNoteByTitleCommand
 class ListNoteCommand
 class PinNoteCommand
 
 ' Inheritance
-FindNoteCommand -up-|> Command
+FindNoteByBodyCommand -down-|> Command
+FindNoteByTitleCommand -down-|> Command
 PinNoteCommand -up-|> Command
 ListNoteCommand -up-|> Command
 @enduml

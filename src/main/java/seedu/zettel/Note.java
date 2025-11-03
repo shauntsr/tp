@@ -29,7 +29,7 @@ public class Note {
     private String body; // Body content of the note
     private Instant createdAt; // Timestamp when the note was created
     private Instant modifiedAt; // Timestamp when the note was last modified
-    private boolean pinned; // Whether the note is pinned
+    private boolean isPinned; // Whether the note is pinned
     private boolean isArchived; // Whether the note has been archived
     private String archiveName; // Name of the archive the note belongs to
     private List<String> tags; // Tags for the note
@@ -55,7 +55,7 @@ public class Note {
         this.body = body;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
-        this.pinned = false;
+        this.isPinned = false;
         this.isArchived = false;
         this.archiveName = null;
         this.tags = new ArrayList<>();
@@ -88,7 +88,7 @@ public class Note {
         this.body = body;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
-        this.pinned = pinned;
+        this.isPinned = pinned;
         this.isArchived = isArchived;
         this.archiveName = archiveName;
         this.tags = tags != null ? new ArrayList<>(tags) : new ArrayList<>();
@@ -159,7 +159,7 @@ public class Note {
      * @return true if pinned, false otherwise
      */
     public boolean isPinned() {
-        return pinned;
+        return isPinned;
     }
 
     /**
@@ -276,7 +276,7 @@ public class Note {
      * @param pinned true to pin the note, false to unpin
      */
     public void setPinned(boolean pinned) {
-        this.pinned = pinned;
+        this.isPinned = pinned;
         updateModifiedAt();
     }
 

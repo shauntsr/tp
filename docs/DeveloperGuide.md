@@ -25,14 +25,9 @@ Refer to the guide [_Setting up and getting started_](SettingUp.md).
 
 ## **Design**
 
-<div markdown="span" class="alert alert-primary">
-
-:bulb: **Tip:** The `.puml` files used to create diagrams are in this document `docs/diagrams` folder. Refer to the [_PlantUML Tutorial_ at se-edu/guides](https://se-education.org/guides/tutorials/plantUml.html) to learn how to create and edit diagrams.
-</div>
-
 ### Architecture
 
-<img src="images/Architecture.png" width="321" />
+<img src="images/Architecture.svg" />
 
 The ***Architecture Diagram*** given above explains the high-level design of Zettel.
 
@@ -50,13 +45,14 @@ The bulk of the app's work is done by the following components:
 
 * [**`UI`**](#ui-component): Handles all user interface interactions
 * [**`Parser`**](#parser-component): Parses user input and creates Command objects
+* [**`Validator`**](#validator-component): Validates user input for Parser
 * [**`Command`**](#command-component): Executes specific operations on notes
 * [**`Storage`**](#storage-component): Manages file system operations and persistence
 * [**`Note`**](#note-component): Represents individual notes with metadata
 
 **How the architecture components interact with each other:**
 
-<img src="images/ArchitectureSequence.png" width="785" />
+<img src="images/ArchitectureSequence.svg" />
 
 1. User enters command in terminal
 2. `Zettel` reads input via `UI`
@@ -73,7 +69,7 @@ The sections below give more details of each component.
 
 **API**: `UI.java`
 
-<img src="images/UIClass.png" width="602" />
+<img src="images/UIClass.svg" />
 
 The `UI` component:
 * Uses `Scanner` to read user input from the console
@@ -100,9 +96,8 @@ Key responsibilities:
 
 The `Parser` component:
 * Takes raw user input strings and converts them into executable `Command` objects
-* Validates input format and parameters
+* Validates input format and parameters (e.g note IDs) using `Validator`
 * Extracts flags and arguments from commands
-* Performs validation on note IDs (8-character hexadecimal format)
 * Throws appropriate `ZettelException` subclasses for invalid input
 
 Parsing workflow:
@@ -113,18 +108,15 @@ Parsing workflow:
 5. Create and return specific Command object
 6. Throw exception if validation fails
 
-Key validation patterns:
-* Note ID validation: Exactly 8 hexadecimal characters (a-f, 0-9)
-* Flag validation: Recognizes `-f` (force), `-t` (title), `-b` (body), `-p` (pinned), `-a` (archived)
-* Repository name validation: Alphanumeric, hyphens, and underscores only
+<img src="images/ParserSequence.svg" />
 
-<img src="images/ParserSequence.png" width="930" />
-
-### Validator Class
+### Validator Component
 
 **API**: `Validator.Java`
 
-The `Validator` class provides centralized validation logic for various input types:
+<img src="images/ValidatorClass.svg" />
+
+The `Validator` class provides centralized validation logic for various input types.
 
 **Key Validation Methods:**
 
@@ -154,7 +146,7 @@ The `Validator` class provides centralized validation logic for various input ty
 
 **API**: `Command.java`
 
-<img src="images/CommandAbstractClass.png" width="563" />
+<img src="images/CommandAbstractClass.svg" />
 
 The `Command` component uses the Command Pattern where each command is an object that encapsulates:
 * The action to perform
@@ -174,7 +166,7 @@ All commands inherit from the abstract `Command` class and implement:
    - `ArchiveNoteCommand` - Moves notes to/from archive folder
    - `PrintNoteBodyCommand` - Prints body of note to stdout
 
-    <img src="images/NoteManagementCommands.png" width="588" />
+    <img src="images/NoteManagementCommands.svg" />
 
 2. **Note Organization:**
    - `ListNoteCommand` - Lists notes with filtering options
@@ -182,7 +174,7 @@ All commands inherit from the abstract `Command` class and implement:
    - `FindNoteByTitleCommand` - Searches notes by title
    - `FindNoteByBodyCommand` - Searches note by body content
 
-    <img src="images/NoteOrganisationCommands.png" width="556" />
+    <img src="images/NoteOrganisationCommands.svg" />
 
 3. **Linking System:**
    - `LinkNotesCommand` - Creates unidirectional links
@@ -191,7 +183,7 @@ All commands inherit from the abstract `Command` class and implement:
    - `UnlinkBothNotesCommand` - Removes bidirectional links
    - `ListLinkedNotesCommand` - Shows incoming/outgoing links
 
-    <img src="images/LinkCommands.png" width="562" />
+    <img src="images/LinkCommands.svg" />
 
 4. **Tagging System:**
    - `NewTagCommand` - Creates global tags
@@ -202,7 +194,7 @@ All commands inherit from the abstract `Command` class and implement:
    - `ListTagsGlobalCommand` - Lists all tags
    - `ListTagsSingleNoteCommand` - Lists tags for specific note
 
-    <img src="images/TagCommands.png" width="749" />
+    <img src="images/TagCommands.svg" />
 
 5. **Repository/System Commands**
     - `InitCommand` - Initializes new repository
@@ -212,11 +204,11 @@ All commands inherit from the abstract `Command` class and implement:
     - `HelpCommand` - Displays help information
     - `ExitCommand` - Terminates application
 
-    <img src="images/SystemCommands.png" width="664" />
+    <img src="images/SystemCommands.svg" />
 
 ### Note Component
 
-<img src="images/NoteClass.png" width="660" />
+<img src="images/NoteClass.svg" />
 
 **API**: `Note.java`
 
@@ -229,8 +221,8 @@ The `Note` class represents a single note in the Zettel system:
 * `body` - Note content (stored separately in file system)
 * `createdAt` - Creation timestamp (Instant)
 * `modifiedAt` - Last modification timestamp (Instant)
-* `pinned` - Boolean flag for pinned status
-* `archived` - Boolean flag for archived status
+* `isPinned` - Boolean flag for pinned status
+* `isArchived` - Boolean flag for archived status
 * `archiveName` - Archive folder name (null if not archived)
 * `tags` - List of tag strings
 * `outgoingLinks` - HashSet of note IDs this note links to
@@ -256,7 +248,7 @@ The `Note` class represents a single note in the Zettel system:
 
 **API**: `Storage.java`, `FileSystemManager.java`, `NoteSerializer.java`
 
-<img src="images/StoragePackage.png" width="812" />
+<img src="images/StoragePackage.svg" />
 
 The Storage component is divided into three classes with distinct responsibilities:
 
@@ -301,15 +293,15 @@ Handles serialization/deserialization of Note objects:
 
 **Index File Format:**
 ```
-ID | Title | Filename | CreatedAt | ModifiedAt | Pinned | Archived | ArchiveName | Tags | OutgoingLinks | IncomingLinks
+ID | Title | Filename | CreatedAt | ModifiedAt | isPinned | isArchived | ArchiveName | Tags | OutgoingLinks | IncomingLinks
 ```
 
 Where:
-* Pinned/Archived are `1` or `0`
+* isPinned/isArchived are `1` or `0`
 * Tags and links are delimited by `;;`
 * All fields are separated by `` | `` (space-pipe-space)
 
-<img src="images/StorageSaveSequence.png" width="754" />
+<img src="images/StorageSaveSequence.svg" />
 
 ### Utility Components
 
@@ -369,7 +361,7 @@ ID = SHA-256(title + createdAt)[0:4] → 8 hex characters
     * Pros: Globally unique across repositories, supports synchronization.
     * Cons: Less readable and harder to manually type or recall.
 
-<img src="images/NoteCreationActivity.png" width="439" />
+<img src="images/NoteCreationActivity.svg" />
 
 **Sequence:**
 1. User provides title (and optional body)
@@ -409,7 +401,7 @@ private HashSet<String> incomingLinks;  // IDs that link to this note
    - For each outgoing link: remove from target's incoming links
    - For each incoming link: remove from source's outgoing links
 
-<img src="images/LinkCreationSequence.png" width="517" />
+<img src="images/LinkCreationSequence.svg" />
 
 **Rationale:**
 * O(1) lookup for "does note A link to note B?"
@@ -448,7 +440,7 @@ Tags are stored both globally (in `tags.txt`) and per-note (in `index.txt`).
 4. **delete-tag-globally**: Removes tag from global list AND all notes
 5. **rename-tag**: Renames tag globally across all notes
 
-<img src="images/RenameTagSequence.png" width="630" />
+<img src="images/RenameTagSequence.svg" />
 
 **Why Global Tag List?**
 * Ensures consistency (no typos creating new tags)
@@ -486,16 +478,16 @@ repo/
 **Implementation:**
 
 1. **Archive Operation:**
-   - Set `note.archived = true`
+   - Set `note.isArchived = true`
    - Move file from `notes/` to `archive/`
    - Update index.txt with archived flag
 
 2. **Unarchive Operation:**
-   - Set `note.archived = false`
+   - Set `note.isArchived = false`
    - Move file from `archive/` back to `notes/`
    - Update index.txt
 
-<img src="images/ArchiveFlowActivity.png" width="727" />
+<img src="images/ArchiveFlow.svg" />
 
 **Advantages:**
 * Clear visual separation in file system
@@ -545,34 +537,34 @@ data/
 <repo1> | <repo2> | ...
 <current-repo-name>
 ```
-- **First lines:** List of all repositories, pipe-separated
+- **First line:** List of all repositories, pipe-separated
 - **Second line:** Current active repository
 
 #### Operations
 
-**InitCommand:**
+1. **InitCommand:**
 
 - Creates new repository directory structure
-- Adds repository name to `.zettelConfig`
+- Adds repository name to first line of `.zettelConfig` (if not exists)
 - Does **not** switch to new repository
 
-**ChangeRepoCommand:**
+2. **ChangeRepoCommand:**
 
 - Validates repository exists
 - Updates second line of `.zettelConfig`
 - Reloads notes from new repository
 
-**CurrentRepoCommand:**
+3. **CurrentRepoCommand:**
 
 - Reads second line from `.zettelConfig`
 - Displays current repository name
 
-**ListRepoCommand:**
+4. **ListRepoCommand:**
 
 - Parses first line of `.zettelConfig`
 - Displays numbered list of repositories
 
-### Advantages
+#### Advantages
 
 * Complete isolation between projects
 * Easy to archive entire projects
@@ -618,7 +610,7 @@ Storage performs validation on every save and automatically repairs common issue
    - Validates current repository exists
    - Note: if `.zettelConfig` is forcibly removed by user, on validation a new default `.zettelConfig` is created; as such previously created repos are lost to the program.
 
-<img src="images/StorageValidationFlow.png" height="1250" />
+<img src="images/StorageValidationFlow.svg" height="1250" />
 
 **Recovery Strategy:**
 * Non-destructive: Never deletes data automatically
@@ -635,8 +627,8 @@ Rather than implementing a built-in editor, Zettel opens notes in the user's pre
 **Editor Selection Priority:**
 1. `$VISUAL` environment variable
 2. `$EDITOR` environment variable
-3. Common CLI editors: vim, nano, vi
-4. Platform-specific: notepad.exe (Windows)
+3. Platform-specific: notepad.exe (Windows)
+4. Common CLI editors: vim, nano, vi
 
 **Implementation:**
 
@@ -647,7 +639,7 @@ Process process = new ProcessBuilder(editor, filepath)
 int exitCode = process.waitFor();
 ```
 
-<img src="images/EditorIntegrationSequence.png" width="336" />
+<img src="images/EditorIntegrationSequence.svg" />
 
 **Advantages:**
 * Leverages user's existing editor preferences
@@ -687,7 +679,7 @@ int exitCode = process.waitFor();
 
 **Unit Tests:**
 * Test individual Command classes with mock data
-* Test Parser validation logic extensively
+* Test Parser and Validator logic extensively
 * Test ID generation for deterministic behavior
 * Test serialization/deserialization round-trips
 
