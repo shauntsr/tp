@@ -1,46 +1,46 @@
 @startuml NoteClass
 skinparam classAttributeIconSize 0
+hide circle
 
 class Note {
-    - static Logger logger
-    - static DateTimeFormatter DATE_FORMATTER
-    - static int ID_LENGTH = 8
-    - static int numberOfNotes
+    - {static} logger : Logger
+    - {static} DATE_FORMATTER : DateTimeFormatter
+    - {static} ID_LENGTH : int = 8
+    - {static} numberOfNotes : int
 
-    - String id
-    - String title
-    - String filename
-    - String body
-    - Instant createdAt
-    - Instant modifiedAt
-    - boolean pinned
-    - boolean archived
-    - String archiveName
-    - List<String> logs
-    - List<String> tags
-    - HashSet<String> outgoingLinks
-    - HashSet<String> incomingLinks
+    - id : String
+    - title : String
+    - filename : String
+    - body : String
+    - createdAt : Instant
+    - modifiedAt : Instant
+    - pinned : boolean
+    - archived : boolean
+    - archiveName : String
+    - tags : List<String>
+    - outgoingLinks : HashSet<String>
+    - incomingLinks : HashSet<String>
 
-    + Note(String id, String title, String filename, String body, Instant createdAt, Instant modifiedAt)
-    + Note(String id, String title, String filename, String body, Instant createdAt, Instant modifiedAt,
-           boolean pinned, boolean archived, String archiveName, List<String> tags)
+    + Note(id : String, title : String, filename : String, body : String, createdAt : Instant, modifiedAt : Instant)
+    + Note(id : String, title : String, filename : String, body : String, createdAt : Instant, modifiedAt : Instant,
+           pinned : boolean, archived : boolean, archiveName : String, tags : List<String>)
 
-    + Instant getCreatedAt()
-    + Instant getModifiedAt()
-    + boolean isLinkedTo(String noteId)
-    + boolean isLinkedBy(String noteId)
-    + List<String> getTags()
-    + static int getNumberOfNotes()
-    + HashSet<String> getOutgoingLinks()
-    + HashSet<String> getIncomingLinks()
+    + getCreatedAt() : Instant
+    + getModifiedAt() : Instant
+    + isLinkedTo(noteId : String) : boolean
+    + isLinkedBy(noteId : String) : boolean
+    + getTags() : List<String>
+    + {static} getNumberOfNotes() : int
+    + getOutgoingLinks() : HashSet<String>
+    + getIncomingLinks() : HashSet<String>
 
-    + void addTag(String tag)
-    + void removeTag(String tag)
-    + void addOutgoingLink(String noteId)
-    + void addIncomingLink(String noteId)
-    + void removeOutgoingLink(String noteId)
-    + void removeIncomingLink(String noteId)
-    + void updateModifiedAt()
-    + void loadBody(String body)
+    + addTag(tag : String) : void
+    + removeTag(tag : String) : void
+    + addOutgoingLink(noteId : String) : void
+    + addIncomingLink(noteId : String) : void
+    + removeOutgoingLink(noteId : String) : void
+    + removeIncomingLink(noteId : String) : void
+    + updateModifiedAt() : void
+    + loadBody(body : String) : void
 }
 @enduml

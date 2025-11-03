@@ -8,9 +8,9 @@ participant ":Parser"
 participant ":DeleteNoteCommand"
 participant ":Storage"
 
-activate ":Zettel"
 
 User -> ":Zettel": input "delete -f abc12345"
+activate ":Zettel"
 ":Zettel" -> ":UI": readCommand()
 activate ":UI"
 ":UI" --> ":Zettel": "delete -f abc12345"
@@ -37,5 +37,7 @@ deactivate ":Storage"
 ":DeleteNoteCommand" --> ":Zettel": execution complete
 deactivate ":DeleteNoteCommand"
 
+":Zettel" --> "User"
+deactivate ":Zettel"
 @enduml
 

@@ -1,47 +1,48 @@
 @startuml UIClass
 skinparam classAttributeIconSize 0
 hide circle
+
 class UI {
-    - static final String LINE
-    - static final String LIST_INCOMING
-    - static final String LIST_OUTGOING
-    - Scanner scanner
+    - {static} LINE : String
+    - {static} LIST_INCOMING : String
+    - {static} LIST_OUTGOING : String
+    - scanner : Scanner
 
     + UI()
-    + String readCommand()
-    + void showWelcome()
-    + void showHelp()
-    + void showDeletionCancelled()
-    + void showNoteDeleted(String id)
-    + void showDeleteNoteConfirmation(String id, String noteTitle)
-    + void showDeleteTagConfirmation(String tag)
-    + void showDeleteTagFromNoteConfirmation(String tag, String noteId)
-    + void showError(String message)
-    + void showBye()
-    + void showAddedNote(Note note)
-    + void showNoPinnedNotes()
-    + void showNoNotes()
-    + void showNoteList(List<Note> notes, boolean isPinned)
-    + void printLine()
-    + void close()
-    + void showNoNotesFound()
-    + void showFoundNotes(ArrayList<Note> matchedNotes)
-    + void showJustPinnedNote(Note note, String noteId)
-    + void showRepoInit(String repoName)
-    + void showSuccessfullyTaggedNote(String noteID, String tag)
-    + void showSuccessfullyAddedTag(String tag)
-    + void showOpeningEditor()
-    + void showNoteSavedFromEditor()
-    + void showNoteEdited(Note updatedNote)
-    + void showSuccessfulLinking(String referencingTitle, String linkedToTitle)
-    + void showLinkedNotes(ArrayList<Note> linkedNotes, String noteId, String listToShow)
-    + void showSuccessfullyUnlinkedNotes(String sourceNoteId, String targetNoteId)
-    + void showSuccessfullyDoubleLinkedNotes(String noteTitle1, String noteTitle2)
-    + void showSuccessfullyUnlinkedBothNotes(String noteId1, String noteId2)
-    + void showTagsSingleNote(List<String> tags, String noteId)
-    + void showTagsListGlobal(List<String> tags)
-    + void showSuccessfullyDeletedTagFromNote(String noteId, String tag)
-    + void showSuccessfullyDeletedTag(String tag)
-    + void showSuccessfullyRenamedTag(String oldTag, String newTag)
+    + readCommand() : String
+    + showWelcome() : void
+    + showHelp() : void
+    + showDeletionCancelled() : void
+    + showNoteDeleted(id : String) : void
+    + showDeleteNoteConfirmation(id : String, noteTitle : String) : void
+    + showDeleteTagConfirmation(tag : String) : void
+    + showDeleteTagFromNoteConfirmation(tag : String, noteId : String) : void
+    + showError(message : String) : void
+    + showBye() : void
+    + showAddedNote(note : Note) : void
+    + showNoPinnedNotes() : void
+    + showNoNotes() : void
+    + showNoteList(notes : List<Note>, isPinned : boolean) : void
+    + printLine() : void
+    + close() : void
+    + showNoNotesFound() : void
+    + showFoundNotes(matchedNotes : ArrayList<Note>) : void
+    + showJustPinnedNote(note : Note, noteId : String) : void
+    + showRepoInit(repoName : String) : void
+    + showSuccessfullyTaggedNote(noteId : String, tag : String) : void
+    + showSuccessfullyAddedTag(tag : String) : void
+    + showOpeningEditor() : void
+    + showNoteSavedFromEditor() : void
+    + showNoteEdited(updatedNote : Note) : void
+    + showSuccessfulLinking(referencingTitle : String, linkedToTitle : String) : void
+    + showLinkedNotes(linkedNotes : ArrayList<Note>, noteId : String, listToShow : String) : void
+    + showSuccessfullyUnlinkedNotes(sourceNoteId : String, targetNoteId : String) : void
+    + showSuccessfullyDoubleLinkedNotes(noteTitle1 : String, noteTitle2 : String) : void
+    + showSuccessfullyUnlinkedBothNotes(noteId1 : String, noteId2 : String) : void
+    + showTagsSingleNote(tags : List<String>, noteId : String) : void
+    + showTagsListGlobal(tags : List<String>) : void
+    + showSuccessfullyDeletedTagFromNote(noteId : String, tag : String) : void
+    + showSuccessfullyDeletedTag(tag : String) : void
+    + showSuccessfullyRenamedTag(oldTag : String, newTag : String) : void
 }
 @enduml

@@ -29,13 +29,13 @@ activate ":Storage"
 ":Storage" --> ":Command": modification done
 deactivate ":Storage"
 
-":Command" -> ":UI": show output
+":Command" -> ":UI": showAddedNote()
 activate ":UI"
 ":UI" --> ":Command": done
 deactivate ":UI"
 
 ":Command" --> ":Zettel": execution complete
-":Zettel" --> "User"
 deactivate ":Command"
+":Zettel" --> "User"
 deactivate ":Zettel"
 @enduml
