@@ -407,7 +407,7 @@ Tags are stored both globally (in `tags.txt`) and per-note (in `index.txt`).
 **Operations:**
 
 1. **new-tag**: Adds tag to global list
-2. **add-tag**: Adds existing global tag to specific note
+2. **add-tag**: Adds a tag to a specific note. Also creates the tag if it does not yet exist on the global list.
 3. **delete-tag**: Removes tag from specific note
 4. **delete-tag-globally**: Removes tag from global list AND all notes
 5. **rename-tag**: Renames tag globally across all notes

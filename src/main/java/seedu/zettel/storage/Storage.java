@@ -177,6 +177,7 @@ public class Storage {
      * @throws ZettelException if there's an error writing to the config file
      */
     public void updateTags(List<String> tags) throws ZettelException {
+
         fileSystemManager.validateTagsFile(); // Ensure tags file exists
         Path rootPath= fileSystemManager.getRootPath();
         Path tagsFile = rootPath.resolve(FileSystemManager.TAGS_FILE);
