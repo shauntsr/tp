@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import seedu.zettel.Note;
 import seedu.zettel.exceptions.ZettelException;
-import java.util.logging.Logger;
 
 /**
  * Orchestrates storage operations for Zettel repositories.
@@ -23,8 +22,6 @@ import java.util.logging.Logger;
 public class Storage {
     /** Default repository name used when no other repository is specified. */
     static final String DEFAULT_REPO = "main";
-
-    private static final Logger logger = Logger.getLogger(Storage.class.getName());
 
     private final FileSystemManager fileSystemManager;
     private final NoteSerializer noteSerializer;
@@ -53,8 +50,12 @@ public class Storage {
 
         Path defaultRepoPath = fileSystemManager.getRootPath().resolve(DEFAULT_REPO);
         if (Files.notExists(defaultRepoPath)) {
-            createRepo(DEFAULT_REPO);
-            System.out.println("Initialising default repo: " + DEFAULT_REPO);
+            try {
+                createRepo(DEFAULT_REPO);
+                System.out.println("Initialising default repo: " + DEFAULT_REPO);
+            } catch (ZettelException e) {
+                System.out.println("Error creating default repo: " + e.getMessage());
+            }
         }
 
         try {
@@ -176,8 +177,6 @@ public class Storage {
      * @throws ZettelException if there's an error writing to the config file
      */
     public void updateTags(List<String> tags) throws ZettelException {
-        logger.info("Updating tags in tags.txt: " + tags);
-
         fileSystemManager.validateTagsFile(); // Ensure tags file exists
         Path rootPath= fileSystemManager.getRootPath();
         Path tagsFile = rootPath.resolve(FileSystemManager.TAGS_FILE);
@@ -273,14 +272,14 @@ public class Storage {
      * Creates a new repository with the specified name.
      *
      * @param repoName the name of the repository to create
+     * @throws ZettelException if the repository already exists or creation failed
      */
-    public void createRepo(String repoName) {
-        //logger.info("Creating repository: " + repoName);
+    public void createRepo(String repoName) throws ZettelException {
         boolean created = fileSystemManager.createRepoStructure(repoName);
         if (created) {
             addToConfig(repoName);
         } else {
-            logger.warning("Repository " + repoName + " already exists or creation failed");
+            throw new ZettelException("Repository " + repoName + " already exists or creation failed");
         }
     }
 
