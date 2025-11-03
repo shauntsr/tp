@@ -26,10 +26,11 @@ end
 ' Editor launch logic
 EditorUtil -> System: getenv("VISUAL") / getenv("EDITOR")
 EditorUtil -> System: getProperty("os.name")
-alt Editor launches successfully via env var
-    EditorUtil -> Process: tryLaunchEditor(editor, file)
-    Process --> EditorUtil: exitCode
-else Env var failed, try OS-specific fallback
+
+EditorUtil -> Process: tryLaunchEditor(editor, file)
+Process --> EditorUtil: exitCode
+
+opt Launch failed, try OS-specific fallback
     alt Windows
         EditorUtil -> Process: tryLaunchEditor("notepad.exe", file)
         Process --> EditorUtil: exitCode
