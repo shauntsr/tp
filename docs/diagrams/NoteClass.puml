@@ -17,7 +17,6 @@ class Note {
     - pinned : boolean
     - archived : boolean
     - archiveName : String
-    - logs : List<String>
     - tags : List<String>
     - outgoingLinks : HashSet<String>
     - incomingLinks : HashSet<String>

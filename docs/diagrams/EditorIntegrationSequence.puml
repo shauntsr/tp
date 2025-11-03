@@ -1,76 +1,48 @@
 @startuml EditorIntegrationSequence
-actor User
-participant CLI
+participant ":Command" as Command
 participant "<<class>>\nEditorUtil" as EditorUtil
 participant ":System" as System
 participant ":Process" as Process
 
 hide footbox
+activate Command
 
-User -> CLI : Run command to edit note
-activate CLI
-
-CLI -> EditorUtil : openInEditor(filePath)
+' Command calls EditorUtil
+Command -> EditorUtil: openInEditor(filePath)
 activate EditorUtil
 
-EditorUtil -> System : Check if file exists
-activate System
-alt File missing
-    System --> EditorUtil : File not found
-    EditorUtil --> CLI : throw NoNoteFoundException
-else File exists
-    System --> EditorUtil : exists
-    deactivate System
+' Check if file exists
+EditorUtil -> System: file.exists()
+opt File missing
+    EditorUtil --> Command: throw NoNoteFoundException
 end
 
-EditorUtil -> System : Check if console is available
-activate System
-alt No console
-    System --> EditorUtil : No console
-    EditorUtil --> CLI : throw EditorNotFoundException
-else Console available
-    System --> EditorUtil : console ok
-    deactivate System
+' Check console availability
+EditorUtil -> System: System.console()
+opt No console
+    EditorUtil --> Command: throw EditorNotFoundException
 end
 
-EditorUtil -> System : Read $VISUAL, $EDITOR env vars
-activate System
-System --> EditorUtil : editor command(s)
-deactivate System
-
-alt Editor found
-    EditorUtil -> Process : tryLaunchEditor(editor, file)
-    activate Process
-    Process --> EditorUtil : exitCode
-    deactivate Process
-    alt Success
-        EditorUtil --> CLI : return
-    else Failure
-        EditorUtil -> System : Detect OS
-        activate System
-        System --> EditorUtil : OS info
-        deactivate System
-
-        alt Windows
-            EditorUtil -> Process : tryLaunchEditor("notepad.exe", file)
-            activate Process
-        else Other OS
-            EditorUtil -> Process : tryLaunchEditor("vim/nano/vi", file)
-        end
-        activate Process
-        Process --> EditorUtil : exitCode
-        deactivate Process
-        alt Success
-            EditorUtil --> CLI : return
-        else Failure
-            EditorUtil --> CLI : throw EditorNotFoundException
-        end
+' Editor launch logic
+EditorUtil -> System: getenv("VISUAL") / getenv("EDITOR")
+EditorUtil -> System: getProperty("os.name")
+alt Editor launches successfully via env var
+    EditorUtil -> Process: tryLaunchEditor(editor, file)
+    Process --> EditorUtil: exitCode
+else Env var failed, try OS-specific fallback
+    alt Windows
+        EditorUtil -> Process: tryLaunchEditor("notepad.exe", file)
+        Process --> EditorUtil: exitCode
+    else Other OS
+        EditorUtil -> Process: tryLaunchEditor("vim/nano/vi", file)
+        Process --> EditorUtil: exitCode
     end
-else No editor found
-    EditorUtil --> CLI : throw EditorNotFoundException
-    deactivate EditorUtil
+    opt All OS fallback attempts failed
+        EditorUtil --> Command: throw EditorNotFoundException
+    end
 end
 
-deactivate CLI
+EditorUtil --> Command: return (success)
+deactivate EditorUtil
 
 @enduml

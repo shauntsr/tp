@@ -1,5 +1,5 @@
 @startuml LinkCreationSequence
-actor User
+participant ":Zettel" as Zettel
 participant ":LinkNotesCommand" as Command
 participant ":ArrayList<Note>" as Notes
 participant ":UI" as UI
@@ -7,8 +7,8 @@ participant "sourceNote:Note" as SourceNote
 participant "targetNote:Note" as TargetNote
 
 hide footbox
-
-User -> Command: execute(notes, tags, ui, storage)
+activate Zettel
+Zettel -> Command: execute(notes, tags, ui, storage)
 activate Command
 
 Command -> Notes: check isEmpty()
@@ -18,7 +18,7 @@ deactivate Notes
 
 opt Notes empty
     Command -> UI: show error "No notes to link"
-    Command --> User: throw NoNotesException
+    Command --> Zettel: throw NoNotesException
 end
 
 Command -> Notes: find sourceNote by ID
@@ -32,12 +32,11 @@ Notes --> Command: return TargetNote
 deactivate Notes
 
 opt Either note missing
-    Command --> User: throw InvalidNoteIdException
+    Command --> Zettel: throw InvalidNoteIdException
 end
 
-Command -> Command: check if same ID
 opt Same note
-    Command --> User: throw NoteSelfLinkException
+    Command --> Zettel: throw NoteSelfLinkException
 end
 
 Command -> SourceNote: isLinkedTo(targetNoteId)
@@ -46,7 +45,7 @@ SourceNote --> Command: return false
 deactivate SourceNote
 
 opt Already linked
-    Command --> User: throw NotesAlreadyLinkedException
+    Command --> Zettel: throw NotesAlreadyLinkedException
 end
 
 Command -> SourceNote: addOutgoingLink(targetNoteId)
@@ -64,6 +63,6 @@ activate UI
 UI --> Command: done
 deactivate UI
 
-Command --> User: return
+Command --> Zettel: return
 deactivate Command
 @enduml

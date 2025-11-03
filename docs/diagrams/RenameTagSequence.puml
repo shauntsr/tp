@@ -1,40 +1,68 @@
 @startuml RenameTagSequence
-actor User
+participant ":Zettel" as Zettel
 participant ":RenameTagCommand" as Command
-participant "notes:ArrayList<Notes>" as Notes
+participant "notes:ArrayList<Note>" as Notes
 participant "tags:List<String>" as Tags
 participant "ui:UI" as UI
 participant "storage:Storage" as Storage
 
 hide footbox
+activate Zettel
 
-User -> Command: execute(notes, tags, ui, storage)
+Zettel -> Command: execute(notes, tags, ui, storage)
 activate Command
 
-Command -> Tags: validate oldTag exists
-Tags --> Command: ok
+' === Validation Phase ===
+opt Missing or blank oldTag
+    Command --> Zettel: throw InvalidFormatException("No tag provided to rename")
+end
 
-Command -> Tags: validate newTag not exists
-Tags --> Command: ok
+Command -> Tags: check if oldTag exists
+activate Tags
+Tags --> Command: result (true/false)
+deactivate Tags
 
+opt oldTag not found
+    Command --> Zettel: throw TagNotFoundException("Tag 'oldTag' does not exist")
+end
+
+opt Missing or blank newTag
+    Command --> Zettel: throw InvalidFormatException("No new tag name provided")
+end
+
+Command -> Tags: check if newTag already exists
+activate Tags
+Tags --> Command: result (true/false)
+deactivate Tags
+
+opt newTag already exists
+    Command --> Zettel: throw TagAlreadyExistsException("Tag 'newTag' already exists")
+end
+
+' === Rename Phase ===
 Command -> Tags: replace oldTag with newTag
+activate Tags
 Tags --> Command: updated
+deactivate Tags
 
-Command -> Notes: for each note containing oldTag
+' === Update Notes ===
+Command -> Notes: for each note containing oldTag\nreplace with newTag
 activate Notes
-Notes --> Command: oldTag replaced with newTag in note
+Notes --> Command: tags updated in notes
 deactivate Notes
 
+' === Persist Changes ===
 Command -> Storage: updateTags(tags)
 activate Storage
 Storage --> Command: tags persisted
 deactivate Storage
 
+' === UI Feedback ===
 Command -> UI: showSuccessfullyRenamedTag(oldTag, newTag)
 activate UI
 UI --> Command: done
 deactivate UI
 
-Command --> User: return
+Command --> Zettel: return
 deactivate Command
 @enduml
