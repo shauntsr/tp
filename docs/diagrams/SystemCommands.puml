@@ -7,11 +7,16 @@ abstract class Command {
 }
 class InitCommand
 class ChangeRepoCommand
+class CurrentRepoCommand
+class ListRepoCommand
 class ExitCommand
 class HelpCommand
 
-InitCommand -up-|> Command
+InitCommand -down-|> Command
+ChangeRepoCommand -down-|> Command
+CurrentRepoCommand -down-|> Command
+ListRepoCommand -down-|> Command
+
 ExitCommand -up-|> Command
-ChangeRepoCommand -up-|> Command
 HelpCommand -up-|> Command
 @enduml

@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="/tp/print.css">
 ---
 layout: page
 title: Developer Guide
@@ -55,14 +56,16 @@ The bulk of the app's work is done by the following components:
 
 **How the architecture components interact with each other:**
 
-<img src="images/ArchitectureSequence.png" width="782" />
+<img src="images/ArchitectureSequence.png" width="785" />
 
 1. User enters command in terminal
 2. `Zettel` reads input via `UI`
-3. `Parser` parses the input and creates appropriate `Command` object
-4. `Command` executes operation on `notes` list
-5. `Storage` persists changes to disk
-6. `UI` displays feedback to user
+3. `Parser` parses the input and 
+4. `Validator` validates input parameters (IDs, names, etc.)
+5. `Parser` creates appropriate `Command` object
+6. `Command` executes operation on `notes` list
+7. `Storage` persists changes to disk
+8. `UI` displays feedback to user
 
 The sections below give more details of each component.
 
@@ -70,7 +73,7 @@ The sections below give more details of each component.
 
 **API**: `UI.java`
 
-<img src="images/UIClass.png" width="600" />
+<img src="images/UIClass.png" width="602" />
 
 The `UI` component:
 * Uses `Scanner` to read user input from the console
@@ -115,13 +118,43 @@ Key validation patterns:
 * Flag validation: Recognizes `-f` (force), `-t` (title), `-b` (body), `-p` (pinned), `-a` (archived)
 * Repository name validation: Alphanumeric, hyphens, and underscores only
 
-<img src="images/ParserSequence.png" width="977" />
+<img src="images/ParserSequence.png" width="930" />
+
+### Validator Class
+
+**API**: `Validator.Java`
+
+The `Validator` class provides centralized validation logic for various input types:
+
+**Key Validation Methods:**
+
+1. **Note ID Validation:**
+    - Ensures exactly 8 lowercase hexadecimal characters (a-f, 0-9)
+    - Throws `InvalidFormatException` if invalid
+
+2. **Command Input Validation:**
+    - Bans usage of `` | `` in input
+    - Ensures input contains only ASCII characters
+    - Ensures input is not longer than 3000 characters
+    - Throws `ForbiddenCharacterFoundException` or `LengthExceedException` appropriately
+
+3. **Repo Title Validation:**
+    - Ensures input title only contains alphanumeric characters or spaces
+    - Ensures input is not longer than 200 characters
+    - Throws `InvalidFormatException` or `LengthExceedException` appropriately
+
+**Design Rationale:**
+
+- Separation of Concerns: Moves validation logic out of Parser class
+- Reusability: Validation methods can be called from multiple commands
+- Maintainability: Single source of truth for validation rules
+- Testability: Easier to unit test validation in isolation
 
 ### Command Component
 
 **API**: `Command.java`
 
-<img src="images/CommandAbstractClass.png" width="603" />
+<img src="images/CommandAbstractClass.png" width="563" />
 
 The `Command` component uses the Command Pattern where each command is an object that encapsulates:
 * The action to perform
@@ -141,14 +174,15 @@ All commands inherit from the abstract `Command` class and implement:
    - `ArchiveNoteCommand` - Moves notes to/from archive folder
    - `PrintNoteBodyCommand` - Prints body of note to stdout
 
-    <img src="images/NoteManagementCommands.png" width="628" />
+    <img src="images/NoteManagementCommands.png" width="588" />
 
 2. **Note Organization:**
    - `ListNoteCommand` - Lists notes with filtering options
    - `PinNoteCommand` - Pins/unpins notes for quick access
-   - `FindNoteCommand` - Searches notes by keyword
+   - `FindNoteByTitleCommand` - Searches notes by title
+   - `FindNoteByBodyCommand` - Searches note by body content
 
-    <img src="images/NoteOrganisationCommands.png" width="596" />
+    <img src="images/NoteOrganisationCommands.png" width="556" />
 
 3. **Linking System:**
    - `LinkNotesCommand` - Creates unidirectional links
@@ -157,7 +191,7 @@ All commands inherit from the abstract `Command` class and implement:
    - `UnlinkBothNotesCommand` - Removes bidirectional links
    - `ListLinkedNotesCommand` - Shows incoming/outgoing links
 
-    <img src="images/LinkCommands.png" width="636" />
+    <img src="images/LinkCommands.png" width="562" />
 
 4. **Tagging System:**
    - `NewTagCommand` - Creates global tags
@@ -168,19 +202,21 @@ All commands inherit from the abstract `Command` class and implement:
    - `ListTagsGlobalCommand` - Lists all tags
    - `ListTagsSingleNoteCommand` - Lists tags for specific note
 
-    <img src="images/TagCommands.png" width="885" />
+    <img src="images/TagCommands.png" width="749" />
 
-5. **System Commands:**
-   - `InitCommand` - Initializes new repository
-   - `ChangeRepoCommand` - Changes current note repo to another repo
-   - `HelpCommand` - Displays help information
-   - `ExitCommand` - Terminates application
+5. **Repository/System Commands**
+    - `InitCommand` - Initializes new repository
+    - `ChangeRepoCommand` - Changes current note repo to another repo
+    - `CurrentRepoCommand` - Displays current repo name
+    - `ListRepoCommand` - Lists all repos
+    - `HelpCommand` - Displays help information
+    - `ExitCommand` - Terminates application
 
-    <img src="images/SystemCommands.png" width="612" />
+    <img src="images/SystemCommands.png" width="664" />
 
 ### Note Component
 
-<img src="images/NoteClass.png" width="654" />
+<img src="images/NoteClass.png" width="660" />
 
 **API**: `Note.java`
 
@@ -220,7 +256,7 @@ The `Note` class represents a single note in the Zettel system:
 
 **API**: `Storage.java`, `FileSystemManager.java`, `NoteSerializer.java`
 
-<img src="images/StoragePackage.png" width="1006" />
+<img src="images/StoragePackage.png" width="812" />
 
 The Storage component is divided into three classes with distinct responsibilities:
 
@@ -271,9 +307,9 @@ ID | Title | Filename | CreatedAt | ModifiedAt | Pinned | Archived | ArchiveName
 Where:
 * Pinned/Archived are `1` or `0`
 * Tags and links are delimited by `;;`
-* All fields are separated by ` | ` (space-pipe-space)
+* All fields are separated by `` | `` (space-pipe-space)
 
-<img src="images/StorageSaveSequence.png" width="776" />
+<img src="images/StorageSaveSequence.png" width="754" />
 
 ### Utility Components
 
@@ -333,7 +369,7 @@ ID = SHA-256(title + createdAt)[0:4] → 8 hex characters
     * Pros: Globally unique across repositories, supports synchronization.
     * Cons: Less readable and harder to manually type or recall.
 
-<img src="images/NoteCreationActivity.png" width="464" />
+<img src="images/NoteCreationActivity.png" width="439" />
 
 **Sequence:**
 1. User provides title (and optional body)
@@ -373,7 +409,7 @@ private HashSet<String> incomingLinks;  // IDs that link to this note
    - For each outgoing link: remove from target's incoming links
    - For each incoming link: remove from source's outgoing links
 
-<img src="images/LinkCreationSequence.png" width="893" />
+<img src="images/LinkCreationSequence.png" width="517" />
 
 **Rationale:**
 * O(1) lookup for "does note A link to note B?"
@@ -412,7 +448,7 @@ Tags are stored both globally (in `tags.txt`) and per-note (in `index.txt`).
 4. **delete-tag-globally**: Removes tag from global list AND all notes
 5. **rename-tag**: Renames tag globally across all notes
 
-<img src="images/RenameTagSequence.png" width="908" />
+<img src="images/RenameTagSequence.png" width="630" />
 
 **Why Global Tag List?**
 * Ensures consistency (no typos creating new tags)
@@ -436,7 +472,7 @@ Tags are stored both globally (in `tags.txt`) and per-note (in `index.txt`).
 
 **Design Choice: Separate Archive Directory**
 
-Archived notes are physically moved to `archive/` subdirectory rather than just flagged.
+Archived notes are physically moved to `archive/` subdirectory rather than just flagged, and can no longer be edited.
 
 **Structure:**
 ```
@@ -479,6 +515,84 @@ repo/
     * Pros: Keeps links intact, avoids file system changes.
     * Cons: Requires more parsing logic and filtering in commands.
 
+### Repository Management System
+
+**Design Choice: Multiple Independent Repositories**
+
+Users can create and switch between multiple isolated repositories, each with its own notes, index, and archive.
+
+**Structure:**
+```
+data/
+├── .zettelConfig          # Repository configuration file
+├── tags.txt               # Global tags (shared across all repos)
+├── main/                  # Default repository
+│   ├── index.txt
+│   ├── notes/
+│   └── archive/
+├── project1/              # Additional repositories
+│   ├── index.txt
+│   ├── notes/
+│   └── archive/
+└── research/
+    ├── index.txt
+    ├── notes/
+    └── archive/
+```
+
+**Configuration File Format (`.zettelConfig`):**
+```
+<repo1> | <repo2> | ...
+<current-repo-name>
+```
+- **First lines:** List of all repositories, pipe-separated
+- **Second line:** Current active repository
+
+#### Operations
+
+**InitCommand:**
+
+- Creates new repository directory structure
+- Adds repository name to `.zettelConfig`
+- Does **not** switch to new repository
+
+**ChangeRepoCommand:**
+
+- Validates repository exists
+- Updates second line of `.zettelConfig`
+- Reloads notes from new repository
+
+**CurrentRepoCommand:**
+
+- Reads second line from `.zettelConfig`
+- Displays current repository name
+
+**ListRepoCommand:**
+
+- Parses first line of `.zettelConfig`
+- Displays numbered list of repositories
+
+### Advantages
+
+* Complete isolation between projects
+* Easy to archive entire projects
+* Simple file-based configuration
+* No cross-repository dependencies
+
+> **Note:** Tags are global across all repositories (stored in `data/tags.txt`), while notes and links are repository-specific.
+
+#### Design Considerations
+
+**Aspect: How to manage multiple repositories**
+
+* **Alternative 1 (current choice):** Separate directories with centralized config file
+    * Pros: Complete isolation, simple structure, easy backup per project
+    * Cons: Must manually switch repositories, no cross-repo features
+
+* **Alternative 2:** Single directory with repository field in each note
+    * Pros: No switching needed, can link across repositories
+    * Cons: More complex queries, easier to corrupt, harder to backup individually
+
 ### Storage Validation and Recovery
 
 **Design Choice: Robust Validation with Auto-Recovery**
@@ -504,7 +618,7 @@ Storage performs validation on every save and automatically repairs common issue
    - Validates current repository exists
    - Note: if `.zettelConfig` is forcibly removed by user, on validation a new default `.zettelConfig` is created; as such previously created repos are lost to the program.
 
-<img src="images/StorageValidationFlow.png" width="479" />
+<img src="images/StorageValidationFlow.png" height="1250" />
 
 **Recovery Strategy:**
 * Non-destructive: Never deletes data automatically
@@ -533,7 +647,7 @@ Process process = new ProcessBuilder(editor, filepath)
 int exitCode = process.waitFor();
 ```
 
-<img src="images/EditorIntegrationSequence.png" width="812" />
+<img src="images/EditorIntegrationSequence.png" width="336" />
 
 **Advantages:**
 * Leverages user's existing editor preferences
@@ -567,7 +681,7 @@ int exitCode = process.waitFor();
 * Use Javadoc for all public classes and methods
 * Include `@param`, `@return`, and `@throws` annotations
 * Document design decisions in class-level Javadoc
-* Keep comments concise and focused on "why" not "what"
+* Keep comments concise and focused on "what" and "why", not "how"
 
 ### Testing Recommendations
 
@@ -651,7 +765,10 @@ Priorities: High (must have) - `***`, Medium (nice to have) - `**`, Low (unlikel
 
 * **Zettelkasten**: A method of note-taking and knowledge management based on linking atomic notes
 * **Note ID**: An 8-character hexadecimal identifier generated from note title and creation time
+* **Validator**: Utility class that performs input validation before command execution
 * **Repository**: A collection of notes stored in a single directory (can have multiple repositories)
+* **Current Repository**: The active repository where new notes are created and commands are executed
+* **Repository List**: Collection of all initialized repositories stored in .zettelConfig
 * **Index file**: `index.txt` containing metadata for all notes in pipe-delimited format
 * **Body file**: Separate `.txt` file containing the actual content of a note
 * **Outgoing link**: A link from the current note to another note
@@ -713,9 +830,13 @@ Priorities: High (must have) - `***`, Medium (nice to have) - `**`, Low (unlikel
    - Command: `list -a`
    - Expected: Only archived notes shown
 
-4. **Search notes**
-   - Command: `find test`
+4. **Search note bodies**
+   - Command: `find-note-by-body test`
    - Expected: All notes with body containing "test" (case-insensitive) displayed
+ 
+5. **Search note titles**
+   - Command: `find-note-by-title test`
+   - Expected: All notes with title containing "test" (case-insensitive) displayed
 
 ### Linking Notes
 
@@ -726,7 +847,7 @@ Priorities: High (must have) - `***`, Medium (nice to have) - `**`, Low (unlikel
 
 2. **Create bidirectional link**
    - Command: `link-both <id1> <id2>`
-   - Expected: Both directions linked
+   - Expected: Both directions linked with message
 
 3. **List incoming links**
    - Command: `list-incoming-links <note-id>`
@@ -736,11 +857,30 @@ Priorities: High (must have) - `***`, Medium (nice to have) - `**`, Low (unlikel
    - Command: `list-outgoing-links <note-id>`
    - Expected: All notes this note links to displayed
 
-5. **Delete note with links**
+5. **Unlink a note with links**
+   - Command: `unlink <source-id> <target-id>`
+   - Expected: One-way link from source note to target note removed with message
+
+6. **Delete note with links**
    - Delete a linked note
-   - Check linked notes
+   - Check linked notes with `list-incoming-links` and/or `list-outgoing-links`
    - Expected: All links cleaned up automatically
 
+### Repository Management
+
+1. **View current repository**
+   - Command: `current-repo`
+   - Expected: Display current repository name (e.g main)
+
+2. **List all repositories**
+   - Create multiple repos: `init repo1`, `init repo2`
+   - Command: `list-repos`
+   - Expected: Numbered list showing all repositories 
+
+3. **Switch to non-existent repository**
+   - Command: `change-repo nonexistent`
+   - Expected: Error message about repository not existing
+ 
 ### Tag Management
 
 1. **Create global tag**

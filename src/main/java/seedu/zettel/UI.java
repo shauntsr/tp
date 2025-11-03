@@ -55,8 +55,8 @@ public class UI {
     public void showHelp() {
         System.out.println(" Available Commands:");
         System.out.println("   init <repo-name>                  - Initialize a new repository");
-        System.out.println("   change-repo[pository] <repo-name> - Switch to another existing repository");
-        System.out.println("   current-repo[pository]            - Show the name of the current repository");
+        System.out.println("   change-repo[sitory] <repo-name> - Switch to another existing repository");
+        System.out.println("   current-repo[sitory]            - Show the name of the current repository");
         System.out.println("   list-repos                        - Lists all repositories initialized");
         System.out.println("   new -t <title> [-b <body>]        - Create a new note");
         System.out.println("   edit <note-id>                    - Edit an existing note");

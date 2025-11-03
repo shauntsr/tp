@@ -91,7 +91,7 @@ public class Parser {
     private static final String CHANGE_REPO_FORMAT = "Change repository format should be: change-repo[sitory]"+
             "<REPO_NAME>";
     private static final String CHANGE_REPO_EMPTY = "Please specify a repo name to change to!";
-    private static final String CURRENT_REPO_FORMAT = "Current repository format should be: current-repo\";";
+    private static final String CURRENT_REPO_FORMAT = "Current repository format should be: current-repo[sitory]";
     private static final String PRINT_NOTE_BODY_FORMAT =
         "Print note body format should be: print-body <NOTE_ID>";
 
