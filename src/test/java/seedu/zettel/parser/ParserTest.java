@@ -1,23 +1,27 @@
-package seedu.zettel;
+package seedu.zettel.parser;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
+import seedu.zettel.commands.ChangeRepoCommand;
 import seedu.zettel.commands.Command;
+import seedu.zettel.commands.CurrentRepoCommand;
 import seedu.zettel.commands.DeleteNoteCommand;
 import seedu.zettel.commands.DeleteTagFromNoteCommand;
 import seedu.zettel.commands.DeleteTagGloballyCommand;
 import seedu.zettel.commands.EditNoteCommand;
 import seedu.zettel.commands.ExitCommand;
-import seedu.zettel.commands.FindNoteCommand;
+import seedu.zettel.commands.FindNoteByBodyCommand;
+import seedu.zettel.commands.FindNoteByTitleCommand;
 import seedu.zettel.commands.HelpCommand; // Added import
 import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.LinkBothNotesCommand;
 import seedu.zettel.commands.LinkNotesCommand;
 import seedu.zettel.commands.ListLinkedNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
+import seedu.zettel.commands.ListRepoCommand;
 import seedu.zettel.commands.ListTagsGlobalCommand;
 import seedu.zettel.commands.ListTagsSingleNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
@@ -184,13 +188,30 @@ class ParserTest {
 
     @Test
     void testParseFindWithSearchTermReturnsFindNoteCommand() throws ZettelException {
-        Command command = Parser.parse("find test");
-        assertInstanceOf(FindNoteCommand.class, command);
+        Command command = Parser.parse("find-note-by-body test");
+        assertInstanceOf(FindNoteByBodyCommand.class, command);
     }
 
     @Test
     void testParseFindWithoutSearchTermThrowsEmptyDescriptionException() {
-        assertThrows(EmptyDescriptionException.class, () -> Parser.parse("find"));
+        assertThrows(EmptyDescriptionException.class, () -> Parser.parse("find-note-by-body"));
+    }
+
+    @Test
+    void testParseFindByTitleWithSearchTermReturnsFindNoteByTitleCommand() throws ZettelException {
+        Command command = Parser.parse("find-note-by-title test");
+        assertInstanceOf(FindNoteByTitleCommand.class, command);
+    }
+
+    @Test
+    void testParseFindByTitleWithMultipleTermsReturnsFindNoteByTitleCommand() throws ZettelException {
+        Command command = Parser.parse("find-note-by-title title1 title2");
+        assertInstanceOf(FindNoteByTitleCommand.class, command);
+    }
+
+    @Test
+    void testParseFindByTitleWithoutSearchTermThrowsEmptyDescriptionException() {
+        assertThrows(EmptyDescriptionException.class, () -> Parser.parse("find-note-by-title"));
     }
 
     // ==================== Link Command Tests ====================
@@ -597,15 +618,15 @@ class ParserTest {
     }
 
     @Test
-    void testParseNewTagWithoutTagThrowsInvalidFormatException() {
+    void testParseNewTagWithoutTagThrowsEmptyDescriptionException() {
         ZettelException ex = assertThrows(ZettelException.class, () -> Parser.parse("new-tag"));
-        assertTrue(ex.getMessage().contains("new-tag"));
+        assertTrue(ex.getMessage().contains("Tag"));
     }
 
     @Test
     void testParseNewTagWithEmptyTagThrowsEmptyDescriptionException() {
         ZettelException ex = assertThrows(ZettelException.class, () -> Parser.parse("new-tag "));
-        assertTrue(ex.getMessage().contains("tag"));
+        assertTrue(ex.getMessage().contains("Tag"));
     }
 
     @Test
@@ -893,8 +914,6 @@ class ParserTest {
         assertThrows(InvalidFormatException.class, () -> Parser.parse("help me"));
     }
 
-
-
     // ==================== Print Body Command Tests ====================
 
     @Test
@@ -915,4 +934,76 @@ class ParserTest {
         // too short should fail
         assertThrows(InvalidFormatException.class, () -> Parser.parse("print-body abc"));
     }
+
+    // ==================== Print Repo Tests ====================
+
+    @Test
+    void testParseListReposReturnsListRepoCommand() throws ZettelException {
+        Command command = Parser.parse("list-repos");
+        assertInstanceOf(ListRepoCommand.class, command);
+    }
+
+    @Test
+    void testParseListReposWithExtraArgumentThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-repos extra"));
+    }
+
+    @Test
+    void testParseListReposWithMultipleArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("list-repos arg1 arg2"));
+    }
+    @Test
+    void testParseChangeRepoReturnsChangeRepoCommand() throws ZettelException {
+        Command command = Parser.parse("change-repo my-repo");
+        assertInstanceOf(ChangeRepoCommand.class, command);
+    }
+
+    @Test
+    void testParseChangeRepoWithNoArgumentThrowsEmptyDescriptionException() {
+        assertThrows(EmptyDescriptionException.class, () -> Parser.parse("change-repo"));
+    }
+
+    @Test
+    void testParseChangeRepoWithExtraArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("change-repo repo1 repo2"));
+    }
+
+    @Test
+    void testParseChangeRepoWithEmptyNameThrowsEmptyDescriptionException() {
+        assertThrows(EmptyDescriptionException.class, () -> Parser.parse("change-repo  "));
+    }
+
+    @Test
+    void testParseChangeRepoWithInvalidCharactersThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("change-repo repo@name"));
+    }
+
+    @Test
+    void testParseChangeRepoWithSpacesThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("change-repo my repo"));
+    }
+
+    @Test
+    void testParseChangeRepoWithValidHyphenAndUnderscore() throws ZettelException {
+        Command command = Parser.parse("change-repo my_repo-123");
+        assertInstanceOf(ChangeRepoCommand.class, command);
+    }
+
+    // CurrentRepoCommand tests
+    @Test
+    void testParseCurrentRepoReturnsCurrentRepoCommand() throws ZettelException {
+        Command command = Parser.parse("current-repo");
+        assertInstanceOf(CurrentRepoCommand.class, command);
+    }
+
+    @Test
+    void testParseCurrentRepoWithExtraArgumentThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("current-repo extra"));
+    }
+
+    @Test
+    void testParseCurrentRepoWithMultipleArgumentsThrowsInvalidFormatException() {
+        assertThrows(InvalidFormatException.class, () -> Parser.parse("current-repo arg1 arg2"));
+    }
+
 }

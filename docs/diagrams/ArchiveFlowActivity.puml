@@ -1,6 +1,5 @@
 @startuml ArchiveFlow
 start
-
 :Receive noteId and shouldArchive;
 
 :Find note in notes list by ID;

@@ -25,28 +25,15 @@ class Note {
     + Note(String id, String title, String filename, String body, Instant createdAt, Instant modifiedAt,
            boolean pinned, boolean archived, String archiveName, List<String> tags)
 
-    + String getId()
-    + String getTitle()
-    + String getFilename()
-    + String getBody()
     + Instant getCreatedAt()
     + Instant getModifiedAt()
-    + boolean isPinned()
-    + boolean isArchived()
     + boolean isLinkedTo(String noteId)
     + boolean isLinkedBy(String noteId)
-    + String getArchiveName()
     + List<String> getTags()
     + static int getNumberOfNotes()
     + HashSet<String> getOutgoingLinks()
     + HashSet<String> getIncomingLinks()
 
-    + void setTitle(String title)
-    + void setFilename(String filename)
-    + void setBody(String body)
-    + void setPinned(boolean pinned)
-    + void setArchived(boolean archived)
-    + void setArchiveName(String archiveName)
     + void addTag(String tag)
     + void removeTag(String tag)
     + void addOutgoingLink(String noteId)
@@ -55,6 +42,5 @@ class Note {
     + void removeIncomingLink(String noteId)
     + void updateModifiedAt()
     + void loadBody(String body)
-    + String toString()
 }
 @enduml

@@ -9,7 +9,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -51,6 +53,24 @@ public class StorageTest {
         assertTrue(Files.exists(defaultRepoNotes));
         assertTrue(Files.exists(defaultRepoArchive));
         assertTrue(Files.exists(defaultIndexFile));
+    }
+
+    @Test
+    void testInitPrintsDefaultRepoMessage() throws IOException {
+        // Capture System.out
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outContent));
+
+        try {
+            storage.init();
+        } finally {
+            System.setOut(originalOut); // restore
+        }
+
+        String output = outContent.toString();
+        assertTrue(output.contains("Initialising default repo: main"),
+                "init() should print message about initializing default repo");
     }
 
     @Test

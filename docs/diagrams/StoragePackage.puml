@@ -1,65 +1,68 @@
 @startuml StoragePackage
 skinparam classAttributeIconSize 0
+hide circle
 
 package storage {
-    class Storage {
-        - static final String DEFAULT_REPO
-        - FileSystemManager fileSystemManager
-        - NoteSerializer noteSerializer
-        - String repoName
-        - ArrayList<String> repoList
 
-        + Storage(String rootPath)
-        + void init()
-        + String readCurrRepo()
-        + List<String> readTagsLine()
-        + void createStorageFile(Note note)
-        + void loadConfig()
-        + void updateConfig(String newRepo)
-        + void updateTags(List<String> tags)
-        + ArrayList<Note> load()
-        + void save(List<Note> notes)
-        + void changeRepo(String newRepo)
-        + void createRepo(String repoName)
-        + void deleteStorageFile(String filename)
+    class Storage {
+        - {static} DEFAULT_REPO : String
+        - fileSystemManager : FileSystemManager
+        - noteSerializer : NoteSerializer
+        - repoName : String
+        - repoList : ArrayList<String>
+
+        + Storage(rootPath : String)
+        + init() : void
+        + readCurrRepo() : String
+        + readTagsLine() : List<String>
+        + createStorageFile(note : Note) : void
+        + loadConfig() : void
+        + updateConfig(newRepo : String) : void
+        + updateTags(tags : List<String>) : void
+        + load() : ArrayList<Note>
+        + save(notes : List<Note>) : void
+        + changeRepo(newRepo : String) : void
+        + createRepo(repoName : String) : void
+        + deleteStorageFile(filename : String) : void
     }
 
     class FileSystemManager {
-        - static final String CONFIG_FILE
-        - static final String TAGS_FILE
-        - static final String REPO_NOTES
-        - static final String REPO_ARCHIVE
-        - static final String REPO_INDEX
-        - Path rootPath
+        - {static} CONFIG_FILE : String
+        - {static} TAGS_FILE : String
+        - {static} REPO_NOTES : String
+        - {static} REPO_ARCHIVE : String
+        - {static} REPO_INDEX : String
+        - rootPath : Path
 
-        + FileSystemManager(String rootPath)
-        + Path getRootPath()
-        + void createRootFolder()
-        + void createConfigFile(String defaultRepo)
-        + boolean createRepoStructure(String repoName)
-        + void createNoteFile(String noteFilename, String noteBody, String repoName)
-        + void validateRepoStructure(String repoName, List<String> expectedFiles)
-        + void validateTagsFile()
-        + Path getIndexPath(String repoName)
-        + Path getNotesPath(String repoName)
-        + Path getConfigPath()
+        + FileSystemManager(rootPath : String)
+        + getRootPath() : Path
+        + createRootFolder() : void
+        + createConfigFile(defaultRepo : String) : void
+        + createRepoStructure(repoName : String) : boolean
+        + createNoteFile(noteFilename : String, noteBody : String, repoName : String) : void
+        + validateRepoStructure(repoName : String, expectedFiles : List<String>) : void
+        + validateTagsFile() : void
+        + getIndexPath(repoName : String) : Path
+        + getNotesPath(repoName : String) : Path
+        + getConfigPath() : Path
     }
 
     class NoteSerializer {
-        - static final String LIST_DELIM
+        - {static} LIST_DELIM : String
 
-        + ArrayList<Note> loadNotes(Path indexPath, Path notesDir)
-        + void saveNotes(List<Note> notes, Path indexPath)
-        + List<String> getExpectedFilenames(Path indexPath)
+        + loadNotes(indexPath : Path, notesDir : Path) : ArrayList<Note>
+        + saveNotes(notes : List<Note>, indexPath : Path) : void
+        + getExpectedFilenames(indexPath : Path) : List<String>
     }
 
     class Note {
     }
 
-
-    Storage *-- FileSystemManager : uses
-    Storage *-- NoteSerializer : uses
-    NoteSerializer --> Note : serializes/deserializes
+    ' Associations
+    Storage --> FileSystemManager : uses
+    Storage --> NoteSerializer : uses
+    NoteSerializer --> Note : serializes / deserializes
     FileSystemManager --> Path : file operations
 }
+
 @enduml

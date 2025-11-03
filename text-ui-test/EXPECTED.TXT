@@ -1,3 +1,4 @@
+Initialising default repo: main
 ____________________________________________________________
  Hello! I'm Zettel
  What can I do for you?
@@ -7,9 +8,10 @@ ____________________________________________________________
    init <repo-name>                  - Initialize a new repository
    change-repo[pository] <repo-name> - Switch to another existing repository
    current-repo[pository]            - Show the name of the current repository
+   list-repos                        - Lists all repositories initialized
    new -t <title> [-b <body>]        - Create a new note
    edit <note-id>                    - Edit an existing note
-   list [-p] [-a]                    - List all notes (or pinned only)
+   list [-p] [-a]                    - List notes (pinned and/or archived filters)
    delete [-f] <note-id>             - Delete a note by ID
    pin <note-id>                     - Pin a note
    unpin <note-id>                   - Unpin a note
@@ -26,22 +28,28 @@ ____________________________________________________________
    delete-tag [-f] <note-id> <tag>   - Delete a tag from a note
    delete-tag-globally [-f] <tag>    - Delete a tag from all notes
    rename-tag <old-tag> <new-tag>    - Rename a tag globally
-   archive <note-id>               - Moves note to archive folder
-   unarchive <note-id>             - Moves note out of archive folder
-   print-body <note-id>            - Print the body of a note
-   find <text>                       - Search for notes
+   archive <note-id>                 - Moves note to archive folder
+   unarchive <note-id>               - Moves note out of archive folder
+   print-body <note-id>              - Print the body of a note
+   find-note-by-body <search-terms>  - Search for notes by body content
+   find-note-by-title <search-terms> - Search for notes by title
    help                              - Show this list of commands
    bye                               - Exit the application
 
 ____________________________________________________________
-Note created: test1.txt #35413cb9
-Note created: test2.txt #3fc6da0d
-Note created: test3.txt #b09d6cd3
+Note created: test1.txt #50722821
+____________________________________________________________
+Note created: test2.txt #58bd564b
+____________________________________________________________
+Note created: test3.txt #fb9de1cf
+____________________________________________________________
 You have 3 notes:
-    1. test3.txt 2025-10-30 b09d6cd3
-    2. test2.txt 2025-10-30 3fc6da0d
-    3. test1.txt 2025-10-30 35413cb9
-Here are the matching notes in your list:
- 1. test3.txt 2025-10-30 b09d6cd3
- 2. test2.txt 2025-10-30 3fc6da0d
- 3. test1.txt 2025-10-30 35413cb9
+    1. test3.txt 2025-11-02 fb9de1cf
+    2. test2.txt 2025-11-02 58bd564b
+    3. test1.txt 2025-11-02 50722821
+____________________________________________________________
+ Here are the notes with bodies matching the above:
+ 1. test3.txt 2025-11-02 fb9de1cf
+ 2. test2.txt 2025-11-02 58bd564b
+ 3. test1.txt 2025-11-02 50722821
+____________________________________________________________

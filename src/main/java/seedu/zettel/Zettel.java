@@ -10,6 +10,7 @@ import java.util.concurrent.TimeoutException;
 
 import seedu.zettel.commands.Command;
 import seedu.zettel.exceptions.ZettelException;
+import seedu.zettel.parser.Parser;
 import seedu.zettel.storage.Storage;
 
 /**
@@ -85,8 +86,11 @@ public class Zettel {
                 // Save notes after each command (auto-save)
                 storage.save(notes);
 
+                ui.printLine();
+
             } catch (ZettelException e) {
                 ui.showError(e.getMessage());
+                ui.printLine();
             } catch (Exception e) {
                 ui.showError("An unexpected error occurred: " + e.getMessage());
                 break;

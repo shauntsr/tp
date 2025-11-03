@@ -1,4 +1,4 @@
-package seedu.zettel;
+package seedu.zettel.parser;
 
 import java.util.Arrays;
 
@@ -11,13 +11,15 @@ import seedu.zettel.commands.DeleteTagFromNoteCommand;
 import seedu.zettel.commands.DeleteTagGloballyCommand;
 import seedu.zettel.commands.EditNoteCommand;
 import seedu.zettel.commands.ExitCommand;
-import seedu.zettel.commands.FindNoteCommand;
+import seedu.zettel.commands.FindNoteByBodyCommand;
+import seedu.zettel.commands.FindNoteByTitleCommand;
 import seedu.zettel.commands.HelpCommand;
 import seedu.zettel.commands.InitCommand;
 import seedu.zettel.commands.LinkBothNotesCommand;
 import seedu.zettel.commands.LinkNotesCommand;
 import seedu.zettel.commands.ListLinkedNotesCommand;
 import seedu.zettel.commands.ListNoteCommand;
+import seedu.zettel.commands.ListRepoCommand;
 import seedu.zettel.commands.ListTagsGlobalCommand;
 import seedu.zettel.commands.ListTagsSingleNoteCommand;
 import seedu.zettel.commands.NewNoteCommand;
@@ -40,14 +42,18 @@ import seedu.zettel.exceptions.ZettelException;
 public class Parser {
     // Error messages to be printed when encountering errors
     // Categorised between empty, format and invalid
-    private static final String LIST_FORMAT = "List format should be: list [-p]";
+    private static final String LIST_FORMAT = "List format should be: list [-p] [-a], where -p and -a can be"
+            + " in any order";
     private static final String PIN_FORMAT = "Pin format should be: pin/unpin <NOTE_ID>";
     private static final String INIT_FORMAT = "Init format should be: init <REPO_NAME>";
     private static final String DELETE_FORMAT = "Delete format should be: delete [-f] <NOTE_ID>";
-    private static final String FIND_FORMAT = "Find format should be: find <SEARCH_TERM>";
+    private static final String FIND_FORMAT = "Find format should be: find-note-by-body <SEARCH_TERMS>";
+    private static final String FIND_BY_TITLE_FORMAT = 
+            "Find by title format should be: find-note-by-title <SEARCH_TERMS>";
     private static final String NOTE_FORMAT = "New note format should be: new -t <TITLE> [-b <BODY>]";
     private static final String ADD_TAG_FORMAT = "Add tag command format should be: add-tag <NOTE_ID> <TAG>";
-    private static final String NEW_TAG_FORMAT = "New tag command format should be: new-tag <TAG>";
+    private static final String NEW_TAG_FORMAT = "New tag command format should be: new-tag <TAG>"
+            + ", where <TAG> is one word without spaces!";
     private static final String LIST_TAGS_GLOBAL_FORMAT = "List all tags globally command format should be: "
             + "list-tags-all";
     private static final String LINK_NOTES_FORMAT = "Link notes command format should be: link"
@@ -60,6 +66,7 @@ public class Parser {
             + " <NOTE_ID_1> <NOTE_ID_2>";
     private static final String LIST_TAGS_SINGLE_NOTE_FORMAT = "List tags for single note command format "
             + "should be: list-tags <NOTE_ID>";
+    private static final String LIST_REPO_FORMAT = "List repository command format should be: list-repo[sitorie]s";
     private static final String DELETE_TAG_FORMAT = "Delete tag command format should be: delete-tag [-f] "
             + "<NOTE_ID> <TAG>";
     private static final String DELETE_TAG_GLOBALLY_FORMAT = "Delete tag globally format should be: "
@@ -69,20 +76,10 @@ public class Parser {
     private static final String NOTE_EMPTY = "Note title cannot be empty!";
     private static final String TAG_EMPTY = "Tag cannot be empty!";
     private static final String ID_EMPTY = "Please specify a Note ID to ";
-    private static final String ID_INVALID = "Note ID must be exactly 8 hexadecimal characters (0-9, a-f)";
     private static final String INIT_EMPTY = "Please specify a repo name!";
     private static final String INIT_INVALID =
             "Repo name can only contain alphanumeric characters, "
                     + "hyphens and underscores.";
-    // Note ID validation constants
-    private static final int VALID_NOTE_ID_LENGTH = 8;
-    private static final String VALID_NOTE_ID_REGEX = "^[a-f0-9]{" + VALID_NOTE_ID_LENGTH + "}$";
-    private static final String INVALID_ID_LENGTH_FORMAT =
-            "Note ID must be exactly " + VALID_NOTE_ID_LENGTH + " characters long.";
-    private static final String LIST_LINKED_TYPE_FORMAT = "Link type must be either" + 
-                    " 'incoming-links' or 'outgoing-links'.";
-    private static final String LIST_LINKED_FORMAT = "List linked notes format should be: list "
-                    + "<incoming-links/outgoing-links> <NOTE_ID>";
     private static final String ARCHIVE_NOTES_FORMAT = "Archive notes format should be: " +
                     "archive <NOTE_ID>";
     private static final String UNARCHIVE_NOTES_FORMAT = "Unarchive notes format should be: " +
@@ -91,7 +88,8 @@ public class Parser {
         "List incoming links format should be: list-incoming-links <NOTE_ID>";
     private static final String LIST_OUTGOING_LINKS_FORMAT =
         "List outgoing links format should be: list-outgoing-links <NOTE_ID>";
-    private static final String CHANGE_REPO_FORMAT = "Change repo format should be: change-repo <REPO_NAME>";
+    private static final String CHANGE_REPO_FORMAT = "Change repository format should be: change-repo[sitory]"+
+            "<REPO_NAME>";
     private static final String CHANGE_REPO_EMPTY = "Please specify a repo name to change to!";
     private static final String CURRENT_REPO_FORMAT = "Current repository format should be: current-repo\";";
     private static final String PRINT_NOTE_BODY_FORMAT =
@@ -99,16 +97,15 @@ public class Parser {
 
     /**
      * Parses a user command string and returns the corresponding Command object.
-     * Supported commands include: bye, list, new, delete, pin, unpin, init, and find.
+     * Supported commands listed for each case.
+     * Validate input with validator before parsing cases.
      *
      * @param input The raw user input string to parse.
      * @return A Command object corresponding to the user's input.
      * @throws ZettelException If the command format is invalid or parameters are missing.
      */
     public static Command parse(String input) throws ZettelException {
-        if (input.contains("|")) {
-            throw new InvalidFormatException("Invalid character '|' detected in command input!");
-        }
+        Validator.validateCommandInput(input);
         String[] inputs = input.trim().split("\\s+"); //split input based on spaces in between
         String command = inputs[0].toLowerCase(); //first word of user input
         return switch (command) {
@@ -120,7 +117,8 @@ public class Parser {
         case "pin" -> parsePinNoteCommand(inputs, true);
         case "unpin" -> parsePinNoteCommand(inputs, false);
         case "init" -> parseInitCommand(inputs);
-        case "find" -> parseFindNoteCommand(inputs);
+        case "find-note-by-body" -> parseFindNoteByBodyCommand(inputs);
+        case "find-note-by-title" -> parseFindNoteByTitleCommand(inputs);
         case "new-tag" -> parseNewTagCommand(inputs);
         case "add-tag" -> parseAddTagCommand(inputs);
         case "link" -> parseLinkNotesCommand(inputs);
@@ -133,6 +131,7 @@ public class Parser {
         case "list-outgoing-links" -> parseListOutgoingLinksCommand(inputs);
         case "list-tags-all" -> parseListTagsGlobalCommand(inputs);
         case "list-tags" -> parseListTagsSingleNoteCommand(inputs);
+        case "list-repos", "list-repositories" -> parseListRepoCommand(inputs);
         case "delete-tag" -> parseDeleteTagFromNoteCommand(inputs);
         case "delete-tag-globally" -> parseDeleteTagGloballyCommand(inputs);
         case "rename-tag" -> parseRenameTagCommand(inputs);
@@ -143,35 +142,6 @@ public class Parser {
         default -> throw new InvalidInputException(command);
         };
     }
-
-    /**
-     * Extracts and validates a note ID from the input array.
-     * The note ID must be exactly 8 alphanumeric characters.
-     * Helper function used to validate NoteId during parsing
-     *
-     * @param noteId ID of note
-     * @param actionName The name of the action requesting the ID (for error messages).
-     * @return The validated note ID string.
-     * @throws ZettelException If the ID is missing, has incorrect length, or contains invalid characters.
-     */
-    private static String parseNoteId(String noteId, String actionName) throws ZettelException {
-        if (noteId == null || noteId.trim().isEmpty()) {
-            throw new EmptyDescriptionException(ID_EMPTY + actionName + "!");
-        }
-        String idString = noteId.trim();
-        assert !idString.isEmpty() : "ID string should not be empty after trim";
-
-        // Validate noteId format - must be exactly 8 lowercase hex characters
-        if (!idString.matches(VALID_NOTE_ID_REGEX)) {
-            throw new InvalidFormatException(ID_INVALID);
-        }
-        if (idString.length() != VALID_NOTE_ID_LENGTH) {
-            throw new InvalidFormatException(INVALID_ID_LENGTH_FORMAT);
-        }
-
-        return idString;
-    }
-
 
     /**
      * Parses a list command to display notes.
@@ -242,10 +212,7 @@ public class Parser {
             throw new EmptyDescriptionException(INIT_EMPTY);
         }
 
-        // Validate input - only alphanumeric, hyphens, and underscores
-        if (!content.matches("[a-zA-Z0-9_-]+")) {
-            throw new InvalidFormatException(INIT_INVALID);
-        }
+        Validator.validateRepoTitleTag(content,"Repo name");
         return new InitCommand(content);
     }
 
@@ -277,9 +244,12 @@ public class Parser {
                 title = content.substring(titleIndex + 2).trim();
             }
 
+
             if (title.isEmpty()) {
                 throw new EmptyDescriptionException(NOTE_EMPTY);
             }
+
+            Validator.validateRepoTitleTag(title,"Title");
 
             return new NewNoteCommand(title, body);
 
@@ -300,28 +270,50 @@ public class Parser {
         if (inputs.length != 2) {
             throw new InvalidFormatException("Invalid format. Usage: edit <NOTE_ID>");
         }
-        String noteId = parseNoteId(inputs[1], "edit");
+        String noteId = Validator.validateNoteId(inputs[1], "edit");
         return new EditNoteCommand(noteId);
     }
 
     /**
-     * Parses a find command to search for notes.
-     * Expected format: find SEARCH_TERM
+     * Parses a find-note-by-body command to search for notes by body content.
+     * Expected format: find-note-by-body SEARCH_TERMS
      *
      * @param inputs The tokenized user input split by spaces
-     * @return A FindNoteCommand object with the search query.
+     * @return A FindNoteByBodyCommand object with the search query.
      * @throws ZettelException If the search query is empty.
      */
-    private static Command parseFindNoteCommand(String[] inputs) throws ZettelException {
+    private static Command parseFindNoteByBodyCommand(String[] inputs) throws ZettelException {
         if (inputs.length < 2) {
             throw new EmptyDescriptionException(FIND_FORMAT);
         }
 
-        String content = inputs[1].trim();
-        if (content.isEmpty()) {
+        // Combine all search terms from index 1 onwards
+        String searchTerms = String.join(" ", Arrays.copyOfRange(inputs, 1, inputs.length)).trim();
+        if (searchTerms.isEmpty()) {
             throw new EmptyDescriptionException(FIND_FORMAT);
         }
-        return new FindNoteCommand(content);
+        return new FindNoteByBodyCommand(searchTerms);
+    }
+
+    /**
+     * Parses a find-note-by-title command to search for notes by title.
+     * Expected format: find-note-by-title SEARCH_TERMS
+     *
+     * @param inputs The tokenized user input split by spaces
+     * @return A FindNoteByTitleCommand object with the search query.
+     * @throws ZettelException If the search query is empty.
+     */
+    private static Command parseFindNoteByTitleCommand(String[] inputs) throws ZettelException {
+        if (inputs.length < 2) {
+            throw new EmptyDescriptionException(FIND_BY_TITLE_FORMAT);
+        }
+
+        // Combine all search terms from index 1 onwards
+        String searchTerms = String.join(" ", Arrays.copyOfRange(inputs, 1, inputs.length)).trim();
+        if (searchTerms.isEmpty()) {
+            throw new EmptyDescriptionException(FIND_BY_TITLE_FORMAT);
+        }
+        return new FindNoteByTitleCommand(searchTerms);
     }
 
     /**
@@ -340,7 +332,7 @@ public class Parser {
         if (inputs.length > 2) {
             throw new InvalidFormatException(PIN_FORMAT);
         }
-        String noteId = parseNoteId(inputs[1], isPin ? "pin" : "unpin");
+        String noteId = Validator.validateNoteId(inputs[1], isPin ? "pin" : "unpin");
         return new PinNoteCommand(noteId, isPin);
     }
 
@@ -364,14 +356,14 @@ public class Parser {
 
         switch (inputs.length) {
         case 2 -> {
-            String noteId = parseNoteId(inputs[1], "delete");
+            String noteId = Validator.validateNoteId(inputs[1], "delete");
             return new DeleteNoteCommand(noteId, false);
         }
         case 3 -> {
             if (!"-f".equals(inputs[1])) {
                 throw new InvalidFormatException(DELETE_FORMAT);
             }
-            String noteId = parseNoteId(inputs[2], "delete");
+            String noteId = Validator.validateNoteId(inputs[2], "delete");
             return new DeleteNoteCommand(noteId, true);
         }
         default -> throw new InvalidFormatException(DELETE_FORMAT);
@@ -391,7 +383,7 @@ public class Parser {
             throw new InvalidFormatException(ADD_TAG_FORMAT);
         }
 
-        String noteId = parseNoteId(inputs[1], "add-tag");
+        String noteId = Validator.validateNoteId(inputs[1], "add-tag");
         String tag = inputs[2].trim();
 
         if (tag.isEmpty()) {
@@ -410,15 +402,15 @@ public class Parser {
      * @throws ZettelException If the format is invalid or tag is missing.
      */
     private static Command parseNewTagCommand(String[] inputs) throws ZettelException {
-        if (inputs.length != 2) {
+        if (inputs.length > 2) {
             throw new InvalidFormatException(NEW_TAG_FORMAT);
         }
-
-        String tag = inputs[1];
-        if (tag.isEmpty()) {
+        if (inputs.length < 2) {
             throw new EmptyDescriptionException(TAG_EMPTY);
         }
 
+        String tag = inputs[1];
+        Validator.validateRepoTitleTag(tag,"Tag");
         return new NewTagCommand(tag);
     }
 
@@ -449,8 +441,8 @@ public class Parser {
             throw new InvalidFormatException(LINK_NOTES_FORMAT);
         }
 
-        String sourceNoteId = parseNoteId(inputs[1], "link");
-        String targetNoteId = parseNoteId(inputs[2], "link");
+        String sourceNoteId = Validator.validateNoteId(inputs[1], "link");
+        String targetNoteId = Validator.validateNoteId(inputs[2], "link");
 
         return new LinkNotesCommand(sourceNoteId, targetNoteId);
     }
@@ -467,7 +459,7 @@ public class Parser {
         if (inputs.length != 2) {
             throw new InvalidFormatException(LIST_INCOMING_LINKS_FORMAT);
         }
-        String noteId = parseNoteId(inputs[1], "list linked notes");
+        String noteId = Validator.validateNoteId(inputs[1], "list linked notes");
         return new ListLinkedNotesCommand("incoming", noteId);
     }
 
@@ -483,7 +475,7 @@ public class Parser {
         if (inputs.length != 2) {
             throw new InvalidFormatException(LIST_OUTGOING_LINKS_FORMAT);
         }
-        String noteId = parseNoteId(inputs[1], "list linked notes");
+        String noteId = Validator.validateNoteId(inputs[1], "list linked notes");
         return new ListLinkedNotesCommand("outgoing", noteId);
     }
 
@@ -501,8 +493,8 @@ public class Parser {
             throw new InvalidFormatException(UNLINK_NOTES_FORMAT);
         }
 
-        String sourceNoteId = parseNoteId(inputs[1], "unlink to");
-        String targetNoteId = parseNoteId(inputs[2], "unlink to");
+        String sourceNoteId = Validator.validateNoteId(inputs[1], "unlink to");
+        String targetNoteId = Validator.validateNoteId(inputs[2], "unlink to");
 
         return new UnlinkNotesCommand(sourceNoteId, targetNoteId);
     }
@@ -519,8 +511,8 @@ public class Parser {
             throw new InvalidFormatException(LINK_BOTH_NOTES_FORMAT);
         }
 
-        String sourceNoteId = parseNoteId(inputs[1], "link in both directions");
-        String targetNoteId = parseNoteId(inputs[2], "link in both directions");
+        String sourceNoteId = Validator.validateNoteId(inputs[1], "link in both directions");
+        String targetNoteId = Validator.validateNoteId(inputs[2], "link in both directions");
 
         return new LinkBothNotesCommand(sourceNoteId, targetNoteId);
     }
@@ -537,8 +529,8 @@ public class Parser {
             throw new InvalidFormatException(UNLINK_BOTH_NOTES_FORMAT);
         }
 
-        String noteId1 = parseNoteId(inputs[1], "unlink in both directions");
-        String noteId2 = parseNoteId(inputs[2], "unlink in both directions");
+        String noteId1 = Validator.validateNoteId(inputs[1], "unlink in both directions");
+        String noteId2 = Validator.validateNoteId(inputs[2], "unlink in both directions");
 
         return new UnlinkBothNotesCommand(noteId1, noteId2);
     }
@@ -558,7 +550,7 @@ public class Parser {
             throw (shouldArchive) ? new InvalidFormatException(ARCHIVE_NOTES_FORMAT)
                     : new InvalidFormatException(UNARCHIVE_NOTES_FORMAT);
         }
-        String noteId = parseNoteId(inputs[1], shouldArchive ? "archive" : "unarchive");
+        String noteId = Validator.validateNoteId(inputs[1], shouldArchive ? "archive" : "unarchive");
         return new ArchiveNoteCommand(noteId, shouldArchive);
     }
 
@@ -574,7 +566,7 @@ public class Parser {
             throw new InvalidFormatException(LIST_TAGS_SINGLE_NOTE_FORMAT);
         }
 
-        String noteId = parseNoteId(inputs[1], "list tags for");
+        String noteId = Validator.validateNoteId(inputs[1], "list tags for");
  
         return new ListTagsSingleNoteCommand(noteId);
     }
@@ -591,7 +583,7 @@ public class Parser {
         // 2) delete-tag -f NOTE_ID TAG_NAME
         switch (inputs.length) {
         case 3 -> {
-            String noteId = parseNoteId(inputs[1], "delete-tag");
+            String noteId = Validator.validateNoteId(inputs[1], "delete-tag");
             String tag = inputs[2].trim();
             if (tag.isEmpty()) {
                 throw new EmptyDescriptionException(TAG_EMPTY);
@@ -602,7 +594,7 @@ public class Parser {
             if (!"-f".equals(inputs[1])) {
                 throw new InvalidFormatException(DELETE_TAG_FORMAT);
             }
-            String noteId = parseNoteId(inputs[2], "delete-tag");
+            String noteId = Validator.validateNoteId(inputs[2], "delete-tag");
             String tag = inputs[3].trim();
             if (tag.isEmpty()) {
                 throw new EmptyDescriptionException(TAG_EMPTY);
@@ -738,7 +730,22 @@ public class Parser {
         if (inputs.length != 2) {
             throw new InvalidFormatException(PRINT_NOTE_BODY_FORMAT);
         }
-        String noteId = parseNoteId(inputs[1], "print-body");
+        String noteId = Validator.validateNoteId(inputs[1], "print-body");
         return new PrintNoteBodyCommand(noteId);
+    }
+
+    /**
+     * Parses a command to list all tags globally across all notes.
+     * Expected format: list-tags-all
+     *
+     * @param inputs The tokenized user input split by spaces.
+     * @return A ListTagsGlobalCommand object.
+     * @throws ZettelException If the format is invalid.
+     */
+    private static Command parseListRepoCommand(String[] inputs) throws ZettelException {
+        if (inputs.length != 1) {
+            throw new InvalidFormatException(LIST_REPO_FORMAT);
+        }
+        return new ListRepoCommand();
     }
 }
