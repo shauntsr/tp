@@ -1,10 +1,6 @@
 # Gordon - Project Portfolio Page
 
-## Overview
-
-Zettel is a lightweight, file-based note-taking system inspired by the Zettelkasten method. It allows users to quickly create, link, tag, and archive notes from the command line, with a focus on bidirectional linking and deterministic note IDs.
-
----
+## Project: ZettelCLI
 
 ### Summary of Contributions
 
@@ -20,7 +16,7 @@ Zettel is a lightweight, file-based note-taking system inspired by the Zettelkas
 - Implemented `Storage.java` refactor after `v1.0`
 - Developed note archival and editor integration features.
 - Refactored note persistence from in-memory to file-based structure.
-- Repository: [link to my RepoSense project dashboard]
+- [RepoSense link](https://nus-cs2113-ay2526s1.github.io/tp-dashboard/?search=&sort=groupTitle&sortWithin=title&timeframe=commit&mergegroup=&groupSelect=groupByRepos&breakdown=true&checkedFileTypes=docs~functional-code~test-code~other&since=2025-09-19T00%3A00%3A00&filteredFileName=&tabOpen=true&tabType=authorship&tabAuthor=gordonajajar&tabRepo=AY2526S1-CS2113-W13-1%2Ftp%5Bmaster%5D&authorshipIsMergeGroup=false&authorshipFileTypes=docs~functional-code~test-code~other&authorshipIsBinaryFileTypeChecked=false&authorshipIsIgnoredFilesChecked=false)
 
 #### Contributions to UG
 
