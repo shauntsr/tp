@@ -6,15 +6,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Represents a note in the Zettel system.
  * Each note has a unique 8-character hash-based ID, title, body, and metadata.
  */
 public class Note {
-    private static final Logger logger = Logger.getLogger(Note.class.getName());
-
     // Date formatter for toString method
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
@@ -65,7 +62,6 @@ public class Note {
         this.outgoingLinks = new HashSet<>();
         this.incomingLinks = new HashSet<>();
         numberOfNotes++;
-        logger.info("Sucessful note creation!");
     }
 
     /**

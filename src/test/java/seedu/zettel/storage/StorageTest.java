@@ -74,7 +74,7 @@ public class StorageTest {
     }
 
     @Test
-    void testCreateRepo() throws IOException {
+    void testCreateRepo() throws IOException, ZettelException {
         // should create new repo structure, and update config
         String repoName = "newRepo";
         Path repoNotes = tempDir.resolve(repoName).resolve("notes");
@@ -142,7 +142,7 @@ public class StorageTest {
     }
 
     @Test
-    void testChangeRepo() {
+    void testChangeRepo() throws ZettelException {
         // should switch repo and update config
         storage.init();
         storage.createRepo("testRepo");
