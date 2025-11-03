@@ -53,8 +53,9 @@ java -jar zettel.jar
 
 ### Starting a Zettelkasten Repository: `init`
 
-Initializes a new Zettelkasten repository. This does not change the current repository, only creates a new one. User will have to
-use change-repo to change repository (See: [Changing Repository](#changing-repository-change-repo))
+Initializes a new Zettelkasten repository. All repository names will be converted to lower
+case, thus duplicates are case-insensitive. This does not change the current repository, only creates a new one. User will have to
+use change-repo to change repository. (See: [Changing Repository](#changing-repository-change-repo))
 
 **Format:**
 ```

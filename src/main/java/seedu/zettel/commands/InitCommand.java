@@ -3,6 +3,7 @@ package seedu.zettel.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import seedu.zettel.exceptions.InvalidRepoException;
 import seedu.zettel.exceptions.ZettelException;
 import seedu.zettel.Note;
 import seedu.zettel.storage.Storage;
@@ -40,7 +41,13 @@ public class InitCommand extends Command {
      */
     @Override
     public void execute(ArrayList<Note> notes, List<String> tags, UI ui, Storage storage) throws ZettelException {
-        storage.createRepo(repoName);
+        ArrayList<String> repoList = storage.getRepoList();
+        boolean duplicateExists = repoList.stream()
+                        .anyMatch(n -> n.equalsIgnoreCase(repoName));
+        if (duplicateExists) {
+            throw new InvalidRepoException("This repo already exists.");
+        }
+        storage.createRepo(repoName.toLowerCase());
         ui.showRepoInit(repoName);
     }
 }
