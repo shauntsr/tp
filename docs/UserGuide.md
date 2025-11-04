@@ -53,9 +53,8 @@ java -jar zettel.jar
 
 ### Starting a Zettelkasten Repository: `init`
 
-Initializes a new Zettelkasten repository. All repository names will be converted to lower
-case, thus duplicates are case-insensitive. This does not change the current repository, only creates a new one. User will have to
-use change-repo to change repository. (See: [Changing Repository](#changing-repository-change-repo))
+Initializes a new Zettelkasten repository. All repository names will be converted to lower case, thus duplicates are case-insensitive. This does not change the current repository, only creates a new one. User will have to use change-repo to change repository. (See: [Changing Repository](#changing-repository-change-repo))
+ - Note: repository names only allow 2 special characters, dash (e.g. `-`) and underscore (e.g. `_`). All other speical characters are banned.
 
 **Format:**
 ```
@@ -69,7 +68,7 @@ init My_New_Repo
 
 **Expected Output:**
 ```
- Repository /My_New_Repo has been created.
+ Repository /my_new_repo has been created.
 ```
 
 ---
@@ -77,7 +76,8 @@ init My_New_Repo
 ### Changing Repository: `change-repo`
 
 Switches to another existing repository. The repository must have been previously created using the `init` command.
-If already in the existing repository, no switching occurs.
+If already in the existing repository, no switching occurs. Repo names are case insensitive.
+
 
 **Format:**
 ```
@@ -95,7 +95,7 @@ change-repo My_New_Repo
 
 **Expected Output:**
 ```
- Successfully changed to repository: /My_New_Repo
+ Successfully changed to repository: /my_new_repo
 ```
 
 **Example (Already in Repository):**
@@ -112,7 +112,7 @@ change-repo main
 
 ### Viewing Current Repository: `current-repo`
 
-Displays the name of the currently active repository.
+Displays the name of the currently active repository. As per commands above, all repository names will be transformed to lower case.
 
 **Format:**
 ```
@@ -125,7 +125,7 @@ current-repository
 
 **Expected Output:**
 ```
- Current repository: /My_New_Repo
+ Current repository: /my_new_repo
 ```
 
 ---
@@ -147,7 +147,7 @@ list-repositories
 ```
  You have 2 repositories:
     1. /main
-    2. /My_New_Repo
+    2. /my_new_repo
 ```
 
 ---
@@ -477,6 +477,7 @@ print-body abcd1234
 ### Finding Notes by Body: `find-note-by-body`
 
 Searches for notes that contain the specified search terms in their body. You can provide multiple space-separated search terms, and the command will find notes whose body contains all of the specified terms.
+ - Note: search is case insensitive.
 
 **Format:**
 ```
@@ -500,6 +501,7 @@ find-note-by-body Zettelkasten system
 ### Finding Notes by Title: `find-note-by-title`
 
 Searches for notes that contain the specified search terms in their title. You can provide multiple space-separated search terms, and the command will find notes whose title contains all of the specified terms.
+ - Note: search is case insensitive.
 
 **Format:**
 ```
