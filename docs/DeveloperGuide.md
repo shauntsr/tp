@@ -291,11 +291,11 @@ Handles serialization/deserialization of Note objects:
 * Saves note metadata to index.txt
 
 **Index File Format:**
-```
-ID | Title | Filename | CreatedAt | ModifiedAt | isPinned | isArchived | ArchiveName | Tags | OutgoingLinks | 
-IncomingLinks
-```
-* Note: IncomingLinks is on the same line as the others in the index file, line break shown due to 
+`
+ID | Title | Filename | CreatedAt | ModifiedAt | isPinned | isArchived 
+| ArchiveName | Tags | OutgoingLinks | IncomingLinks
+`
+* Note: all metadata is on the same line in the index file, line break shown due to 
 space constraints within this PDF.
 
 Where:
