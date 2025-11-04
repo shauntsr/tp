@@ -29,8 +29,8 @@ public class Note {
     private String body; // Body content of the note
     private Instant createdAt; // Timestamp when the note was created
     private Instant modifiedAt; // Timestamp when the note was last modified
-    private boolean pinned; // Whether the note is pinned
-    private boolean archived; // Whether the note has been archived
+    private boolean isPinned; // Whether the note is pinned
+    private boolean isArchived; // Whether the note has been archived
     private String archiveName; // Name of the archive the note belongs to
     private List<String> tags; // Tags for the note
     private HashSet<String> outgoingLinks; // note IDs that this note links to
@@ -55,8 +55,8 @@ public class Note {
         this.body = body;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
-        this.pinned = false;
-        this.archived = false;
+        this.isPinned = false;
+        this.isArchived = false;
         this.archiveName = null;
         this.tags = new ArrayList<>();
         this.outgoingLinks = new HashSet<>();
@@ -75,12 +75,12 @@ public class Note {
      * @param createdAt The timestamp when the note was created
      * @param modifiedAt The timestamp when the note was last modified
      * @param pinned Whether the note is pinned
-     * @param archived Whether the note is archived
+     * @param isArchived Whether the note is archived
      * @param archiveName The archive name if archived, null otherwise
      */
     public Note(String id, String title, String filename, String body,
                 Instant createdAt, Instant modifiedAt, boolean pinned,
-                boolean archived, String archiveName, List<String> tags) {
+                boolean isArchived, String archiveName, List<String> tags) {
         assert id.length() == ID_LENGTH : "Note ID must be " + ID_LENGTH + " characters long";
         this.id = id;
         this.title = title;
@@ -88,8 +88,8 @@ public class Note {
         this.body = body;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
-        this.pinned = pinned;
-        this.archived = archived;
+        this.isPinned = pinned;
+        this.isArchived = isArchived;
         this.archiveName = archiveName;
         this.tags = tags != null ? new ArrayList<>(tags) : new ArrayList<>();
         this.outgoingLinks = new HashSet<>();
@@ -159,7 +159,7 @@ public class Note {
      * @return true if pinned, false otherwise
      */
     public boolean isPinned() {
-        return pinned;
+        return isPinned;
     }
 
     /**
@@ -168,7 +168,7 @@ public class Note {
      * @return true if archived, false otherwise
      */
     public boolean isArchived() {
-        return archived;
+        return isArchived;
     }
 
     /** 
@@ -276,7 +276,7 @@ public class Note {
      * @param pinned true to pin the note, false to unpin
      */
     public void setPinned(boolean pinned) {
-        this.pinned = pinned;
+        this.isPinned = pinned;
         updateModifiedAt();
     }
 
@@ -286,7 +286,7 @@ public class Note {
      * @param archived true to archive the note, false to unarchive
      */
     public void setArchived(boolean archived) {
-        this.archived = archived;
+        this.isArchived = archived;
         updateModifiedAt();
     }
 

@@ -10,9 +10,7 @@ title: Setting up and getting started
 
 ## Setting up the project in your computer
 
-<div markdown="span" class="alert alert-warning">:exclamation: **Caution:**  
 Follow the steps in this guide precisely. Deviating from them may cause build or runtime issues.
-</div>
 
 ### 1. Fork and clone the repository
 

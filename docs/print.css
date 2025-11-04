@@ -1,0 +1,35 @@
+/* Center all diagrams/images and scale to fit page or screen width */
+img, figure, .diagram, .plantuml {
+  display: block;               /* puts each image on its own line */
+  margin: 1.2em auto;           /* centers horizontally */
+  max-width: 100%;              /* prevents overflowing */
+}
+
+/* Make tables wrap naturally instead of forcing a horizontal scrollbar */
+.table-wrapper { overflow: visible !important; }
+
+table {
+  width: 100%;
+  table-layout: auto;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+th, td {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  vertical-align: top;
+  padding: .18rem .4rem;
+}
+
+/* Keep headings with the figure that follows */
+h1, h2, h3, h4, h5, h6 {
+  page-break-after: avoid;
+}
+
+/* Keep diagrams/images from splitting across pages when printing to PDF */
+figure, .diagram, img {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
