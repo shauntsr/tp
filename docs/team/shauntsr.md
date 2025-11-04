@@ -42,6 +42,7 @@ PRs include
 ### Helping in Team Tasks
 - Maintaining level of code coverage by adding test cases
 - Participated in group discussions to decide features and their high level implementations.
+
 ### Developer Guide Contributions
 I contributed to the DG in the form of the UML Diagrams. These includes class diagrams, and sequence diagrams. 
 Attached below are some of the diagrams I added.
