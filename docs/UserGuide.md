@@ -221,6 +221,7 @@ new -t New_Note -b "This is a new note"
 
 Opens an editor to modify the body of an existing note. Editor is based on the default editor of your system, can be notepad, vim etc.
 The application is blocked in the background until the user closes the editor (be it after saving changes or not)
+  - Note: archived notes are unable to be edited. One would have to bring it out of archive via `unarchive` command before attempt to edit (see `unarchive` command below).
 
 **Format:**
 ```
@@ -410,6 +411,7 @@ unpin ccfd2e51
 
 Moves a note to the archive folder. There will be an archive folder for each of the repositories.
 Archived notes can still be viewed using `list -a`.
+  - Note: once a note is archived, it cannot be edited in the archived state. User would have to unarchive the note before it can be edited again, via `unarchive` command below.
 
 **Format:**
 ```
@@ -431,6 +433,7 @@ archive e0e7b989
 ### Unarchiving a Note: `unarchive`
 
 Moves a note out of the archive folder back to the main notes directory.
+Can also be used to temporarily bring a note out of archive, with the purpose of editing the note (and possibly rearchiving it later again).
 
 **Format:**
 ```
