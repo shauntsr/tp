@@ -1,8 +1,7 @@
 <link rel="stylesheet" href="/tp/print.css">
----
-layout: page
-title: Developer Guide
----
+
+# **ZettelCLI Developer Guide**
+
 * Table of Contents
 {:toc}
 
@@ -293,8 +292,11 @@ Handles serialization/deserialization of Note objects:
 
 **Index File Format:**
 ```
-ID | Title | Filename | CreatedAt | ModifiedAt | isPinned | isArchived | ArchiveName | Tags | OutgoingLinks | IncomingLinks
+ID | Title | Filename | CreatedAt | ModifiedAt | isPinned | isArchived | ArchiveName | Tags | OutgoingLinks | 
+IncomingLinks
 ```
+* Note: IncomingLinks is on the same line as the others in the index file, line break shown due to 
+space constraints within this PDF.
 
 Where:
 * isPinned/isArchived are `1` or `0`
@@ -790,7 +792,7 @@ Priorities: High (must have) - `***`, Medium (nice to have) - `**`, Low (unlikel
 ### Creating and editing notes
 
 1. **Create note with title and body**
-   - Command: `new -t "Test Note" -b "This is test content"`
+   - Command: `new -t Test-Note -b This is test content`
    - Expected: Note created with 8-char ID, confirmation message displayed
 
 2. **Create note with title only** (requires interactive editor)
@@ -798,8 +800,8 @@ Priorities: High (must have) - `***`, Medium (nice to have) - `**`, Low (unlikel
    - Expected: External editor opens, saving and closing editor saves note
 
 3. **Create duplicate filename**
-   - Create: `new -t "Same Title" -b "First"`
-   - Try: `new -t "Same Title" -b "Second"`
+   - Create: `new -t Same Title -b First`
+   - Try: `new -t Same Title -b Second`
    - Expected: Error message about existing note
 
 4. **Edit existing note**
@@ -808,25 +810,29 @@ Priorities: High (must have) - `***`, Medium (nice to have) - `**`, Low (unlikel
 
 ### Listing and Searching
 
-1. **List all notes**
+1. **List all unarchived notes**
    - Command: `list`
-   - Expected: All notes displayed with filename, date, and ID
+   - Expected: All unarchived notes displayed with filename, date, and ID, regardless of its pinned state.
 
-2. **List pinned only**
+2. **List all unarchived notes that are pinned only**
    - Pin a note: `pin <note-id>`
    - Command: `list -p`
-   - Expected: Only pinned notes shown
+   - Expected: Only unarchived notes that are pinned shown.
 
 3. **List archived only**
    - Archive a note: `archive <note-id>`
    - Command: `list -a`
-   - Expected: Only archived notes shown
+   - Expected: Only archived notes shown, regardless of its pinned state.
 
-4. **Search note bodies**
+4. **List all archived that are pinned only**
+    - Command: `list -a -p` or `list -p -a`
+    - Expected: Only archived notes that are pinned shown.
+
+5. **Search note bodies**
    - Command: `find-note-by-body test`
    - Expected: All notes with body containing "test" (case-insensitive) displayed
  
-5. **Search note titles**
+6. **Search note titles**
    - Command: `find-note-by-title test`
    - Expected: All notes with title containing "test" (case-insensitive) displayed
 
@@ -852,6 +858,10 @@ Priorities: High (must have) - `***`, Medium (nice to have) - `**`, Low (unlikel
 5. **Unlink a note with links**
    - Command: `unlink <source-id> <target-id>`
    - Expected: One-way link from source note to target note removed with message
+
+6. **Unlink 2 notes in both directions**
+   - Command: `unlink-both <source-id> <target-id>`
+   - Expected: All existing links between 2 notes are broken. 
 
 6. **Delete note with links**
    - Delete a linked note
@@ -881,7 +891,7 @@ Priorities: High (must have) - `***`, Medium (nice to have) - `**`, Low (unlikel
 
 2. **Add tag to note**
    - Command: `add-tag <note-id> project`
-   - Expected: Tag added to note
+   - Expected: Tag added to note. If the tag did not originally exist globally, a new tag will be created.
 
 3. **List all tags**
    - Command: `list-tags-all`

@@ -79,7 +79,7 @@ public class Note {
      * @param archiveName The archive name if archived, null otherwise
      */
     public Note(String id, String title, String filename, String body,
-                Instant createdAt, Instant modifiedAt, boolean pinned,
+                Instant createdAt, Instant modifiedAt, boolean isPinned,
                 boolean isArchived, String archiveName, List<String> tags) {
         assert id.length() == ID_LENGTH : "Note ID must be " + ID_LENGTH + " characters long";
         this.id = id;
@@ -88,7 +88,7 @@ public class Note {
         this.body = body;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
-        this.isPinned = pinned;
+        this.isPinned = isPinned;
         this.isArchived = isArchived;
         this.archiveName = archiveName;
         this.tags = tags != null ? new ArrayList<>(tags) : new ArrayList<>();

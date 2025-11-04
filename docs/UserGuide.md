@@ -53,9 +53,8 @@ java -jar zettel.jar
 
 ### Starting a Zettelkasten Repository: `init`
 
-Initializes a new Zettelkasten repository. All repository names will be converted to lower
-case, thus duplicates are case-insensitive. This does not change the current repository, only creates a new one. User will have to
-use change-repo to change repository. (See: [Changing Repository](#changing-repository-change-repo))
+Initializes a new Zettelkasten repository. All repository names will be converted to lower case, thus duplicates are case-insensitive. This does not change the current repository, only creates a new one. User will have to use change-repo to change repository. (See: [Changing Repository](#changing-repository-change-repo))
+ - Note: repository names only allow 2 special characters, dash (e.g. `-`) and underscore (e.g. `_`). All other speical characters are banned.
 
 **Format:**
 ```
@@ -69,7 +68,7 @@ init My_New_Repo
 
 **Expected Output:**
 ```
- Repository /My_New_Repo has been created.
+ Repository /my_new_repo has been created.
 ```
 
 ---
@@ -77,7 +76,8 @@ init My_New_Repo
 ### Changing Repository: `change-repo`
 
 Switches to another existing repository. The repository must have been previously created using the `init` command.
-If already in the existing repository, no switching occurs.
+If already in the existing repository, no switching occurs. Repo names are case insensitive.
+
 
 **Format:**
 ```
@@ -95,7 +95,7 @@ change-repo My_New_Repo
 
 **Expected Output:**
 ```
- Successfully changed to repository: /My_New_Repo
+ Successfully changed to repository: /my_new_repo
 ```
 
 **Example (Already in Repository):**
@@ -112,7 +112,7 @@ change-repo main
 
 ### Viewing Current Repository: `current-repo`
 
-Displays the name of the currently active repository.
+Displays the name of the currently active repository. As per commands above, all repository names will be transformed to lower case.
 
 **Format:**
 ```
@@ -125,7 +125,7 @@ current-repository
 
 **Expected Output:**
 ```
- Current repository: /My_New_Repo
+ Current repository: /my_new_repo
 ```
 
 ---
@@ -147,7 +147,7 @@ list-repositories
 ```
  You have 2 repositories:
     1. /main
-    2. /My_New_Repo
+    2. /my_new_repo
 ```
 
 ---
@@ -221,6 +221,7 @@ new -t New_Note -b "This is a new note"
 
 Opens an editor to modify the body of an existing note. Editor is based on the default editor of your system, can be notepad, vim etc.
 The application is blocked in the background until the user closes the editor (be it after saving changes or not)
+  - Note: archived notes are unable to be edited. One would have to bring it out of archive via `unarchive` command before attempt to edit (see `unarchive` command below).
 
 **Format:**
 ```
@@ -410,6 +411,7 @@ unpin ccfd2e51
 
 Moves a note to the archive folder. There will be an archive folder for each of the repositories.
 Archived notes can still be viewed using `list -a`.
+  - Note: once a note is archived, it cannot be edited in the archived state. User would have to unarchive the note before it can be edited again, via `unarchive` command below.
 
 **Format:**
 ```
@@ -431,6 +433,7 @@ archive e0e7b989
 ### Unarchiving a Note: `unarchive`
 
 Moves a note out of the archive folder back to the main notes directory.
+Can also be used to temporarily bring a note out of archive, with the purpose of editing the note (and possibly rearchiving it later again).
 
 **Format:**
 ```
@@ -474,6 +477,7 @@ print-body abcd1234
 ### Finding Notes by Body: `find-note-by-body`
 
 Searches for notes that contain the specified search terms in their body. You can provide multiple space-separated search terms, and the command will find notes whose body contains all of the specified terms.
+ - Note: search is case insensitive.
 
 **Format:**
 ```
@@ -497,6 +501,7 @@ find-note-by-body Zettelkasten system
 ### Finding Notes by Title: `find-note-by-title`
 
 Searches for notes that contain the specified search terms in their title. You can provide multiple space-separated search terms, and the command will find notes whose title contains all of the specified terms.
+ - Note: search is case insensitive.
 
 **Format:**
 ```
@@ -523,12 +528,11 @@ ZettelCLI uses a global tagging system that allows you to organize notes across 
 
 **Tag Naming Requirements:**
 - Can only contain **alphanumeric characters** (letters and numbers)
-- Can include **dashes** (`-`) to separate words
 - **No spaces allowed**
-- **No special characters** other than dashes (e.g., `?`, `%`, `!`, `_` are not allowed)
+- **No special characters** (e.g., `?`, `%`, `!`, `_`, `-` are not allowed)
 - Examples:
-  - Allowed: `important`, `work-notes`, `123-456-abc`, `project2024`
-  - Not allowed: `my tag` (contains space), `urgent!!` (contains `!`), `test_tag` (contains `_`)
+  - Allowed: `important`, `toDoLater`
+  - Not allowed: `my tag` (contains space), `urgent!!` (contains `!`), `test_tag` (contains `_`), `my-tag` (contains `-`)
 
 #### Creating a Tag: `new-tag`
 
@@ -650,6 +654,7 @@ delete-tag -f e0e7b989 important
 #### Deleting a Tag Globally: `delete-tag-globally`
 
 Deletes a tag from all notes across all repositories and removes it from the global tag list.
+ - Note: deletion is case sensitive.
 
 **Format:**
 ```
