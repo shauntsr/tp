@@ -526,12 +526,11 @@ ZettelCLI uses a global tagging system that allows you to organize notes across 
 
 **Tag Naming Requirements:**
 - Can only contain **alphanumeric characters** (letters and numbers)
-- Can include **dashes** (`-`) to separate words
 - **No spaces allowed**
-- **No special characters** other than dashes (e.g., `?`, `%`, `!`, `_` are not allowed)
+- **No special characters** (e.g., `?`, `%`, `!`, `_`, `-` are not allowed)
 - Examples:
-  - Allowed: `important`, `work-notes`, `123-456-abc`, `project2024`
-  - Not allowed: `my tag` (contains space), `urgent!!` (contains `!`), `test_tag` (contains `_`)
+  - Allowed: `important`, `toDoLater`
+  - Not allowed: `my tag` (contains space), `urgent!!` (contains `!`), `test_tag` (contains `_`), `my-tag` (contains `-`)
 
 #### Creating a Tag: `new-tag`
 
