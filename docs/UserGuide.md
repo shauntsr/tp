@@ -654,6 +654,7 @@ delete-tag -f e0e7b989 important
 #### Deleting a Tag Globally: `delete-tag-globally`
 
 Deletes a tag from all notes across all repositories and removes it from the global tag list.
+ - Note: deletion is case sensitive.
 
 **Format:**
 ```
