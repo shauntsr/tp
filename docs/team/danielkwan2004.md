@@ -9,7 +9,7 @@ My primary contributions centered on user-facing features for linking, pinning, 
 ## Summary of Contributions
 
 ### Code Contributed
-- Dashboard (authorship) link: https://nus-cs2113-ay2526s1.github.io/tp-dashboard/?search=&sort=groupTitle&sortWithin=title&timeframe=commit&mergegroup=&groupSelect=groupByRepos&breakdown=true&checkedFileTypes=docs~functional-code~test-code~other&since=2025-09-19T00%3A00%3A00&filteredFileName=&tabOpen=true&tabType=authorship&tabAuthor=danielkwan2004&tabRepo=AY2526S1-CS2113-W13-1%2Ftp%5Bmaster%5D&authorshipIsMergeGroup=false&authorshipFileTypes=docs~functional-code~test-code~other&authorshipIsBinaryFileTypeChecked=false&authorshipIsIgnoredFilesChecked=false&until=2025-10-29T23%3A59%3A59
+- Dashboard (authorship) link: https://tinyurl.com/danielkwancs2113contributions
 
 ### Enhancements Implemented
 - Tagging features
@@ -30,14 +30,7 @@ My primary contributions centered on user-facing features for linking, pinning, 
 ### Testing
 - Added comprehensive JUnit tests for parser and commands, including:
 	- Parser: direct commands for `list-incoming-links` and `list-outgoing-links`, list flags, tag operations, and `print-body`.
-	- Command tests: delete tag (single note and globally) with confirmation/force flows, rename tag globally, unlink/link-both variants, and print note body edge cases (empty notes, missing ID, empty body).
-
-### Documentation
-- User Guide (UG)
-	- Authored end-user sections and examples for: tagging (`new-tag`, `add-tag`, `list-tags`, `list-tags-all`, `delete-tag`, `delete-tag-globally`, `rename-tag`), linking (`link`, `unlink`, `link-both`, `unlink-both`, `list-incoming-links`, `list-outgoing-links`), searching (`find`), and printing note bodies (`print-body`).
-	- Wrote the `list` command filters section with the pinned/archived matrix and updated examples; ensured help text matches runtime output.
-- Developer Guide (DG)
-	- Created UML diagrams for linking system architecture, including the Link Commands class diagram and Link Creation Sequence diagram, illustrating the bidirectional link tracking mechanism and command execution flow.
+	- Command tests: delete tag (single note and globally) with confirmation/force flows, rename tag globally, unlink/link-both variants.
 
 ### Team-Based Contributions
 - **Project Management**
@@ -47,6 +40,7 @@ My primary contributions centered on user-facing features for linking, pinning, 
 - **Code Review and Quality Assurance**
 	- Reviewed the majority of pull requests throughout v2.0 and v2.1, providing detailed feedback on code quality, design consistency, and potential bugs.
 	- Caught and resolved numerous critical issues in PRs before merging, including incorrect error handling, inconsistent command formats, and storage serialization bugs.
+    - Notable team PR reviews: https://github.com/AY2526S1-CS2113-W13-1/tp/pull/109 and https://github.com/AY2526S1-CS2113-W13-1/tp/pull/216
 - **Code Contributions**
 	- Implemented the largest number of features among team members, covering tagging, linking, searching, and deletion workflows.
 	- Wrote the most lines of functional code due to the breadth and depth of implemented features, including complex bidirectional linking logic and global tag management.
@@ -66,4 +60,15 @@ My primary contributions centered on user-facing features for linking, pinning, 
 	- Reported a total of 16 unique bugs during the Practical Exam Dry Run (PE-D), helping other teams identify and fix critical issues in their applications. https://github.com/nus-cs2113-AY2526S1/ped-danielkwan2004
 	- Provided detailed reproduction steps and suggestions for fixes, contributing to the overall quality of peer projects.
 
+
+### Documentation
+- User Guide (UG)
+	- Authored end-user sections and examples for: tagging (`new-tag`, `add-tag`, `list-tags`, `list-tags-all`, `delete-tag`, `delete-tag-globally`, `rename-tag`), linking (`link`, `unlink`, `link-both`, `unlink-both`, `list-incoming-links`, `list-outgoing-links`), searching (`find`), and printing note bodies (`print-body`).
+	- Wrote the `list` command filters section with the pinned/archived matrix and updated examples; ensured help text matches runtime output.
+- Developer Guide (DG)
+	- Created UML diagrams for linking system architecture, including the Link Commands class diagram and Link Creation Sequence diagram, illustrating the bidirectional link tracking mechanism and command execution flow. Attached below are some of the diagrams I added.
+
+![](../images/LinkCommands.svg)
+![](../images/LinkCreationSequence.svg)
+![](../images/RenameTagSequence.svg)
 
